@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "--- 📝 RUNNING COMMIT LINT ---"
+echo "following: conventional commits"
+echo "https://www.conventionalcommits.org/en/v1.0.0/#summary"
+echo ""
+pnpm run commitlint --edit $1
