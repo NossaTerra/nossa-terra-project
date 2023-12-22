@@ -1,3 +1,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+ 
+@layer base {
+
+  .font-inter-400 {
+    font-family: var(--font-inter);
+    font-weight: 400;
+  }
+
+  .font-inter-500 {
+    font-family: var(--font-inter);
+    font-weight: 500;
+  }
+
+  .font-inter-600 {
+    font-family: var(--font-inter);
+    font-weight: 600;
+  }
+
+  .font-inter-700 {
+    font-family: var(--font-inter);
+    font-weight: 700;
+  }
+
+  .font-inter-800 {
+    font-family: var(--font-inter);
+    font-weight: 800;
+  }
+
+  .font-inter-900 {
+    font-family: var(--font-inter);
+    font-weight: 900;
+  }
+
+  .font-poppins-400 {
+    font-family: var(--font-poppins);
+    font-weight: 400;
+  }
+
+  .font-poppins-500 {
+    font-family: var(--font-poppins);
+    font-weight: 500;
+  }
+
+  .font-poppins-600 {
+    font-family: var(--font-poppins);
+    font-weight: 600;
+  }
+
+  .font-poppins-700 {
+    font-family: var(--font-poppins);
+    font-weight: 700;
+  }
+
+  .font-poppins-800 {
+    font-family: var(--font-poppins);
+    font-weight: 800;
+  }
+
+  .font-poppins-900 {
+    font-family: var(--font-poppins);
+    font-weight: 900;
+  }
+
+}

@@ -1,13 +1,21 @@
 import "~/styles/globals.css";
 
-import { Inter } from "next/font/google";
+import { Inter as Inter, Poppins } from "next/font/google";
+
 import { cookies } from "next/headers";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
-const inter = Inter({
+export const fontInter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+export const fontPoppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
 });
 
 export const metadata = {
@@ -22,8 +30,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>
+    <html>
+      <body
+        className={`${fontInter.variable} ${fontPoppins.variable} bg-backgroundPrimary`}
+      >
         <TRPCReactProvider cookies={cookies().toString()}>
           {children}
         </TRPCReactProvider>

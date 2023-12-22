@@ -1,65 +1,101 @@
-import Link from "next/link";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import ImageCarousel from "./_components/ImageCarrousel";
+import { type ClassNameProps, cn } from "~/lib/utils";
+import { NossaTerraLogo } from "./_components/NossaTerraLogo";
 
-import { CreatePost } from "~/app/_components/create-post";
-import { api } from "~/trpc/server";
-
-export default async function Home() {
-  const hello = await api.post.hello.query({ text: "from tRPC" });
-
+function MainContent({ className }: ClassNameProps) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#025d6d] to-[#2c2815] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          Create T3 App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
-            </div>
-          </Link>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-2xl text-white">
-            {hello ? hello.greeting : "Loading tRPC query..."}
-          </p>
-        </div>
+    <main
+      className={cn(
+        "flex items-center justify-center md:justify-start",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "w-full max-w-[28rem] md:max-w-none",
+          "flex flex-col md:flex-row",
 
-        <CrudShowcase />
+          // Align
+          "items-center md:items-start",
+          "justify-center",
+
+          // Spacing
+          "px-8 py-10",
+          "gap-10 md:gap-16 lg:gap-28",
+        )}
+      >
+        <h1
+          className={cn(
+            "font-poppins-700 text-headingPrimary",
+            "text-left md:text-right",
+            "text-2xl md:text-3xl lg:text-4xl",
+          )}
+        >
+          Seja bem vindo(a) à{" "}
+          <span
+            className={cn(
+              "font-poppins-800 text-headingSecondary",
+              "text-3xl md:text-4xl lg:text-5xl",
+              "inline-block md:block",
+            )}
+          >
+            Nossa Terra
+          </span>
+        </h1>
+
+        <form className="w-full md:max-w-xs lg:max-w-sm">
+          <div className="mb-4 w-full">
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="email"
+            >
+              Email
+            </label>
+            <Input
+              className="mt-3x w-full md:mt-0"
+              id="email"
+              placeholder="Email"
+            />
+          </div>
+          <Button className="w-full bg-backgroundTertiary text-basedDark hover:bg-green-400">
+            Continuar
+          </Button>
+        </form>
       </div>
     </main>
   );
 }
 
-async function CrudShowcase() {
-  const latestPost = await api.post.getLatest.query();
-
+export default function RootScreen() {
   return (
-    <div className="w-full max-w-xs">
-      {latestPost ? (
-        <p className="truncate">Your most recent post: {latestPost.name}</p>
-      ) : (
-        <p>You have no posts yet.</p>
-      )}
+    <div className="flex min-h-screen flex-grow flex-col">
+      <header className="flex items-start justify-center pt-12 md:justify-end">
+        <div className="hidden px-12 md:block">
+          <NossaTerraLogo />
+        </div>
+        <ImageCarousel
+          pathArray={["", "", "", "", "", "", ""]}
+          height={220}
+          width={220}
+          className="block md:hidden"
+        />
+      </header>
 
-      <CreatePost />
+      <MainContent className="flex grow" />
+
+      <footer className="flex flex-col justify-center">
+        <ImageCarousel
+          pathArray={["", "", "", "", "", "", ""]}
+          height={220}
+          width={220}
+          className="hidden md:block"
+        />
+        <div className="flex justify-center p-12 md:hidden">
+          <NossaTerraLogo />
+        </div>
+      </footer>
     </div>
   );
 }
