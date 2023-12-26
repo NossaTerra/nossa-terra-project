@@ -1,6 +1,6 @@
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { type ClassNameProps, cn } from "~/lib/utils";
+import { type ClassNameProps, cn } from "src/utils/ui";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import ImageCarousel from "~/components/common/ImageCarrousel";
 
