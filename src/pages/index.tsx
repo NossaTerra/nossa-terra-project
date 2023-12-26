@@ -1,8 +1,8 @@
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import ImageCarousel from "./_components/ImageCarrousel";
 import { type ClassNameProps, cn } from "~/lib/utils";
-import { NossaTerraLogo } from "./_components/NossaTerraLogo";
+import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
+import ImageCarousel from "~/components/common/ImageCarrousel";
 
 function MainContent({ className }: ClassNameProps) {
   return (
