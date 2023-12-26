@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { cn, type ClassNameProps } from "~/lib/utils";
+import { cn, type ClassNameProps } from "src/utils/ui";
 
 interface ImageCarouselProps extends ClassNameProps {
   width: number;
