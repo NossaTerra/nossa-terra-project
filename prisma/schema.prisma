@@ -10,11 +10,46 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+// -----------------------------------------
+// AUTH
+//
+// Lucia Auth Setup
+// @link https://lucia-auth.com/database-adapters/prisma/
+// -----------------------------------------
 
-    @@index([name])
+model User {
+    id           String    @id @unique
+    auth_session Session[]
+    key          Key[]
+
+    // UserAttributes
+    email    String  @unique
+    name     String
+    role     String
+    cpf      String
+    isActive Boolean
+
+    image String?
 }
+
+model Session {
+    id             String @id @unique
+    user_id        String
+    active_expires BigInt
+    idle_expires   BigInt
+    user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+    @@index([user_id])
+}
+
+model Key {
+    id              String  @id @unique
+    hashed_password String?
+    user_id         String
+    user            User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+    @@index([user_id])
+    @@map("Key")
+}
+
+// -----------------------------------------
