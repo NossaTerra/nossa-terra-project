@@ -21,6 +21,8 @@ import {
 import { useLoginRegisterFlow } from "../state/machine";
 import { ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "~/hooks/useAuth";
+import { TRPCClientError } from "@trpc/client";
+import { type AppRouter } from "~/server/api/routers/_root";
 
 function WelcomeBackContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -29,6 +31,7 @@ function WelcomeBackContent({ className }: ClassNameProps) {
   const form = useForm<WelcomeBackFields>({
     resolver: zodResolver(schema),
   });
+  const { setError } = form;
 
   const { login } = useAuth();
   const onSubmit: SubmitHandler<WelcomeBackFields> = useCallback(
@@ -37,13 +40,29 @@ function WelcomeBackContent({ className }: ClassNameProps) {
         return;
       }
       const { email } = state.accumulatedContext;
-      await login({
-        email,
-        password,
-      });
-      resetState();
+
+      try {
+        await login({
+          email,
+          password,
+        });
+        resetState();
+      } catch (e) {
+        if (e instanceof TRPCClientError) {
+          const code = (e as TRPCClientError<AppRouter>).data?.code;
+          const message =
+            code === "UNAUTHORIZED"
+              ? `Senha incorreta. Tente novamente ou clique em "Esqueci minha senha."`
+              : "Algo deu errado. Tente novamente mais tarde.";
+
+          setError("password", {
+            type: "manual",
+            message,
+          });
+        }
+      }
     },
-    [login, resetState, state.accumulatedContext, state.stepKey],
+    [login, resetState, setError, state.accumulatedContext, state.stepKey],
   );
 
   return (
