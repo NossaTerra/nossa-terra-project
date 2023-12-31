@@ -23,6 +23,12 @@ import { useAuth } from "~/hooks/useAuth";
 import { Checkbox } from "~/components/ui/checkbox";
 import { ClosableDialogButton } from "~/components/common/ClosableDialogButton";
 import termsAndConditions from "~/utils/termsAndConditions";
+import {
+  lengthFormattedCPF,
+  lengthFormattedCNPJ,
+  formatCPF,
+  formatCNPJ,
+} from "~/utils/formatters";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -139,7 +145,12 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                     className="mt-3x w-full md:mt-0"
                     placeholder="xxx.xxx.xxx-xx"
                     {...field}
-                    value={field.value ?? ""}
+                    value={
+                      field.value?.length <= lengthFormattedCPF
+                        ? formatCPF(field?.value ?? "")
+                        : formatCNPJ(field?.value ?? "")
+                    }
+                    maxLength={lengthFormattedCNPJ}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
