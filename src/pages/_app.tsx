@@ -23,7 +23,7 @@ const fontPoppins = Poppins({
 const AppWrapper: AppType = ({ Component, pageProps }) => {
   return (
     <div
-      className={`${fontInter.variable} ${fontPoppins.variable} bg-backgroundPrimary`}
+      className={`${fontInter.variable} ${fontPoppins.variable} bg-backgroundPrimary overflow-x-hidden`}
     >
       <Toaster />
       <Component {...pageProps} />
