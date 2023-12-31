@@ -109,7 +109,6 @@ function GreetingContent({ className }: ClassNameProps) {
                   <FormControl>
                     <Input
                       className="mt-3x w-full md:mt-0"
-                      id="email"
                       placeholder="Email"
                       {...field}
                       value={field.value ?? ""}
