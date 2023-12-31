@@ -8,6 +8,7 @@ import {
   MenuIcon,
   PhoneIcon,
   SearchIcon,
+  TagsIcon,
   UserIcon,
   UsersIcon,
 } from "lucide-react";
@@ -90,7 +91,7 @@ export function AppHeader({ user }: { user: User }) {
   );
 }
 
-export function BackofficeHeader() {
+export function BackofficeHeader({ user }: { user: User }) {
   return (
     <div className="flex w-full items-center justify-between p-10">
       <NavBar>
@@ -104,6 +105,13 @@ export function BackofficeHeader() {
           label="Anúncios"
           icon={<DollarSignIcon />}
         />
+        {user.role === "admin" && (
+          <NavItem
+            href="/admin/products"
+            label="Produtos"
+            icon={<TagsIcon />}
+          />
+        )}
       </NavBar>
       <NossaTerraLogo />
     </div>
