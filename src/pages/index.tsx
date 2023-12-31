@@ -10,8 +10,26 @@ import {
   type Transition,
 } from "framer-motion";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
+import { useRouter } from "next/router";
+import { z } from "zod";
+import { useInvokeCallbackOnce } from "~/hooks/useInvokeCallbackOnce";
+import { useToastMustSignIn } from "~/screens/LoginRegisterFlow/useToastMustSignIn";
 
 export const getServerSideProps = redirectGetServerSideProps.Public;
+
+function useToastWhenRedirected() {
+  const toastMustSignIn = useToastMustSignIn();
+
+  const router = useRouter();
+  const hasRedirectQueryParam = z
+    .string()
+    .safeParse(router.query.redirect).success;
+
+  useInvokeCallbackOnce({
+    callback: toastMustSignIn,
+    shouldInvoke: hasRedirectQueryParam,
+  });
+}
 
 enum Direction {
   Left = "left",
@@ -41,6 +59,8 @@ const transition: Transition = {
 };
 
 export default function RootScreen() {
+  useToastWhenRedirected();
+
   const stepKey = useLoginRegisterFlow((s) => s.state.stepKey);
   const lastCommand = useLoginRegisterFlow((s) => s.lastCommand);
 

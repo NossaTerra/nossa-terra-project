@@ -4,6 +4,8 @@ import { Inter as Inter, Poppins } from "next/font/google";
 
 import { api } from "~/utils/api";
 
+import { Toaster } from "react-hot-toast";
+
 import "~/styles/globals.css";
 
 const fontInter = Inter({
@@ -23,6 +25,7 @@ const AppWrapper: AppType = ({ Component, pageProps }) => {
     <div
       className={`${fontInter.variable} ${fontPoppins.variable} bg-backgroundPrimary`}
     >
+      <Toaster />
       <Component {...pageProps} />
     </div>
   );
