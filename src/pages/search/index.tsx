@@ -1,7 +1,10 @@
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { Button } from "~/components/ui/button";
+import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { api } from "~/utils/api";
+
+export const getServerSideProps = redirectGetServerSideProps.Private;
 
 // TODO: implement proper SearchScreen
 // For now it's just an auth showcase

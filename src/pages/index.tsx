@@ -9,6 +9,9 @@ import {
   motion,
   type Transition,
 } from "framer-motion";
+import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
+
+export const getServerSideProps = redirectGetServerSideProps.Public;
 
 enum Direction {
   Left = "left",
