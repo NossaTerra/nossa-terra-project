@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const roles = ["seller", "buyer", "backoffice"] as const;
+export const roles = ["seller", "buyer", "backoffice", "admin"] as const;
 export const rolesSchema = z.enum(roles);
 export type Role = z.infer<typeof rolesSchema>;
 
@@ -26,5 +26,6 @@ function roleParser<T extends [Role, ...Role[]]>(roles: T) {
 export const RoleTypeSchema = {
   Common: roleParser(["seller", "buyer"]),
   BuyerOnly: roleParser(["buyer"]),
-  Backoffice: roleParser(["backoffice"]),
+  Backoffice: roleParser(["backoffice", "admin"]),
+  Admin: roleParser(["admin"]),
 } as const;
