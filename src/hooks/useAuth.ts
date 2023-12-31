@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { InitialRoute } from "~/server/api/auth/initialRoutes";
+import { getInitialRoute } from "~/server/api/auth/getInitialRoute";
 import { type RouterInputs, api } from "~/utils/api";
 
 export function useAuth() {
@@ -15,11 +15,7 @@ export function useAuth() {
       if (redirect && typeof redirect === "string") {
         await router.replace(redirect);
       } else {
-        await router.replace(
-          user.role === "backoffice"
-            ? InitialRoute.backoffice
-            : InitialRoute.normalUser,
-        );
+        await router.replace(getInitialRoute(user));
       }
     },
     [loginApi, router],

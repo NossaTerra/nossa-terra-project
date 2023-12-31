@@ -56,3 +56,6 @@ export const buyerOnlyProcedure = t.procedure.use(
 export const backofficeProcedure = t.procedure.use(
   rolesFilterMiddleware(RoleTypeSchema.Backoffice),
 );
+export const adminProcedure = t.procedure.use(
+  rolesFilterMiddleware(RoleTypeSchema.Admin),
+);

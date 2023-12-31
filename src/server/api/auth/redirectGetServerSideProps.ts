@@ -1,6 +1,6 @@
 import { type GetServerSidePropsContext, type GetServerSideProps } from "next";
 import { auth } from "./lucia";
-import { InitialRoute } from "./initialRoutes";
+import { getInitialRoute } from "./getInitialRoute";
 import { RoleTypeSchema, type Role } from "./types";
 import { type ZodEnum } from "zod";
 
@@ -26,10 +26,7 @@ const Public = (async (context) => {
   if (user) {
     return {
       redirect: {
-        destination:
-          user.role === "backoffice"
-            ? InitialRoute.backoffice
-            : InitialRoute.normalUser,
+        destination: getInitialRoute(user),
         permanent: false,
       },
     };
@@ -69,4 +66,5 @@ export const redirectGetServerSideProps = {
   Common: Authed(RoleTypeSchema.Common),
   BuyerOnly: Authed(RoleTypeSchema.BuyerOnly),
   Backoffice: Authed(RoleTypeSchema.Backoffice),
+  Admin: Authed(RoleTypeSchema.Admin),
 } as const;
