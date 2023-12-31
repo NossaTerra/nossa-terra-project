@@ -1,6 +1,5 @@
-import { useRouter } from "next/router";
-import { useCallback } from "react";
 import { Button } from "~/components/ui/button";
+import { useAuth } from "~/hooks/useAuth";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { api } from "~/utils/api";
 
@@ -10,24 +9,7 @@ export const getServerSideProps = redirectGetServerSideProps.Private;
 // For now it's just an auth showcase
 export default function SearchScreen() {
   const { data: user } = api.auth.getUser.useQuery();
-
-  const apiUtils = api.useUtils();
-  const logout = api.auth.logout.useMutation({
-    onSuccess: () => {
-      // We can invalidate the ReactQuery cache to force
-      // a reload of the data
-      void apiUtils.auth.getUser.invalidate();
-
-      // Or we can reload the page
-      // router.reload();
-    },
-  });
-
-  const router = useRouter();
-  const onLogout = useCallback(async () => {
-    await logout.mutateAsync();
-    await router.replace("/");
-  }, [logout, router]);
+  const { logout } = useAuth();
 
   if (user) {
     return (
@@ -42,7 +24,7 @@ export default function SearchScreen() {
           </p>
           <p>{user.isActive ? "✅ isActive" : "❌ NotActive"}</p>
         </div>
-        ) <Button onClick={onLogout}>Log Out</Button>
+        ) <Button onClick={logout}>Log Out</Button>
       </div>
     );
   }

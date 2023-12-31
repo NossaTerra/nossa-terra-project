@@ -20,8 +20,7 @@ import {
 } from "../hooks/useWelcomeBackSchema";
 import { useLoginRegisterFlow } from "../state/machine";
 import { ArrowLeftIcon } from "lucide-react";
-import { api } from "~/utils/api";
-import { useRouter } from "next/router";
+import { useAuth } from "~/hooks/useAuth";
 
 function WelcomeBackContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -31,22 +30,20 @@ function WelcomeBackContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
 
-  const login = api.auth.login.useMutation();
-  const router = useRouter();
+  const { login } = useAuth();
   const onSubmit: SubmitHandler<WelcomeBackFields> = useCallback(
     async ({ password }) => {
       if (state.stepKey !== "welcomeBack") {
         return;
       }
       const { email } = state.accumulatedContext;
-      await login.mutateAsync({
+      await login({
         email,
         password,
       });
-      await router.replace("/search");
       resetState();
     },
-    [login, resetState, router, state.accumulatedContext, state.stepKey],
+    [login, resetState, state.accumulatedContext, state.stepKey],
   );
 
   return (
