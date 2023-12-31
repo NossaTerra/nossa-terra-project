@@ -111,7 +111,6 @@ function WelcomeBackContent({ className }: ClassNameProps) {
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    id="email"
                     placeholder="Senha"
                     {...field}
                     value={field.value ?? ""}
