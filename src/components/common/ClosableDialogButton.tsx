@@ -1,4 +1,4 @@
-import { Button, type buttonVariantType } from "../ui/button";
+import { Button, type ButtonVariantType } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import { type ClassNameProps } from "~/utils/ui";
 interface ClosableDialogProps extends ClassNameProps {
   buttonLabel: string;
   title: string;
-  buttonVariant: buttonVariantType;
+  buttonVariant: ButtonVariantType;
   description?: string;
   children?: React.ReactNode;
 }

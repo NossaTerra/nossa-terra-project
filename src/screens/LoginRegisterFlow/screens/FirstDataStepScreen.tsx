@@ -20,6 +20,9 @@ import {
 } from "../hooks/useFirstDataStepSchema";
 import { Input } from "~/components/ui/input";
 import { useAuth } from "~/hooks/useAuth";
+import { Checkbox } from "~/components/ui/checkbox";
+import { ClosableDialogButton } from "~/components/common/ClosableDialogButton";
+import termsAndConditions from "~/utils/termsAndConditions";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -186,6 +189,38 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                     type="password"
                     value={field.value ?? ""}
                   />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="agreeToTermsAndConditions"
+            render={({ field, fieldState }) => (
+              <FormItem className="mb-5">
+                <FormControl>
+                  <div className="mb-2.5 flex flex-row rounded-md border p-3">
+                    <Checkbox
+                      id="terms"
+                      className="mr-2 self-center"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                    <label htmlFor="terms" className="font-poppins-400 text-sm">
+                      Aceitar{" "}
+                      <ClosableDialogButton
+                        buttonVariant="link"
+                        buttonLabel="termos e condições"
+                        title="Termos e condições"
+                        className={"font-poppins-900 px-0 text-headingPrimary "}
+                      >
+                        <p className="max-h-[80vh] overflow-y-scroll px-4 text-justify">
+                          {termsAndConditions}
+                        </p>
+                      </ClosableDialogButton>
+                    </label>
+                  </div>
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
               </FormItem>
