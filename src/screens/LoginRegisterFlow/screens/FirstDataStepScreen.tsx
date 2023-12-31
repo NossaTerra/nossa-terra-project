@@ -19,8 +19,7 @@ import {
   useFirstDataStepSchema,
 } from "../hooks/useFirstDataStepSchema";
 import { Input } from "~/components/ui/input";
-import { api } from "~/utils/api";
-import { useRouter } from "next/router";
+import { useAuth } from "~/hooks/useAuth";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -30,38 +29,23 @@ function FirstDataStepContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
 
-  const register = api.auth.register.useMutation();
-  const login = api.auth.login.useMutation();
-  const router = useRouter();
-
+  const { register } = useAuth();
   const onSubmit: SubmitHandler<FirstDataStepFields> = useCallback(
     async ({ name, cpf, password }) => {
       if (state.stepKey !== "firstDataStep") {
         return;
       }
       const { email, role } = state.accumulatedContext;
-      await register.mutateAsync({
+      await register({
         email,
         name,
         cpf,
         password,
         role,
       });
-      await login.mutateAsync({
-        email,
-        password,
-      });
-      await router.replace("/search");
       resetState();
     },
-    [
-      state.stepKey,
-      state.accumulatedContext,
-      register,
-      login,
-      router,
-      resetState,
-    ],
+    [state.stepKey, state.accumulatedContext, register, resetState],
   );
 
   return (
