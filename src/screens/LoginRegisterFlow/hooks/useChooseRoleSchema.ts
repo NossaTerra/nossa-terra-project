@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import { userRolesSchema } from "~/server/api/auth/types";
+import { RoleTypeSchema } from "~/server/api/auth/types";
 
 export function useChooseRoleSchema() {
   // It's best to use a hook to get the schema because
@@ -9,7 +9,7 @@ export function useChooseRoleSchema() {
   return useMemo(
     () =>
       z.object({
-        role: userRolesSchema,
+        role: RoleTypeSchema.Common,
       }),
     [],
   );

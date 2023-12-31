@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { useAuth } from "~/hooks/useAuth";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 
-export const getServerSideProps = redirectGetServerSideProps.Private;
+export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export default function ProfileScreen({ user }: Props) {

@@ -1,11 +1,10 @@
 import { z } from "zod";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
-import { publicProcedure } from "../trpc/procedures/public";
 import { TRPCError } from "@trpc/server";
 import { auth } from "../auth/lucia";
-import { protectedProcedured } from "../trpc/procedures/protected";
-import { userRolesSchema } from "../auth/types";
+import { rolesSchema } from "../auth/types";
+import { protectedProcedure, publicProcedure } from "../trpc/procedures";
 
 export const authRouter = createTRPCRouter({
   getUser: publicProcedure.query(({ ctx: { user } }) => user),
@@ -25,7 +24,7 @@ export const authRouter = createTRPCRouter({
         name: z.string().min(2).max(255),
         password: z.string().min(2).max(255),
         cpf: z.string().min(2).max(255),
-        role: userRolesSchema,
+        role: rolesSchema,
       }),
     )
     .mutation(({ input: { name, email, password, role, cpf } }) => {
@@ -67,7 +66,7 @@ export const authRouter = createTRPCRouter({
       }
     }),
 
-  logout: protectedProcedured.mutation(
+  logout: protectedProcedure.mutation(
     async ({ ctx: { authRequest, session } }) => {
       await auth.invalidateSession(session.sessionId);
       authRequest.setSession(null);
