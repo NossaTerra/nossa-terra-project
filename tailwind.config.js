@@ -25,6 +25,7 @@ module.exports = {
         backgroundTertiary: "#9ADFC1",
         backgroundQuarternary: "#04027B0D",
         cardShade: "#FEFEF6",
+        cardHover: "#FAFAD3",
         headingPrimary: "#15B16D",
         headingSecondary: "#2A1D10",
         basedDark: "#08120D",

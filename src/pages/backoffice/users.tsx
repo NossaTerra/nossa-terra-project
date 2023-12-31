@@ -1,11 +1,15 @@
+import { BackofficeHeader } from "~/components/common/headers";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 
 export const getServerSideProps = redirectGetServerSideProps.Backoffice;
 
-export default function BackofficeUsersScreen() {
+export default function BackofficeUserControlScreen() {
   return (
-    <div>
-      <p>BackofficeUsersScreen</p>
-    </div>
+    <>
+      <BackofficeHeader />
+      <div className="p-10">
+        <h1 className="text-4xl font-bold">Controle de Usuários</h1>
+      </div>
+    </>
   );
 }
