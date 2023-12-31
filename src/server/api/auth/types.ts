@@ -1,14 +1,6 @@
 import { z } from "zod";
 
-export const userRoles = ["seller", "buyer"] as const;
-export const userRolesSchema = z.enum(userRoles);
-export type UserRole = z.infer<typeof userRolesSchema>;
-
-export const adminRoles = ["backoffice"] as const;
-export const adminRolesSchema = z.enum(adminRoles);
-export type AdminRole = z.infer<typeof adminRolesSchema>;
-
-export const roles = [...userRoles, ...adminRoles] as const;
+export const roles = ["seller", "buyer", "backoffice"] as const;
 export const rolesSchema = z.enum(roles);
 export type Role = z.infer<typeof rolesSchema>;
 
@@ -24,3 +16,15 @@ export type UserAttributes = z.infer<typeof userAttributes>;
 
 export const userSchema = userAttributes.merge(z.object({ id: z.string() }));
 export type User = z.infer<typeof userSchema>;
+
+// Permissions
+
+function roleParser<T extends [Role, ...Role[]]>(roles: T) {
+  return z.enum(roles);
+}
+
+export const RoleTypeSchema = {
+  Common: roleParser(["seller", "buyer"]),
+  BuyerOnly: roleParser(["buyer"]),
+  Backoffice: roleParser(["backoffice"]),
+} as const;

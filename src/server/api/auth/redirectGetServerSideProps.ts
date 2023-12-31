@@ -1,6 +1,8 @@
 import { type GetServerSidePropsContext, type GetServerSideProps } from "next";
 import { auth } from "./lucia";
 import { InitialRoute } from "./initialRoutes";
+import { RoleTypeSchema, type Role } from "./types";
+import { type ZodEnum } from "zod";
 
 const getUser = async (context: GetServerSidePropsContext) => {
   const { req, res } = context;
@@ -35,72 +37,36 @@ const Public = (async (context) => {
   return { props: {} };
 }) satisfies GetServerSideProps;
 
-const Private = (async (context) => {
-  const user = await getUser(context);
-  if (!user) {
-    return redirectSignIn(context);
-  }
-  if (user.role === "backoffice") {
+const Authed = <TRoles extends [Role, ...Role[]]>(
+  roleParser: ZodEnum<TRoles>,
+) => {
+  return (async (context) => {
+    const user = await getUser(context);
+    if (!user) {
+      return redirectSignIn(context);
+    }
+
+    const roleParse = roleParser.safeParse(user.role);
+    if (!roleParse.success) {
+      return {
+        notFound: true,
+      };
+    }
+
     return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: {
-      user: {
-        ...user,
-        role: user.role,
+      props: {
+        user: {
+          ...user,
+          role: roleParse.data,
+        },
       },
-    },
-  };
-}) satisfies GetServerSideProps;
-
-const BuyerOnly = (async (context) => {
-  const user = await getUser(context);
-  if (!user) {
-    return redirectSignIn(context);
-  }
-  if (user.role !== "buyer") {
-    return {
-      notFound: true,
     };
-  }
-
-  return {
-    props: {
-      user: {
-        ...user,
-        role: user.role,
-      },
-    },
-  };
-}) satisfies GetServerSideProps;
-
-const Backoffice = (async (context) => {
-  const user = await getUser(context);
-  if (!user) {
-    return redirectSignIn(context);
-  }
-  if (user.role !== "backoffice") {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: {
-      user: {
-        ...user,
-        role: user.role,
-      },
-    },
-  };
-}) satisfies GetServerSideProps;
+  }) satisfies GetServerSideProps;
+};
 
 export const redirectGetServerSideProps = {
   Public,
-  Private,
-  BuyerOnly,
-  Backoffice,
+  Common: Authed(RoleTypeSchema.Common),
+  BuyerOnly: Authed(RoleTypeSchema.BuyerOnly),
+  Backoffice: Authed(RoleTypeSchema.Backoffice),
 } as const;
