@@ -28,7 +28,7 @@ import {
   formatCPF,
   formatCNPJ,
 } from "~/utils/formatters";
-import  TermsAndConditions from "~/components/common/TermsAndConditions";
+import TermsAndConditions from "~/components/common/TermsAndConditions";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -227,7 +227,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                         className={"font-poppins-900 px-0 text-headingPrimary "}
                       >
                         <p className="max-h-[80vh] overflow-y-scroll px-4 text-justify">
-                          <TermsAndConditions/>
+                          <TermsAndConditions />
                         </p>
                       </ClosableDialogButton>
                     </label>
