@@ -22,13 +22,13 @@ import { Input } from "~/components/ui/input";
 import { useAuth } from "~/hooks/useAuth";
 import { Checkbox } from "~/components/ui/checkbox";
 import { ClosableDialogButton } from "~/components/common/ClosableDialogButton";
-import termsAndConditions from "~/utils/termsAndConditions";
 import {
   lengthFormattedCPF,
   lengthFormattedCNPJ,
   formatCPF,
   formatCNPJ,
 } from "~/utils/formatters";
+import  TermsAndConditions from "~/components/common/TermsAndConditions";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -227,7 +227,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                         className={"font-poppins-900 px-0 text-headingPrimary "}
                       >
                         <p className="max-h-[80vh] overflow-y-scroll px-4 text-justify">
-                          {termsAndConditions}
+                          <TermsAndConditions/>
                         </p>
                       </ClosableDialogButton>
                     </label>
