@@ -21,14 +21,13 @@ import {
 import { Input } from "~/components/ui/input";
 import { useAuth } from "~/hooks/useAuth";
 import { Checkbox } from "~/components/ui/checkbox";
-import { ClosableDialogButton } from "~/components/common/ClosableDialogButton";
 import {
   lengthFormattedCPF,
   lengthFormattedCNPJ,
   formatCPF,
   formatCNPJ,
 } from "~/utils/formatters";
-import TermsAndConditions from "~/components/common/TermsAndConditions";
+import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -219,17 +218,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                       onCheckedChange={field.onChange}
                     />
                     <label htmlFor="terms" className="font-poppins-400 text-sm">
-                      Aceitar{" "}
-                      <ClosableDialogButton
-                        buttonVariant="link"
-                        buttonLabel="termos e condições"
-                        title="Termos e condições"
-                        className="font-poppins-900 px-0 text-headingPrimary"
-                      >
-                        <article className="prose max-h-[80vh] max-w-none overflow-y-scroll px-4 text-justify">
-                          <TermsAndConditions />
-                        </article>
-                      </ClosableDialogButton>
+                      Aceitar <TermsAndConditionsLink />
                     </label>
                   </div>
                 </FormControl>

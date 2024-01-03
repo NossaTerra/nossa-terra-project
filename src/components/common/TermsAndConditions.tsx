@@ -1,6 +1,39 @@
 import React from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
 
-const TermsAndConditions = () => {
+export function TermsAndConditionsLink() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          className="font-poppins-900 px-0 text-headingPrimary"
+          variant="link"
+        >
+          termos e condições
+        </Button>
+      </DialogTrigger>
+      <DialogContent isFullWidth>
+        <DialogHeader>
+          <DialogTitle>Termos e condições</DialogTitle>
+          <DialogClose />
+        </DialogHeader>
+        <article className="prose max-h-[80vh] max-w-none overflow-y-scroll px-4 text-justify">
+          <ContentTermsAndConditions />
+        </article>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+const ContentTermsAndConditions = () => {
   return (
     <>
       <p>Última atualização: 01 de janeiro de 2024</p>
@@ -101,5 +134,3 @@ const TermsAndConditions = () => {
     </>
   );
 };
-
-export default TermsAndConditions;
