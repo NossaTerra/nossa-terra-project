@@ -2,28 +2,20 @@ import React from "react";
 
 const TermsAndConditions = () => {
   return (
-    <div className="m-4 text-justify font-sans leading-6">
-      <p className="mb-4 text-gray-600">
-        Última atualização: 01 de janeiro de 2024
-      </p>
+    <>
+      <p>Última atualização: 01 de janeiro de 2024</p>
 
-      <h2 className="mb-2 text-xl font-semibold text-gray-700">
-        Interpretação e Definições
-      </h2>
-      <h3 className="mb-2 text-lg font-semibold text-gray-600">
-        Interpretação
-      </h3>
-      <p className="mb-4 text-gray-700">
+      <h2>Interpretação e Definições</h2>
+      <h3>Interpretação</h3>
+      <p>
         As palavras cuja inicial é maiúscula têm significados definidos nas
         seguintes condições. As seguintes definições terão o mesmo significado,
         independentemente de aparecerem no singular ou no plural.
       </p>
-      <h3 className="mb-2 text-lg font-semibold text-gray-600">Definições</h3>
-      <p className="mb-4 text-gray-700">
-        Para os fins destes Termos e Condições:
-      </p>
-      <ul className="mb-4 list-disc pl-8">
-        <li className="text-gray-700">
+      <h3>Definições</h3>
+      <p>Para os fins destes Termos e Condições:</p>
+      <ul>
+        <li>
           <strong>Afiliado</strong> significa uma entidade que controla, é
           controlada por, ou está sob controle comum com uma parte, onde
           "controle" significa a propriedade de 50% ou mais das ações, interesse
@@ -31,19 +23,17 @@ const TermsAndConditions = () => {
           diretores ou outra autoridade gerencial.
         </li>
       </ul>
-      <h2 className="mb-2 text-xl font-semibold text-gray-700">Rescisão</h2>
-      <p className="mb-4 text-gray-700">
+      <h2>Rescisão</h2>
+      <p>
         Podemos rescindir ou suspender imediatamente seu acesso, sem aviso
         prévio ou responsabilidade, por qualquer motivo, inclusive, sem
         limitação, se você violar estes Termos e Condições.
       </p>
-      <p className="mb-4 text-gray-700">
+      <p>
         Após a rescisão, seu direito de usar o Serviço cessará imediatamente.
       </p>
-      <h2 className="mb-2 text-xl font-semibold text-gray-700">
-        Limitação de Responsabilidade
-      </h2>
-      <p className="mb-4 text-gray-700">
+      <h2>Limitação de Responsabilidade</h2>
+      <p>
         Não obstante quaisquer danos que você possa incorrer, a responsabilidade
         total da Empresa e de quaisquer de seus fornecedores sob qualquer
         disposição destes Termos e sua solução exclusiva para todos os itens
@@ -51,7 +41,7 @@ const TermsAndConditions = () => {
         Serviço ou 100 USD, caso você não tenha comprado nada através do
         Serviço.
       </p>
-      <p className="mb-4 text-gray-700">
+      <p>
         Na extensão máxima permitida pela lei aplicável, em nenhum caso a
         Empresa ou seus fornecedores serão responsáveis por danos especiais,
         incidentais, indiretos ou consequentes de qualquer natureza (incluindo,
@@ -75,10 +65,8 @@ const TermsAndConditions = () => {
         venenatis.
       </p>
 
-      <h2 className="mb-2 text-xl font-semibold text-gray-700">
-        Termos de Pagamento
-      </h2>
-      <p className="mb-4 text-gray-700">
+      <h2>Termos de Pagamento</h2>
+      <p>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed faucibus
         sem eget massa rhoncus, eu interdum libero feugiat. Nullam a metus id
         turpis imperdiet venenatis. Lorem ipsum dolor sit amet, consectetur
@@ -95,7 +83,7 @@ const TermsAndConditions = () => {
         sem eget massa rhoncus, eu interdum libero feugiat. Nullam a metus id
         turpis imperdiet venenatis.
       </p>
-      <p className="mb-4 text-gray-700">
+      <p>
         Vestibulum vel neque in tortor blandit efficitur. Aenean tristique, leo
         eu luctus imperdiet, arcu elit bibendum neque, vel fermentum lectus elit
         nec sem. In hac habitasse platea dictumst. Lorem ipsum dolor sit amet,
@@ -110,7 +98,7 @@ const TermsAndConditions = () => {
         rhoncus, eu interdum libero feugiat. Nullam a metus id turpis imperdiet
         venenatis.
       </p>
-    </div>
+    </>
   );
 };
 

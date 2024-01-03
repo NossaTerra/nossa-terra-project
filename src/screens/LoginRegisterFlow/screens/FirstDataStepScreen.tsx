@@ -224,11 +224,11 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                         buttonVariant="link"
                         buttonLabel="termos e condições"
                         title="Termos e condições"
-                        className={"font-poppins-900 px-0 text-headingPrimary "}
+                        className="font-poppins-900 px-0 text-headingPrimary"
                       >
-                        <p className="max-h-[80vh] overflow-y-scroll px-4 text-justify">
+                        <article className="prose max-h-[80vh] max-w-none overflow-y-scroll px-4 text-justify">
                           <TermsAndConditions />
-                        </p>
+                        </article>
                       </ClosableDialogButton>
                     </label>
                   </div>
