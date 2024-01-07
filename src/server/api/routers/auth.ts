@@ -1,10 +1,18 @@
+import {
+  addressSchema,
+  businessSectorSchema,
+  buyerSocialSchema,
+  sellerSocialSchema,
+} from "./../auth/types";
 import { z } from "zod";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { auth } from "../auth/lucia";
-import { rolesSchema } from "../auth/types";
 import { protectedProcedure, publicProcedure } from "../trpc/procedures";
+import axios from "axios";
+import { addressDetailsApiSchema } from "~/server/api/addressApi";
+import { lengthFormattedCNPJ, lengthFormattedCPF } from "~/utils/formatters";
 
 export const authRouter = createTRPCRouter({
   getUser: publicProcedure.query(({ ctx: { user } }) => user),
@@ -16,21 +24,64 @@ export const authRouter = createTRPCRouter({
       return !!user;
     }),
 
-  register: publicProcedure
+  registerSeller: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
-        // TODO: Enforce better register rules
-        name: z.string().min(2).max(255),
-        password: z.string().min(2).max(255),
-        cpf: z.string().min(2).max(255),
-        role: rolesSchema,
+        email: z.string().email().min(2).max(60),
+        name: z.string().min(2).max(120),
+        password: z.string().min(8).max(30),
+        cpf: z.string().min(lengthFormattedCPF).max(lengthFormattedCNPJ),
+        rg: z.string().min(6).max(15),
+        address: addressSchema,
+        social: sellerSocialSchema,
       }),
     )
-    .mutation(({ input: { name, email, password, role, cpf } }) => {
+    .mutation(({ input: { email, password, social, address, ...rest } }) => {
       try {
         const user = auth.createUser({
-          attributes: { email, name, role, isActive: false, cpf },
+          attributes: {
+            email,
+            role: "seller",
+            ...address,
+            ...social,
+            ...rest,
+          },
+          key: {
+            password,
+            providerId: "email",
+            providerUserId: email,
+          },
+        });
+        return user;
+      } catch (error) {
+        console.log(error);
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+    }),
+
+  registerBuyer: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email().min(2).max(60),
+        name: z.string().min(2).max(120),
+        password: z.string().min(8).max(60),
+        cpf: z.string().min(lengthFormattedCNPJ).max(lengthFormattedCNPJ),
+        businessMainSector: businessSectorSchema,
+        address: addressSchema,
+        social: buyerSocialSchema,
+      }),
+    )
+    .mutation(({ input: { email, password, address, social, ...rest } }) => {
+      try {
+        const user = auth.createUser({
+          attributes: {
+            isActive: false,
+            role: "buyer",
+            email,
+            ...address,
+            ...social,
+            ...rest,
+          },
           key: {
             password,
             providerId: "email",
@@ -72,4 +123,21 @@ export const authRouter = createTRPCRouter({
       authRequest.setSession(null);
     },
   ),
+
+  getAddressDetails: publicProcedure
+    .input(z.object({ zipCode: z.string().min(1).max(9) }))
+    .query(async ({ input: { zipCode } }) => {
+      const parsedZipCode = zipCode.replace("-", "");
+      try {
+        const response = await axios.get(
+          `${process.env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
+        );
+        console.log(
+          JSON.stringify(addressDetailsApiSchema.safeParse(response.data)),
+        );
+        return await addressDetailsApiSchema.parseAsync(response.data);
+      } catch (error) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+    }),
 });

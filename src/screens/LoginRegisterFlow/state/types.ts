@@ -3,17 +3,16 @@ import { type WelcomeBackFields } from "../hooks/useWelcomeBackSchema";
 import { type ChooseRoleFields } from "../hooks/useChooseRoleSchema";
 import { type ExaustiveMap } from "~/utils/typescript";
 import { type FirstDataStepFields } from "../hooks/useFirstDataStepSchema";
+import { type SecondDataStepSellerFields } from "../hooks/useSecondDataStepSellerSchema";
+import { type SecondDataStepBuyerFields } from "../hooks/useSecondDataStepBuyerSchema";
 
 export const stepKeys = [
   "greeting",
   "welcomeBack",
-
   "chooseRole",
   "firstDataStep",
-
-  // TODO: add all registration steps
-  // "secondDataStep_buyer",
-  // "secondDataStep_seller",
+  "secondDataStepSeller",
+  "secondDataStepBuyer",
 ] as const;
 export type StepKey = (typeof stepKeys)[number];
 
@@ -24,6 +23,8 @@ export type StepData = ExaustiveMap<
     welcomeBack: WelcomeBackFields;
     chooseRole: ChooseRoleFields;
     firstDataStep: FirstDataStepFields;
+    secondDataStepSeller: SecondDataStepSellerFields;
+    secondDataStepBuyer: SecondDataStepBuyerFields;
   }
 >;
 
@@ -34,6 +35,12 @@ export type StepAccumulatedContext = ExaustiveMap<
     welcomeBack: StepData["greeting"];
     chooseRole: StepData["greeting"];
     firstDataStep: StepData["greeting"] & StepData["chooseRole"];
+    secondDataStepSeller: StepData["greeting"] &
+      StepData["chooseRole"] &
+      StepData["firstDataStep"];
+    secondDataStepBuyer: StepData["greeting"] &
+      StepData["chooseRole"] &
+      StepData["firstDataStep"];
   }
 >;
 

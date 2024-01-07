@@ -19,48 +19,78 @@ import {
   useFirstDataStepSchema,
 } from "../hooks/useFirstDataStepSchema";
 import { Input } from "~/components/ui/input";
-import { useAuth } from "~/hooks/useAuth";
 import { Checkbox } from "~/components/ui/checkbox";
-import {
-  lengthFormattedCPF,
-  lengthFormattedCNPJ,
-  formatCPF,
-  formatCNPJ,
-} from "~/utils/formatters";
+import { formatCPF, formatCNPJ, lengthFormattedCNPJ } from "~/utils/formatters";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
+import { cpfIsCNPJ } from "~/utils/helpers";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
-  const { state, resetState } = useLoginRegisterFlow();
+  const { state } = useLoginRegisterFlow();
 
-  const schema = useFirstDataStepSchema();
+  const schema = useFirstDataStepSchema(
+    state.stepKey === "firstDataStep"
+      ? state.accumulatedContext.role
+      : undefined,
+  );
   const form = useForm<FirstDataStepFields>({
     resolver: zodResolver(schema),
   });
 
-  const { register } = useAuth();
+  const firstDataStepAction = useLoginRegisterFlow(
+    (s) => s.firstDataStepAction,
+  );
+
   const onSubmit: SubmitHandler<FirstDataStepFields> = useCallback(
-    async ({ name, cpf, password }) => {
+    async ({
+      name,
+      cpf,
+      password,
+      confirmPassword,
+      agreeToTermsAndConditions,
+    }) => {
       if (state.stepKey !== "firstDataStep") {
         return;
       }
-      const { email, role } = state.accumulatedContext;
-      await register({
-        email,
-        name,
-        cpf,
-        password,
-        role,
-      });
-      resetState();
+      const { role } = state.accumulatedContext;
+
+      if (role === "seller") {
+        firstDataStepAction({
+          command: "nextSeller",
+          data: {
+            name,
+            cpf,
+            password,
+            confirmPassword,
+            agreeToTermsAndConditions,
+          },
+          nextStep: "secondDataStepSeller",
+        });
+        return;
+      }
+
+      if (role === "buyer") {
+        firstDataStepAction({
+          command: "nextBuyer",
+          data: {
+            name,
+            cpf,
+            password,
+            confirmPassword,
+            agreeToTermsAndConditions,
+          },
+          nextStep: "secondDataStepBuyer",
+        });
+        return;
+      }
     },
-    [state.stepKey, state.accumulatedContext, register, resetState],
+    [state.stepKey, state.accumulatedContext, firstDataStepAction],
   );
 
   return (
     <main
       className={cn(
-        "flex flex-col items-start justify-start gap-10 md:justify-start",
-        "px-8 py-10 lg:px-14",
+        "flex flex-col items-start justify-start gap-8 md:justify-start",
+        "px-8 py-6 lg:px-14",
         className,
       )}
     >
@@ -102,7 +132,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
 
       <Form {...form}>
         <form
-          className="w-full md:max-w-xs lg:max-w-sm"
+          className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
@@ -110,11 +140,12 @@ function FirstDataStepContent({ className }: ClassNameProps) {
             name="name"
             render={({ field, fieldState }) => (
               <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="email"
-                >
-                  Nome
+                <FormLabel className="block text-sm font-medium" htmlFor="name">
+                  {state.stepKey === "firstDataStep"
+                    ? state.accumulatedContext.role === "seller"
+                      ? "Nome*"
+                      : "Nome da empresa*"
+                    : "----"}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -133,11 +164,12 @@ function FirstDataStepContent({ className }: ClassNameProps) {
             name="cpf"
             render={({ field, fieldState }) => (
               <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="email"
-                >
-                  CPF / CNPJ
+                <FormLabel className="block text-sm font-medium" htmlFor="cpf">
+                  {state.stepKey === "firstDataStep"
+                    ? state.accumulatedContext.role === "seller"
+                      ? "CPF/CNPJ*"
+                      : "CNPJ*"
+                    : "----"}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -145,9 +177,13 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                     placeholder="xxx.xxx.xxx-xx"
                     {...field}
                     value={
-                      field.value?.length <= lengthFormattedCPF
-                        ? formatCPF(field?.value ?? "")
-                        : formatCNPJ(field?.value ?? "")
+                      state.stepKey === "firstDataStep" &&
+                      cpfIsCNPJ({
+                        cpf: field.value ?? "",
+                        role: state.accumulatedContext.role,
+                      })
+                        ? formatCNPJ(field?.value ?? "")
+                        : formatCPF(field?.value ?? "")
                     }
                     maxLength={lengthFormattedCNPJ}
                   />
@@ -160,12 +196,12 @@ function FirstDataStepContent({ className }: ClassNameProps) {
             control={form.control}
             name="password"
             render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
+              <FormItem className="mb-2.5 w-full text-gray-700">
                 <FormLabel
                   className="block text-sm font-medium"
-                  htmlFor="email"
+                  htmlFor="password"
                 >
-                  Senha
+                  Senha*
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -184,12 +220,12 @@ function FirstDataStepContent({ className }: ClassNameProps) {
             control={form.control}
             name="confirmPassword"
             render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
+              <FormItem className="mb-2.5 w-full text-gray-700">
                 <FormLabel
                   className="block text-sm font-medium"
-                  htmlFor="email"
+                  htmlFor="confirmPassword"
                 >
-                  Confirmar Senha
+                  Confirmar Senha*
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -208,9 +244,9 @@ function FirstDataStepContent({ className }: ClassNameProps) {
             control={form.control}
             name="agreeToTermsAndConditions"
             render={({ field, fieldState }) => (
-              <FormItem className="mb-5">
+              <FormItem>
                 <FormControl>
-                  <div className="mb-2.5 flex flex-row rounded-md border p-3">
+                  <div className="mt-5 flex flex-row rounded-md border p-1.5 pl-2.5">
                     <Checkbox
                       id="terms"
                       className="mr-2 self-center"
@@ -226,9 +262,12 @@ function FirstDataStepContent({ className }: ClassNameProps) {
               </FormItem>
             )}
           />
-          <Button variant="primary" className="w-full" type="submit">
-            Continuar
-          </Button>
+          <div>
+            <p className="pb-2.5 text-sm">*campo obrigatório</p>
+            <Button variant="primary" className="w-full" type="submit">
+              Continuar
+            </Button>
+          </div>
         </form>
       </Form>
     </main>

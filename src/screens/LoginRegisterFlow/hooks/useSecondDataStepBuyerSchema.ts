@@ -1,0 +1,76 @@
+import { useMemo } from "react";
+import { z } from "zod";
+import { businessSectors } from "~/server/api/auth/types";
+import { emptyString } from "~/utils/constants";
+import {
+  lowerEndLengthFormattedPhone,
+  higherEndLengthFormattedPhone,
+} from "~/utils/formatters";
+import { validatePhone, validateInstagram } from "~/utils/validators";
+import { useAddressSchema } from "./useAddressSchema";
+
+export function useSecondDataStepBuyerSchema() {
+  // It's best to use a hook to get the schema because
+  // we can later add internationalized error messages
+  const adressSchmea = useAddressSchema();
+
+  return useMemo(
+    () =>
+      adressSchmea.merge(
+        z.object({
+          phone: z
+            .string({
+              required_error: "Por favor, insira um telefone da sua empresa",
+            })
+            .min(lowerEndLengthFormattedPhone, {
+              message: `O telefone deve ter no mínimo ${lowerEndLengthFormattedPhone} dígitos`,
+            })
+            .max(higherEndLengthFormattedPhone, {
+              message: `O telefone deve ter no máximo ${higherEndLengthFormattedPhone} dígitos`,
+            })
+            .refine(validatePhone, { message: "Número de telefone inválido" }),
+
+          businessMainSector: z
+            .enum(businessSectors)
+            .optional()
+            .refine((sector) => sector !== undefined, {
+              message: "Por favor, insira o ramo de atuação da sua empresa",
+            })
+            .transform((sector) => {
+              if (sector === undefined) {
+                throw new Error(
+                  "DEV: you didnt' refine the sector to non nullable",
+                );
+              }
+              return sector;
+            }),
+
+          secondaryPhone: z
+            .string()
+            .refine((phone) => phone === emptyString || validatePhone(phone), {
+              message: "Número de telefone secundário inválido",
+            })
+            .optional(),
+          instagram: z
+            .string()
+            .refine(
+              (instagram) => {
+                return (
+                  instagram === emptyString || validateInstagram(instagram)
+                );
+              },
+              { message: "Nome de usuário do Instagram inválido inicie com @" },
+            )
+            .optional(),
+          phoneUsesWhatsapp: z.boolean().optional(),
+          secondaryPhoneUsesWhatsapp: z.boolean().optional(),
+          avatarImage: z.string().optional(),
+        }),
+      ),
+    [adressSchmea],
+  );
+}
+
+export type SecondDataStepBuyerFields = z.infer<
+  ReturnType<typeof useSecondDataStepBuyerSchema>
+>;

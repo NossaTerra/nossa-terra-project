@@ -1,0 +1,162 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type UseFormReturn } from "react-hook-form";
+import { type RouterOutputs, api } from "~/utils/api";
+import { validateZIPCode } from "~/utils/validators";
+
+// OBS: Vai facilitar bastante essa parte se a gente fizer a extração do
+// useAddressSchema que eu tinha sugerido ali em cima, daí seria só pegar
+// essa definição de FormData dele, muito mais fácil!
+interface AddressFormData {
+  zipCode: string;
+  city: string;
+  province: string;
+  street: string;
+  neighborhood?: string | undefined;
+  complementary?: string | undefined;
+  streetNumber?: string | undefined;
+}
+
+interface Props<FormData extends AddressFormData> {
+  form: UseFormReturn<FormData>;
+}
+
+export function useAutomaticAddressFill<FormData extends AddressFormData>({
+  form: anoyinglyTypedForm,
+}: Props<FormData>) {
+  // NOTE: the typesafety here is messy because ReactHookForms's
+  // internal types, but it is great actually!
+  //
+  // We are just casting the form to a more specific type
+  // The safe constraint was already infered by the generic
+  const form = anoyinglyTypedForm as unknown as UseFormReturn<AddressFormData>;
+
+  const [isValidAddress, setIsValidAddress] = useState(false);
+
+  const [latitude, setLatitude] = useState<number | undefined>();
+  const [longitude, setLongitude] = useState<number | undefined>();
+
+  const cityInputRef = useRef<HTMLInputElement | null>(null);
+  const provinceInputRef = useRef<HTMLInputElement | null>(null);
+  const streetInputRef = useRef<HTMLInputElement | null>(null);
+  const neighborhoodInputRef = useRef<HTMLInputElement | null>(null);
+  const affectedInputRefs = useMemo(
+    () =>
+      [
+        cityInputRef,
+        provinceInputRef,
+        streetInputRef,
+        neighborhoodInputRef,
+      ] as const,
+    [],
+  );
+
+  const enableInputs = useCallback(
+    () =>
+      affectedInputRefs.forEach((ref) => {
+        if (ref.current) ref.current.disabled = false;
+      }),
+    [affectedInputRefs],
+  );
+
+  const onSuccessFetchAddress = useCallback(
+    ({
+      street,
+      city,
+      location,
+      province,
+      neighborhood,
+    }: RouterOutputs["auth"]["getAddressDetails"]) => {
+      setIsValidAddress(true);
+
+      // NOTE: this is not necessary if you use the AddressDetails
+      // as a Zod object because you can do this transformation
+      // inside the zod object!
+      setLatitude(location?.coordinates?.latitude);
+      setLongitude(location?.coordinates?.longitude);
+      form.clearErrors("zipCode");
+
+      if (city) {
+        form.setValue("city", city);
+        if (cityInputRef.current) cityInputRef.current.disabled = true;
+      }
+      if (province) {
+        form.setValue("province", province);
+        if (provinceInputRef.current) provinceInputRef.current.disabled = true;
+      }
+      if (street) {
+        form.setValue("street", street);
+        if (streetInputRef.current) streetInputRef.current.disabled = true;
+      }
+      if (neighborhood) {
+        form.setValue("neighborhood", city);
+        if (neighborhoodInputRef.current)
+          neighborhoodInputRef.current.disabled = true;
+      }
+    },
+    [form],
+  );
+
+  const onErrorFetchAddress = useCallback(() => {
+    setIsValidAddress(false);
+    enableInputs();
+
+    setLatitude(undefined);
+    setLongitude(undefined);
+
+    form.setError("zipCode", {
+      type: "manual",
+      message: "Error ao buscar o cep, confira o cep por favor",
+    });
+    form.resetField("city");
+    form.resetField("province");
+    form.resetField("street");
+    form.resetField("neighborhood");
+  }, [enableInputs, form]);
+
+  // NOTE: It's best to call the React Query Client directly without using its hooks
+  // React Query hooks are great when the fetch is triggered by a React State changing
+  // and forms don't trigger state change!
+  const addressQuery = api.useUtils().auth.getAddressDetails;
+  const [isLoading, setIsLoading] = useState(false);
+
+  const queryAndUpdateFields = useCallback(
+    (zipCode: string) => {
+      setIsLoading(true);
+      addressQuery
+        .fetch({ zipCode }, { staleTime: Infinity })
+        .then(onSuccessFetchAddress)
+        .catch(onErrorFetchAddress)
+        .finally(() => setIsLoading(false));
+    },
+    [addressQuery, onErrorFetchAddress, onSuccessFetchAddress],
+  );
+
+  useEffect(() => {
+    const { unsubscribe } = form.watch((value, info) => {
+      if (info.name === "zipCode" && info.type === "change") {
+        const zipCode = value?.zipCode ?? "";
+
+        if (validateZIPCode(zipCode)) {
+          queryAndUpdateFields(zipCode);
+        } else {
+          setIsValidAddress(false);
+          enableInputs();
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, [enableInputs, form, queryAndUpdateFields]);
+
+  return {
+    isValidAddress,
+    isLoading,
+
+    latitude,
+    longitude,
+
+    cityInputRef,
+    provinceInputRef,
+    streetInputRef,
+    neighborhoodInputRef,
+  };
+}

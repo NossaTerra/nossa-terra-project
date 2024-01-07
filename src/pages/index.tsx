@@ -2,7 +2,10 @@ import { ChooseRoleScreen } from "~/screens/LoginRegisterFlow/screens/ChooseRole
 import { FirstDataStepScreen } from "~/screens/LoginRegisterFlow/screens/FirstDataStepScreen";
 import { GreetingScreen } from "~/screens/LoginRegisterFlow/screens/GreetingScreen";
 import { WelcomeBackScreen } from "~/screens/LoginRegisterFlow/screens/WelcomeBackScreen";
+import { SecondDataStepSellerScreen } from "~/screens/LoginRegisterFlow/screens/SecondDataStepSellerScreen";
 import { useLoginRegisterFlow } from "~/screens/LoginRegisterFlow/state/machine";
+import { SecondDataStepBuyerScreen } from "~/screens/LoginRegisterFlow/screens/SecondDataStepBuyerScreen";
+
 import {
   AnimatePresence,
   type Variants,
@@ -83,6 +86,8 @@ export default function RootScreen() {
           {stepKey === "welcomeBack" && <WelcomeBackScreen />}
           {stepKey === "chooseRole" && <ChooseRoleScreen />}
           {stepKey === "firstDataStep" && <FirstDataStepScreen />}
+          {stepKey === "secondDataStepSeller" && <SecondDataStepSellerScreen />}
+          {stepKey === "secondDataStepBuyer" && <SecondDataStepBuyerScreen />}
         </motion.div>
       </AnimatePresence>
     </div>

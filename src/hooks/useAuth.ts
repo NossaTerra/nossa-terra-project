@@ -21,15 +21,6 @@ export function useAuth() {
     [loginApi, router],
   );
 
-  const registerApi = api.auth.register.useMutation();
-  const register = useCallback(
-    async ({ ...args }: RouterInputs["auth"]["register"]) => {
-      await registerApi.mutateAsync({ ...args });
-      await login({ ...args });
-    },
-    [login, registerApi],
-  );
-
   const logoutApi = api.auth.logout.useMutation();
   const logout = useCallback(async () => {
     await logoutApi.mutateAsync();
@@ -38,7 +29,6 @@ export function useAuth() {
 
   return {
     login,
-    register,
     logout,
   };
 }

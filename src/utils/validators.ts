@@ -1,5 +1,13 @@
+// CPF code validation
+import {
+  higherEndLengthFormattedPhone,
+  higherEndLengthInstagram,
+  lowerEndLengthFormattedPhone,
+  lowerEndLengthInstagram,
+} from "./formatters";
+
 export function validateCPF(cpf: string): boolean {
-  cpf = cpf.replace(/\D/g, '');
+  cpf = cpf.replace(/\D/g, "");
 
   if (/^(\d)\1{10}$/.test(cpf)) {
     return false;
@@ -24,15 +32,13 @@ export function validateCPF(cpf: string): boolean {
     digit2 = 0;
   }
 
-  return digit1 === parseInt(cpf.charAt(9)) && digit2 === parseInt(cpf.charAt(10));
+  return (
+    digit1 === parseInt(cpf.charAt(9)) && digit2 === parseInt(cpf.charAt(10))
+  );
 }
 
-export const regexCNPJ = /^\d{2}.\d{3}.\d{3}\/\d{4}-\d{2}$/
-
-function matchNumbers(value: string | number | number[] = '') {
-  const match = value.toString().match(/\d/g)
-  return Array.isArray(match) ? match.map(Number) : []
-}
+// CNPJ code validation
+export const regexCNPJ = /^\d{2}.\d{3}.\d{3}\/\d{4}-\d{2}$/;
 
 function validCalc(x: number, numbers: number[]): number {
   const slice = numbers.slice(0, x);
@@ -53,33 +59,89 @@ function validCalc(x: number, numbers: number[]): number {
   return result > 9 ? 0 : result;
 }
 
-export function validateCNPJ(value: string | number | number[] = ''): boolean {
-  if (!value) return false
-  const isString = typeof value === 'string'
-  const validTypes = isString || Number.isInteger(value) || Array.isArray(value)
+export function validateCNPJ(value: string | number | number[] = ""): boolean {
+  if (!value) return false;
+  const isString = typeof value === "string";
+  const validTypes =
+    isString || Number.isInteger(value) || Array.isArray(value);
 
-  if (!validTypes) return false
+  if (!validTypes) return false;
 
   if (isString) {
-    const digitsOnly = /^\d{14}$/.test(value)
-    const validFormat = regexCNPJ.test(value)
-    const isValid = digitsOnly || validFormat
+    const digitsOnly = /^\d{14}$/.test(value);
+    const validFormat = regexCNPJ.test(value);
+    const isValid = digitsOnly || validFormat;
 
-    if (!isValid) return false
+    if (!isValid) return false;
   }
 
-  const numbers = matchNumbers(value)
+  const numbers = matchNumbers(value);
 
-  if (numbers.length !== 14) return false
+  if (numbers.length !== 14) return false;
 
-  const items = [...new Set(numbers)]
-  if (items.length === 1) return false
+  const items = [...new Set(numbers)];
+  if (items.length === 1) return false;
 
-  const digits = numbers.slice(12)
+  const digits = numbers.slice(12);
 
-  const digit0 = validCalc(12, numbers)
-  if (digit0 !== digits[0]) return false
+  const digit0 = validCalc(12, numbers);
+  if (digit0 !== digits[0]) return false;
 
-  const digit1 = validCalc(13, numbers)
-  return digit1 === digits[1]
+  const digit1 = validCalc(13, numbers);
+  return digit1 === digits[1];
+}
+
+// ZIP code validation
+export const regexCEP = /^\d{5}-?\d{3}$/;
+
+export function validateZIPCode(
+  value: string | number | number[] = "",
+): boolean {
+  if (!value) return false;
+
+  const isString = typeof value === "string";
+  const validTypes =
+    isString || Number.isInteger(value) || Array.isArray(value);
+
+  if (!validTypes) return false;
+
+  if (isString) {
+    const digitsOnly = /^\d{8}$/.test(value);
+    const validFormat = regexCEP.test(value);
+    const isValid = digitsOnly || validFormat;
+
+    if (!isValid) return false;
+  }
+  const numbers = matchNumbers(value);
+  if (numbers.length !== 8) return false;
+  return true;
+}
+
+// RG code validation
+export function validateRG(rg: string): boolean {
+  const rgDigits = rg.replace(/\D/g, "");
+  return /^[0-9]{7,14}$/.test(rgDigits);
+}
+
+// Instagram validation
+export function validateInstagram(instagram: string): boolean {
+  return (
+    /^@[^:\/]+$/.test(instagram) &&
+    instagram.length >= lowerEndLengthInstagram &&
+    instagram.length <= higherEndLengthInstagram
+  );
+}
+
+// Phone validation
+export function validatePhone(phone: string): boolean {
+  return (
+    phone.length >= lowerEndLengthFormattedPhone &&
+    phone.length <= higherEndLengthFormattedPhone
+  );
+}
+
+// Common Helper Functions (useful for multiple validators)
+function matchNumbers(value: string | number | number[] = "") {
+  const match = value.toString().match(/\d/g);
+  return Array.isArray(match) ? match.map(Number) : [];
 }

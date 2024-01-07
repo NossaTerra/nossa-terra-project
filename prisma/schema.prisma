@@ -24,13 +24,29 @@ model User {
     key          Key[]
 
     // UserAttributes
-    email    String  @unique
-    name     String
-    role     String
-    cpf      String
-    isActive Boolean
-
-    image String?
+    email                      String   @unique
+    name                       String
+    role                       String
+    cpf                        String
+    isActive                   Boolean?
+    image                      String?
+    rg                         String?
+    zipCode                    String
+    city                       String
+    province                   String
+    street                     String?
+    neighborhood               String?
+    streetNumber               String?
+    complementary              String?
+    phone                      String
+    phoneUsesWhatsapp          Boolean?
+    secondaryPhone             String?
+    secondaryPhoneUsesWhatsapp Boolean?
+    avatarImage                String?
+    businessMainSector         String?
+    instagram                  String?
+    latitude                   Float?
+    longitude                  Float?
 }
 
 model Session {

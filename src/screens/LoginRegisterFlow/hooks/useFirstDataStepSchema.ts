@@ -1,9 +1,12 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import { lengthFormattedCPF } from "~/utils/formatters";
 import { validateCNPJ, validateCPF } from "~/utils/validators";
+import type { ChooseRoleFields } from "./useChooseRoleSchema";
+import { cpfIsCNPJ } from "~/utils/helpers";
 
-export function useFirstDataStepSchema() {
+export type ChosenRole = ChooseRoleFields["role"];
+
+export function useFirstDataStepSchema(role?: ChosenRole) {
   // It's best to use a hook to get the schema because
   // we can later add internationalized error messages
 
@@ -11,35 +14,47 @@ export function useFirstDataStepSchema() {
     () =>
       z
         .object({
-          name: z.string({ required_error: "Você deve inserir seu nome" }).min(1),
+          name: z
+            .string({ required_error: "Você deve inserir o nome" })
+            .min(3, { message: "Nome com ao menos 3 caracte" }),
           cpf: z
-            .string({ required_error: "Você deve inserir um CPF ou CNPJ válido" })
-            .min(1, { message: "CPF / CNPJ é obrigatório" })
+            .string({
+              required_error: "Você deve inserir um CPF ou CNPJ válido",
+            })
             .refine(
               (data) =>
-                data.length <= lengthFormattedCPF
-                  ? validateCPF(data)
-                  : validateCNPJ(data),
+                cpfIsCNPJ({ cpf: data, role })
+                  ? validateCNPJ(data)
+                  : validateCPF(data),
 
               (data) => ({
-                message:
-                  data.length <= lengthFormattedCPF
-                    ? "CPF inválido"
-                    : "CNPJ inválido",
+                message: cpfIsCNPJ({ cpf: data, role })
+                  ? "CNPJ inválido"
+                  : "CPF inválido",
               }),
             ),
-          password: z.string({ required_error: "Você deve inserir uma senha" }).min(1),
-          agreeToTermsAndConditions: z.boolean({ required_error: "Você deve concordar com os Termos e Condições" })
-            .refine((value) => value === (true), {
+          password: z
+            .string({ required_error: "Você deve inserir uma senha" })
+            .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
+            .max(30, { message: "A senha deve ter no máximo 30 caracteres" }),
+          agreeToTermsAndConditions: z
+            .boolean({
+              required_error: "Você deve concordar com os Termos e Condições",
+            })
+            .refine((value) => value === true, {
               message: "Você deve concordar com os Termos e Condições",
             }),
-          confirmPassword: z.string({ required_error: "Você deve inserir a confirmação de senha" }).min(1),
+          confirmPassword: z
+            .string({
+              required_error: "Você deve inserir a confirmação de senha",
+            })
+            .min(1),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "As senhas devem ser iguais",
           path: ["confirmPassword"],
         }),
-    [],
+    [role],
   );
 }
 
