@@ -35,6 +35,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
             ) : (
               <Image
                 src={"/images/placeholder.png"}
+                priority
                 alt={`Image ${index + 1}`}
                 width={width}
                 height={height}

@@ -1,0 +1,552 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { type ClassNameProps, cn } from "~/utils/ui";
+import { Button } from "~/components/ui/button";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { useCallback } from "react";
+import { useLoginRegisterFlow } from "../state/machine";
+import { ArrowLeftIcon } from "lucide-react";
+import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
+import { Input } from "~/components/ui/input";
+import { api } from "~/utils/api";
+import { useRouter } from "next/router";
+import {
+  type SecondDataStepBuyerFields,
+  useSecondDataStepBuyerSchema,
+} from "../hooks/useSecondDataStepBuyerSchema";
+import {
+  formatPhone,
+  formatZIPCode,
+  lengthFormattedZIPCode,
+} from "~/utils/formatters";
+import { emptyString } from "~/utils/constants";
+import { Checkbox } from "~/components/ui/checkbox";
+import { MapPin } from "lucide-react";
+import Image from "next/image";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "~/components/ui/select";
+import { BusinessSectorLabel, businessSectors } from "~/server/api/auth/types";
+import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
+
+function SecondDataStepBuyerContent({ className }: ClassNameProps) {
+  const { state, resetState } = useLoginRegisterFlow();
+
+  const schema = useSecondDataStepBuyerSchema();
+  const form = useForm<SecondDataStepBuyerFields>({
+    resolver: zodResolver(schema),
+  });
+
+  const {
+    isValidAddress,
+
+    latitude,
+    longitude,
+
+    cityInputRef,
+    provinceInputRef,
+    streetInputRef,
+    neighborhoodInputRef,
+  } = useAutomaticAddressFill({ form });
+
+  const registerBuyer = api.auth.registerBuyer.useMutation();
+  const login = api.auth.login.useMutation();
+  const router = useRouter();
+
+  const onSubmit: SubmitHandler<SecondDataStepBuyerFields> = useCallback(
+    async ({
+      zipCode,
+      city,
+      province,
+      street,
+      neighborhood,
+      complementary,
+      streetNumber,
+      phone,
+      phoneUsesWhatsapp,
+      secondaryPhone,
+      secondaryPhoneUsesWhatsapp,
+      instagram,
+      businessMainSector,
+    }) => {
+      if (state.stepKey !== "secondDataStepBuyer") {
+        return;
+      }
+      const { email, name, password, cpf } = state.accumulatedContext;
+
+      await registerBuyer.mutateAsync({
+        email,
+        name,
+        cpf,
+        password,
+        businessMainSector,
+
+        social: {
+          phone,
+          phoneUsesWhatsapp,
+          secondaryPhone,
+          secondaryPhoneUsesWhatsapp,
+          instagram,
+        },
+        address: {
+          zipCode,
+          city,
+          province,
+          street,
+          neighborhood,
+          complementary,
+          streetNumber,
+          latitude,
+          longitude,
+        },
+      });
+
+      await login.mutateAsync({
+        email,
+        password,
+      });
+
+      await router.replace("/search");
+      resetState();
+    },
+    [
+      state.stepKey,
+      state.accumulatedContext,
+      registerBuyer,
+      latitude,
+      longitude,
+      login,
+      router,
+      resetState,
+    ],
+  );
+
+  return (
+    <main
+      className={cn(
+        "flex flex-col items-start justify-start gap-8 md:justify-start",
+        "px-8 py-6 lg:px-14",
+        className,
+      )}
+    >
+      <h1
+        className={cn(
+          "font-poppins-800 text-headingPrimary",
+          "text-4xl lg:text-5xl",
+          "inline-block md:block",
+        )}
+      >
+        Estamos <span className="text-headingSecondary">quase lá!</span>
+      </h1>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
+        >
+          <div>
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field, fieldState }) => (
+                <FormItem className="w-full text-gray-700">
+                  <FormLabel
+                    className="block text-sm font-medium"
+                    htmlFor="phone"
+                  >
+                    Telefone*
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="mt-3x w-full md:mt-0"
+                      placeholder="(XX) XXXXX-XXXX"
+                      {...field}
+                      value={formatPhone(field.value ?? emptyString)}
+                    />
+                  </FormControl>
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phoneUsesWhatsapp"
+              render={({ field, fieldState }) => (
+                <FormItem className="ml-0.5">
+                  <FormControl>
+                    <div className="p-l-1 mb-1.5 mt-2 flex flex-row">
+                      <Checkbox
+                        id="phoneUsesWhatsapp"
+                        className="mr-2 self-center"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <label htmlFor="phoneUsesWhatsapp" className="text-sm">
+                        <div className="mt-1 flex flex-row items-center justify-center">
+                          <span className="mr-1.5"> Aceita Whatsapp </span>
+                          <Image
+                            priority
+                            src="/images/icons/whatsapp-icon.svg"
+                            height={19}
+                            width={19}
+                            alt="WhatsApp Icon"
+                          />
+                        </div>
+                      </label>
+                    </div>
+                  </FormControl>
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div>
+            <FormField
+              control={form.control}
+              name="secondaryPhone"
+              render={({ field, fieldState }) => (
+                <FormItem className="w-full text-gray-700">
+                  <FormLabel
+                    className="block text-sm font-medium"
+                    htmlFor="secondaryPhone"
+                  >
+                    Telefone secundário (opcional)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="mt-3x w-full md:mt-0"
+                      placeholder="(XX) XXXXX-XXXX"
+                      {...field}
+                      value={formatPhone(field.value ?? emptyString)}
+                    />
+                  </FormControl>
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="secondaryPhoneUsesWhatsapp"
+              render={({ field, fieldState }) => (
+                <FormItem className="ml-0.5">
+                  <FormControl>
+                    <div className="p-l-1 mb-1.5 mt-2 flex flex-row">
+                      <Checkbox
+                        id="acceptsWhatsapp"
+                        className="mr-2 self-center"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <label htmlFor="acceptsWhatsapp" className="text-sm">
+                        <div className="mt-1 flex flex-row items-center justify-center">
+                          <span className="mr-1.5"> Aceita Whatsapp </span>
+                          <Image
+                            priority
+                            src="/images/icons/whatsapp-icon.svg"
+                            height={19}
+                            width={19}
+                            alt="WhatsApp Icon"
+                          />
+                        </div>
+                      </label>
+                    </div>
+                  </FormControl>
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="instagram"
+            render={({ field, fieldState }) => (
+              <FormItem className="w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="instagram"
+                >
+                  <div className="row flex gap-2">
+                    <Image
+                      priority
+                      src="/images/icons/instagram-app-icon.svg"
+                      height={19}
+                      width={19}
+                      alt="Instagram Icon"
+                    />
+                    Instagram @ (opcional)
+                  </div>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    placeholder=" Ex: @minhaempresa"
+                    {...field}
+                    value={field.value ?? emptyString}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="zipCode"
+            render={({ field, fieldState }) => (
+              <FormItem className="mb-4 w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="zipCode"
+                >
+                  CEP*
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    maxLength={lengthFormattedZIPCode}
+                    placeholder="Ex: 99999- 999"
+                    {...field}
+                    value={formatZIPCode(field.value ?? emptyString)}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field, fieldState }) => (
+              <FormItem className="mb-4 w-full text-gray-700">
+                <FormLabel className="block text-sm font-medium" htmlFor="city">
+                  Cidade*
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    placeholder="Cidade"
+                    {...field}
+                    value={field.value ?? emptyString}
+                    ref={cityInputRef}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="province"
+            render={({ field, fieldState }) => (
+              <FormItem className="mb-4 w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="province"
+                >
+                  Estado*
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    placeholder="Estado"
+                    {...field}
+                    value={field.value ?? emptyString}
+                    ref={provinceInputRef}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="street"
+            render={({ field, fieldState }) => (
+              <FormItem className="mb-4 w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="street"
+                >
+                  <div>
+                    {" "}
+                    <MapPin className="mr-1 inline h-4 w-4" />
+                    Endereço*
+                  </div>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    placeholder="Endereço"
+                    {...field}
+                    value={field.value ?? emptyString}
+                    ref={streetInputRef}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="neighborhood"
+            render={({ field, fieldState }) => (
+              <FormItem className="mb-4 w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="neighborhood"
+                >
+                  Bairro
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    placeholder="Bairro"
+                    {...field}
+                    value={field.value ?? emptyString}
+                    ref={neighborhoodInputRef}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="streetNumber"
+            render={({ field, fieldState }) => (
+              <FormItem className="mb-4 w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="streetNumber"
+                >
+                  Número
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    placeholder="Número"
+                    {...field}
+                    value={field.value ?? emptyString}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="complementary"
+            render={({ field, fieldState }) => (
+              <FormItem className="mt-1 w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="complementary"
+                >
+                  Complemento
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="mt-3x w-full md:mt-0"
+                    placeholder="Complemento"
+                    {...field}
+                    value={field.value ?? emptyString}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="businessMainSector"
+            render={({ field }) => (
+              <FormItem className="mt-1 w-full text-gray-700">
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="businessMainField"
+                >
+                  Principal ramo de atividade comercial*
+                </FormLabel>{" "}
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  defaultValue={undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o principal ramo da empresa" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {businessSectors.map((field) => {
+                      return (
+                        <SelectItem key={field} value={field}>
+                          {BusinessSectorLabel[field]}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div>
+            <p className="pb-3 text-sm">*Campo obrigatório</p>
+            <Button
+              disabled={!isValidAddress}
+              variant="primary"
+              className="w-full"
+              type="submit"
+            >
+              Cadastrar
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </main>
+  );
+}
+
+export function SecondDataStepBuyerScreen() {
+  const secondDataStepBuyerAction = useLoginRegisterFlow(
+    (s) => s.secondDataStepBuyerAction,
+  );
+
+  const goBack = useCallback(
+    () =>
+      secondDataStepBuyerAction({
+        command: "goBack",
+        nextStep: "firstDataStep",
+      }),
+    [secondDataStepBuyerAction],
+  );
+
+  return (
+    <div className="flex min-h-screen flex-grow flex-col">
+      <header className="items-between flex justify-between pt-12">
+        <Button
+          className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
+          variant="outline"
+          onClick={goBack}
+        >
+          <ArrowLeftIcon />
+          Voltar
+        </Button>
+        <div className="hidden px-12 md:block">
+          <NossaTerraLogo />
+        </div>
+      </header>
+      <SecondDataStepBuyerContent />
+    </div>
+  );
+}

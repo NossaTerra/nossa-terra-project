@@ -33,7 +33,21 @@ export type StepAction = ExaustiveMap<
           nextStep: "firstDataStep";
         };
 
-    firstDataStep: { command: "goBack"; nextStep: "chooseRole" };
+    firstDataStep:
+      | { command: "goBack"; nextStep: "chooseRole" }
+      | {
+          command: "nextSeller";
+          data: StepData["firstDataStep"];
+          nextStep: "secondDataStepSeller";
+        }
+      | {
+          command: "nextBuyer";
+          data: StepData["firstDataStep"];
+          nextStep: "secondDataStepBuyer";
+        };
+
+    secondDataStepSeller: { command: "goBack"; nextStep: "firstDataStep" };
+    secondDataStepBuyer: { command: "goBack"; nextStep: "firstDataStep" };
   },
   ActionShape
 >;
@@ -46,6 +60,12 @@ interface LoginRegisterFlowStore {
   welcomeBackAction: (action: StepAction["welcomeBack"]) => void;
   chooseRoleAction: (action: StepAction["chooseRole"]) => void;
   firstDataStepAction: (action: StepAction["firstDataStep"]) => void;
+  secondDataStepSellerAction: (
+    action: StepAction["secondDataStepSeller"],
+  ) => void;
+  secondDataStepBuyerAction: (
+    action: StepAction["secondDataStepBuyer"],
+  ) => void;
 }
 
 export const useLoginRegisterFlow = create<LoginRegisterFlowStore>()(
@@ -54,6 +74,18 @@ export const useLoginRegisterFlow = create<LoginRegisterFlowStore>()(
       stepKey: "greeting",
       accumulatedContext: {},
     },
+    // state: {
+    //   stepKey: "secondDataStepBuyer",
+    //   accumulatedContext: {
+    //     name: "Josue Comprador",
+    //     role: "buyer",
+    //     agreeToTermsAndConditions: true,
+    //     password: "senha123",
+    //     confirmPassword: "senha123",
+    //     cpf: "047.685.271-40",
+    //     email: "comprador@email.com",
+    //   },
+    // },
     lastCommand: "",
     resetState: () =>
       set({ state: { stepKey: "greeting", accumulatedContext: {} } }),
@@ -149,6 +181,74 @@ export const useLoginRegisterFlow = create<LoginRegisterFlowStore>()(
       if (currentState.stepKey !== "firstDataStep") {
         return console.warn(
           `Invalid action for current step "${currentState.stepKey}"`,
+        );
+      }
+
+      if (action.command === "goBack") {
+        return set({
+          lastCommand: action.command,
+          state: {
+            stepKey: action.nextStep,
+            accumulatedContext: {
+              ...currentState.accumulatedContext,
+            },
+          },
+        });
+      }
+
+      if (action.command === "nextSeller") {
+        return set({
+          lastCommand: action.command,
+          state: {
+            stepKey: action.nextStep,
+            accumulatedContext: {
+              ...currentState.accumulatedContext,
+              ...action.data,
+            },
+          },
+        });
+      }
+
+      if (action.command === "nextBuyer") {
+        return set({
+          lastCommand: action.command,
+          state: {
+            stepKey: action.nextStep,
+            accumulatedContext: {
+              ...currentState.accumulatedContext,
+              ...action.data,
+            },
+          },
+        });
+      }
+    },
+
+    secondDataStepSellerAction: (action) => {
+      const currentState = get().state;
+      if (currentState.stepKey !== "secondDataStepSeller") {
+        return console.warn(
+          `Invalid action for current step " ${currentState.stepKey}"`,
+        );
+      }
+
+      if (action.command === "goBack") {
+        return set({
+          lastCommand: action.command,
+          state: {
+            stepKey: action.nextStep,
+            accumulatedContext: {
+              ...currentState.accumulatedContext,
+            },
+          },
+        });
+      }
+    },
+
+    secondDataStepBuyerAction: (action) => {
+      const currentState = get().state;
+      if (currentState.stepKey !== "secondDataStepBuyer") {
+        return console.warn(
+          `Invalid action for current step but is second " ${currentState.stepKey}"`,
         );
       }
 
