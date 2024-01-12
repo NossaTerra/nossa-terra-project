@@ -16,57 +16,76 @@ export function useSecondDataStepBuyerSchema() {
 
   return useMemo(
     () =>
-     addressSchema.merge(
-        z.object({
-          phone: z
-            .string({
-              required_error: "Por favor, insira um telefone da sua empresa",
-            })
-            .min(lowerEndLengthFormattedPhone, {
-              message: `O telefone deve ter no mínimo ${lowerEndLengthFormattedPhone} dígitos`,
-            })
-            .max(higherEndLengthFormattedPhone, {
-              message: `O telefone deve ter no máximo ${higherEndLengthFormattedPhone} dígitos`,
-            })
-            .refine(validatePhone, { message: "Número de telefone inválido" }),
+      addressSchema
+        .merge(
+          z.object({
+            phone: z
+              .string({
+                required_error: "Por favor, insira um telefone da sua empresa",
+              })
+              .min(lowerEndLengthFormattedPhone, {
+                message: `O telefone deve ter no mínimo ${lowerEndLengthFormattedPhone} dígitos`,
+              })
+              .max(higherEndLengthFormattedPhone, {
+                message: `O telefone deve ter no máximo ${higherEndLengthFormattedPhone} dígitos`,
+              })
+              .refine(validatePhone, {
+                message: "Número de telefone inválido",
+              }),
 
-          businessMainSector: z
-            .enum(businessSectors)
-            .optional()
-            .refine((sector) => sector !== undefined, {
-              message: "Por favor, insira o ramo de atuação da sua empresa",
-            })
-            .transform((sector) => {
-              if (sector === undefined) {
-                throw new Error(
-                  "DEV: you didnt' refine the sector to non nullable",
-                );
-              }
-              return sector;
-            }),
+            businessMainSector: z
+              .enum(businessSectors)
+              .optional()
+              .refine((sector) => sector !== undefined, {
+                message: "Por favor, insira o ramo de atuação da sua empresa",
+              })
+              .transform((sector) => {
+                if (sector === undefined) {
+                  throw new Error(
+                    "DEV: you didnt' refine the sector to non nullable",
+                  );
+                }
+                return sector;
+              }),
 
-          secondaryPhone: z
-            .string()
-            .refine((phone) => phone === emptyString || validatePhone(phone), {
-              message: "Número de telefone secundário inválido",
-            })
-            .optional(),
-          instagram: z
-            .string()
-            .refine(
-              (instagram) => {
-                return (
-                  instagram === emptyString || validateInstagram(instagram)
-                );
-              },
-              { message: "Nome de usuário do Instagram inválido inicie com @" },
-            )
-            .optional(),
-          phoneUsesWhatsapp: z.boolean().optional(),
-          secondaryPhoneUsesWhatsapp: z.boolean().optional(),
-          avatarImage: z.string().optional(),
-        }),
-      ),
+            secondaryPhone: z
+              .string()
+              .refine(
+                (phone) => phone === emptyString || validatePhone(phone),
+                {
+                  message: "Número de telefone secundário inválido",
+                },
+              )
+              .optional(),
+            instagram: z
+              .string()
+              .refine(
+                (instagram) => {
+                  return (
+                    instagram === emptyString || validateInstagram(instagram)
+                  );
+                },
+                {
+                  message: "Nome de usuário do Instagram inválido inicie com @",
+                },
+              )
+              .optional(),
+            phoneUsesWhatsapp: z.boolean().optional(),
+            secondaryPhoneUsesWhatsapp: z.boolean().optional(),
+            avatarImage: z.string().optional(),
+          }),
+        )
+        .refine(
+          (data) =>
+            !data.secondaryPhoneUsesWhatsapp ||
+            (data.secondaryPhoneUsesWhatsapp &&
+              data.secondaryPhone !== undefined &&
+              data.secondaryPhone !== emptyString),
+          {
+            message: "Apenas selecione se o telefone secundário for válido",
+            path: ["secondaryPhoneUsesWhatsapp"],
+          },
+        ),
     [addressSchema],
   );
 }
