@@ -7,6 +7,9 @@ import {
 } from "~/utils/formatters";
 import { validateInstagram, validatePhone } from "~/utils/validators";
 
+import { UserActiveState } from "@prisma/client";
+export { UserActiveState } from "@prisma/client";
+
 export const roles = ["seller", "buyer", "backoffice", "admin"] as const;
 export const rolesSchema = z.enum(roles);
 export type Role = z.infer<typeof rolesSchema>;
@@ -72,7 +75,7 @@ export const userAttributes = z
     name: z.string(),
     cpf: z.string(),
     role: rolesSchema,
-    isActive: z.boolean().optional(),
+    activeState: z.nativeEnum(UserActiveState).optional().default("inactive"),
     rg: z.string().optional(),
     businessMainSector: businessSectorSchema.optional(),
   })

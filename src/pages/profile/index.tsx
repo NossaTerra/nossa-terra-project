@@ -22,7 +22,11 @@ export default function ProfileScreen({ user }: Props) {
           <p>
             ROLE: <span className="font-bold">{user.role}</span>
           </p>
-          <p>{user.isActive ? "✅ isActive" : "❌ NotActive"}</p>
+          <p>
+            {user.activeState === "active"
+              ? "✅ Active User"
+              : "❌ Inacitve User"}
+          </p>
         </div>
         {user.avatarImage && (
           <Avatar>

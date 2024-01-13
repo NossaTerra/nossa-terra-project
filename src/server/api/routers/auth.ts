@@ -54,6 +54,7 @@ export const authRouter = createTRPCRouter({
       try {
         const user = auth.createUser({
           attributes: {
+            activeState: "inactive",
             email,
             role: "seller",
             ...address,
@@ -90,7 +91,7 @@ export const authRouter = createTRPCRouter({
       try {
         const user = auth.createUser({
           attributes: {
-            isActive: false,
+            activeState: "inactive",
             role: "buyer",
             email,
             ...address,

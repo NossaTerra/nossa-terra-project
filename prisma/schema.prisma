@@ -18,6 +18,12 @@ generator client {
 // @link https://lucia-auth.com/database-adapters/prisma/
 // -----------------------------------------
 
+enum UserActiveState {
+    active
+    inactive
+    inactive_payment_problem
+}
+
 model User {
     id           String    @id @unique
     auth_session Session[]
@@ -26,11 +32,11 @@ model User {
 
 
     // UserAttributes
-    email                      String   @unique
+    email                      String          @unique
+    activeState                UserActiveState @default(inactive)
     name                       String
     role                       String
     cpf                        String
-    isActive                   Boolean?
     image                      String?
     rg                         String?
     zipCode                    String
