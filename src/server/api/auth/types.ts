@@ -7,22 +7,8 @@ import {
 } from "~/utils/formatters";
 import { validateInstagram, validatePhone } from "~/utils/validators";
 
-import { UserActiveState } from "@prisma/client";
-export { UserActiveState } from "@prisma/client";
-
-export const roles = ["seller", "buyer", "backoffice", "admin"] as const;
-export const rolesSchema = z.enum(roles);
-export type Role = z.infer<typeof rolesSchema>;
-
-export const businessSectors = [
-  "Exporter",
-  "Distributor",
-  "Retailer",
-  "Other",
-] as const;
-
-export const businessSectorSchema = z.enum(businessSectors);
-export type BusinessSector = z.infer<typeof businessSectorSchema>;
+import { UserActiveState, Role, BusinessSector } from "@prisma/client";
+export { UserActiveState, Role, BusinessSector } from "@prisma/client";
 
 export const BusinessSectorLabel = {
   Exporter: "Exportador",
@@ -70,14 +56,15 @@ export const buyerSocialSchema = sellerSocialSchema.merge(
 
 export const userAttributes = z
   .object({
-    email: z.string(),
-    avatarImage: z.string().optional(),
-    name: z.string(),
-    cpf: z.string(),
-    role: rolesSchema,
     activeState: z.nativeEnum(UserActiveState).optional().default("inactive"),
+    role: z.nativeEnum(Role).optional().default("seller"),
+
+    name: z.string(),
+    email: z.string(),
+    cpf: z.string(),
     rg: z.string().optional(),
-    businessMainSector: businessSectorSchema.optional(),
+    businessMainSector: z.nativeEnum(BusinessSector).optional(),
+    avatarImage: z.string().optional(),
   })
   .merge(addressSchema)
   .merge(buyerSocialSchema);
@@ -96,6 +83,7 @@ function roleParser<T extends [Role, ...Role[]]>(roles: T) {
 export const RoleTypeSchema = {
   Common: roleParser(["seller", "buyer"]),
   BuyerOnly: roleParser(["buyer"]),
+
   Backoffice: roleParser(["backoffice", "admin"]),
   Admin: roleParser(["admin"]),
 } as const;

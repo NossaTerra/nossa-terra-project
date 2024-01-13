@@ -1,6 +1,6 @@
 import {
   addressSchema,
-  businessSectorSchema,
+  BusinessSector,
   buyerSocialSchema,
   sellerSocialSchema,
 } from "./../auth/types";
@@ -82,7 +82,7 @@ export const authRouter = createTRPCRouter({
         password: z.string().min(8).max(60),
         avatarImage: z.string().optional(),
         cpf: z.string().min(lengthFormattedCNPJ).max(lengthFormattedCNPJ),
-        businessMainSector: businessSectorSchema,
+        businessMainSector: z.nativeEnum(BusinessSector),
         address: addressSchema,
         social: buyerSocialSchema,
       }),

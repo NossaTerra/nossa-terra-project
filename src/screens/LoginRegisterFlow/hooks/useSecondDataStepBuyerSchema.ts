@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import { businessSectors } from "~/server/api/auth/types";
+import { BusinessSector } from "~/server/api/auth/types";
 import { emptyString } from "~/utils/constants";
 import {
   lowerEndLengthFormattedPhone,
@@ -34,7 +34,7 @@ export function useSecondDataStepBuyerSchema() {
               }),
 
             businessMainSector: z
-              .enum(businessSectors)
+              .nativeEnum(BusinessSector)
               .optional()
               .refine((sector) => sector !== undefined, {
                 message: "Por favor, insira o ramo de atuação da sua empresa",

@@ -37,7 +37,7 @@ import {
   SelectContent,
   SelectItem,
 } from "~/components/ui/select";
-import { BusinessSectorLabel, businessSectors } from "~/server/api/auth/types";
+import { BusinessSector, BusinessSectorLabel } from "~/server/api/auth/types";
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
 import { AvatarUpload } from "~/components/common/AvatarUpload";
 
@@ -489,7 +489,7 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {businessSectors.map((field) => {
+                    {Object.values(BusinessSector).map((field) => {
                       return (
                         <SelectItem key={field} value={field}>
                           {BusinessSectorLabel[field]}

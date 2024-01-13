@@ -1,6 +1,13 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// -----------------------------------------
+// AUTH
+//
+// Lucia Auth Setup
+// @link https://lucia-auth.com/database-adapters/prisma/
+// -----------------------------------------
+
 datasource db {
     provider     = "mysql"
     url          = env("DATABASE_URL")
@@ -11,50 +18,64 @@ generator client {
     provider = "prisma-client-js"
 }
 
-// -----------------------------------------
-// AUTH
-//
-// Lucia Auth Setup
-// @link https://lucia-auth.com/database-adapters/prisma/
-// -----------------------------------------
-
 enum UserActiveState {
     active
     inactive
     inactive_payment_problem
 }
 
+enum Role {
+    seller
+    buyer
+    backoffice
+    admin
+}
+
+enum BusinessSector {
+    Exporter
+    Distributor
+    Retailer
+    Other
+}
+
 model User {
+    // LUCIA AUTH
     id           String    @id @unique
     auth_session Session[]
     key          Key[]
-    passwordResetTokens PasswordResetToken[]   // Add this line
+    passwordResetTokens PasswordResetToken[]
+    // END
 
+    // ------ UserAttributes -------
+    activeState UserActiveState @default(inactive)
+    role        Role            @default(seller)
+    name        String
+    email       String          @unique
 
-    // UserAttributes
-    email                      String          @unique
-    activeState                UserActiveState @default(inactive)
-    name                       String
-    role                       String
-    cpf                        String
-    image                      String?
-    rg                         String?
-    zipCode                    String
-    city                       String
-    province                   String
-    street                     String?
-    neighborhood               String?
-    streetNumber               String?
-    complementary              String?
+    cpf                String
+    rg                 String?
+    businessMainSector BusinessSector?
+    // QUESTION: why do we have both fields?
+    image              String?
+    avatarImage        String?
+
+    // Social Info
     phone                      String
     phoneUsesWhatsapp          Boolean?
     secondaryPhone             String?
     secondaryPhoneUsesWhatsapp Boolean?
-    avatarImage                String?
-    businessMainSector         String?
     instagram                  String?
-    latitude                   Float?
-    longitude                  Float?
+
+    // Address Info
+    zipCode       String
+    city          String
+    province      String
+    street        String?
+    neighborhood  String?
+    streetNumber  String?
+    complementary String?
+    latitude      Float?
+    longitude     Float?
 }
 
 model Session {
