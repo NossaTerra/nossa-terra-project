@@ -33,7 +33,7 @@ export function useSecondDataStepSellerSchema() {
               message: `O telefone deve ter no máximo  ${higherEndLengthFormattedPhone} dígitos`,
             })
             .refine(validatePhone, { message: "Número de telefone inválido" }),
-          phoneUsesWhatsapp: z.boolean().optional(),
+          phoneUsesWhatsapp: z.boolean().optional().default(false),
         }),
       ),
     [adressSchmea],

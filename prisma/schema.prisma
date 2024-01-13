@@ -61,7 +61,7 @@ model User {
 
     // Social Info
     phone                      String
-    phoneUsesWhatsapp          Boolean?
+    phoneUsesWhatsapp          Boolean
     secondaryPhone             String?
     secondaryPhoneUsesWhatsapp Boolean?
     instagram                  String?

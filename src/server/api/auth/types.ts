@@ -34,7 +34,7 @@ export const sellerSocialSchema = z.object({
     .string()
     .min(lowerEndLengthFormattedPhone)
     .max(higherEndLengthFormattedPhone),
-  phoneUsesWhatsapp: z.boolean().optional(),
+  phoneUsesWhatsapp: z.boolean().optional().default(false),
 });
 
 export const buyerSocialSchema = sellerSocialSchema.merge(

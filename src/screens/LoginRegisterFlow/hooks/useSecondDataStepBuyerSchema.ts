@@ -70,7 +70,7 @@ export function useSecondDataStepBuyerSchema() {
                 },
               )
               .optional(),
-            phoneUsesWhatsapp: z.boolean().optional(),
+            phoneUsesWhatsapp: z.boolean().optional().default(false),
             secondaryPhoneUsesWhatsapp: z.boolean().optional(),
             avatarImage: z.string().optional(),
           }),
