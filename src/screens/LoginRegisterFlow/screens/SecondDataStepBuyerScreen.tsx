@@ -155,10 +155,7 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
           className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
         >
           <div className="flex w-full items-center justify-center md:col-span-2 lg:absolute lg:right-[32vw] lg:w-0 ">
-            <AvatarUpload
-              id="avatarImage"
-              onChange={(filePath) => form.setValue("avatarImage", filePath)}
-            />
+            <AvatarUpload form={form} />
           </div>
           <div>
             <FormField

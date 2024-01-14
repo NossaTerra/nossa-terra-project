@@ -1,8 +1,12 @@
-import React, { type ChangeEvent, useState, useRef, useCallback } from "react";
+import React, {
+  type ChangeEvent,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 
-import { Brush } from "lucide-react";
-import { AvatarImage } from "../ui/avatar";
-import { Avatar } from "@radix-ui/react-avatar";
+import { Brush, Loader2Icon } from "lucide-react";
 import { Input } from "../ui/input";
 import {
   TooltipProvider,
@@ -12,116 +16,90 @@ import {
 } from "../ui/tooltip";
 import { FormItem } from "../ui/form";
 import { kiloByte } from "~/utils/constants";
-import Image from "next/image";
+import Image, { type ImageProps } from "next/image";
 import { api } from "~/utils/api";
-import { cn } from "~/utils/ui";
+import { type UseFormReturn } from "react-hook-form";
 
 const MAX_FILE_SIZE_MB = 1;
 
-export const AvatarUpload: React.FC<{
-  onChange: (filePath: string) => void;
-  id: string;
-}> = ({ onChange, id }) => {
-  const [preview, setPreview] = useState<string | null>(null);
-  const [wrongImageType, setWrongImageType] = useState(false);
-  const [uploadError, setUploadError] = useState(false);
-  const [fileSizeOverLimit, setFileSizeOverLimit] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+const IMAGE_FILE_TYPES: string[] = [
+  "image/png",
+  "image/svg+xml",
+  "image/jpeg",
+  "image/jpg",
+];
+
+const avatarFormKey = "avatarImage";
+type AvatarFormKey = typeof avatarFormKey;
+
+type AvatarFormData<Key extends string = AvatarFormKey> = {
+  [K in Key]?: string;
+};
+
+interface Props<FormData extends AvatarFormData> {
+  form: UseFormReturn<FormData>;
+}
+
+export function AvatarUpload<FormData extends AvatarFormData>({
+  form: anoyinglyTypedForm,
+}: Props<FormData>) {
+  // NOTE: the typesafety here is messy because ReactHookForms's
+  // internal types, but it is great actually!
+  //
+  // We are just casting the form to a more specific type
+  // The safe constraint was already infered by the generic
+  const form = anoyinglyTypedForm as unknown as UseFormReturn<AvatarFormData>;
+
+  const [error, setError] = useState<ErrorType | null>(null);
+  const errorMessage = useErrorMessage(error);
+
   const uploadAvatar = api.auth.uploadAvatar.useMutation();
+  const [localImagePreview, setLocalImagePreview] = useState<string | null>(
+    null,
+  );
 
-  const readFileAsDataURL = useCallback((file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        resolve(result);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }, []);
-
-  const uploadImageToRemote = useCallback(
+  const handleFileChange = useCallback(
     async (file: File) => {
+      if (file.size > MAX_FILE_SIZE_MB * kiloByte * kiloByte) {
+        return setError(ErrorType.FileSizeOverLimit);
+      }
+
+      if (!IMAGE_FILE_TYPES.includes(file.type)) {
+        return setError(ErrorType.InvalidImageType);
+      }
+
+      const dataUrl = await readFileAsDataURL(file);
+      if (!dataUrl) {
+        return setError(ErrorType.CantReadFile);
+      }
+
+      setLocalImagePreview(dataUrl);
       try {
-        const dataUrl = await readFileAsDataURL(file);
         const imageUrl = await uploadAvatar.mutateAsync({
           dataUrl,
         });
-        console.log("the image url is", imageUrl);
-        onChange(imageUrl);
-      } catch (error) {
-        console.error("Error uploading image to Cloudinary:", error);
-        throw error;
+        form.setValue(avatarFormKey, imageUrl);
+
+        setError(null);
+      } catch (_e) {
+        setError(ErrorType.UploadError);
       }
+      setLocalImagePreview(null);
     },
-    [readFileAsDataURL, uploadAvatar, onChange],
-  );
-
-  const readAndPreview = useCallback((file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      setPreview(result ?? null);
-    };
-
-    reader.readAsDataURL(file);
-  }, []);
-
-  const uploadImage = useCallback(
-    async (file: File) => {
-      const { type } = file;
-      if (
-        type === "image/png" ||
-        type === "image/svg+xml" ||
-        type === "image/jpeg" ||
-        type === "image/jpg"
-      ) {
-        try {
-          await uploadImageToRemote(file);
-          readAndPreview(file);
-          return;
-        } catch (e) {
-          setUploadError(true);
-          return;
-        }
-      }
-      setWrongImageType(true);
-    },
-    [readAndPreview, uploadImageToRemote],
-  );
-
-  const handleFile = useCallback(
-    async (file: File | undefined) => {
-      if (file && file.size <= MAX_FILE_SIZE_MB * kiloByte * kiloByte) {
-        await uploadImage(file);
-        setFileSizeOverLimit(false);
-        return;
-      }
-      setFileSizeOverLimit(true);
-    },
-    [uploadImage],
+    [form, uploadAvatar],
   );
 
   const handleOnDrop = useCallback<React.DragEventHandler<HTMLButtonElement>>(
     (event) => {
       event.preventDefault();
       event.stopPropagation();
-      const files = event.dataTransfer?.files;
-      if (files && files.length > 0) {
-        const imageFile = files?.[0];
 
-        handleFile(imageFile)
-          .then(() => {
-            setWrongImageType(false);
-            setUploadError(false);
-          })
-          .catch((error) => {
-            console.error("Error handling file:", error);
-          });
+      const file = event.dataTransfer?.files?.item(0);
+      if (file) {
+        void handleFileChange(file);
       }
     },
-    [handleFile],
+    [handleFileChange],
   );
 
   const handleOnDragOver = useCallback<
@@ -131,31 +109,33 @@ export const AvatarUpload: React.FC<{
   }, []);
 
   const onFileInputChange = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.item(0);
       if (file) {
-        await handleFile(file);
+        void handleFileChange(file);
       }
     },
-    [handleFile],
+    [handleFileChange],
   );
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const triggerFileInput = useCallback(() => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   }, []);
 
+  const imageSource = localImagePreview ?? form.watch(avatarFormKey);
+
   return (
     <FormItem className="flex flex-col items-center justify-center">
       <Input
-        id={id}
-        name={id}
-        className="hidden"
+        name={avatarFormKey}
         accept=".png, .jpeg, .jpg, .svg"
         type="file"
-        ref={fileInputRef}
+        className="hidden"
         onChange={onFileInputChange}
+        ref={fileInputRef}
       />
 
       <TooltipProvider delayDuration={100}>
@@ -167,36 +147,36 @@ export const AvatarUpload: React.FC<{
             type="button"
             className="flex flex-col items-center gap-2"
           >
-            <div
-              className={cn("h-40 w-40", {
-                "flex items-center justify-center rounded-full border-2 bg-neutral-600":
-                  !preview,
-              })}
-            >
-              {preview ? (
-                <Avatar>
-                  <AvatarImage
-                    className="rounded-full border-2 object-cover"
-                    src={preview}
-                  />
-                </Avatar>
-              ) : (
-                <Image
-                  src={"/images/image-plus.png"}
-                  priority
-                  alt={`logo`}
-                  width={80}
-                  height={80}
-                  className="object-cover"
+            <div className="relative flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-2 bg-neutral-600">
+              {uploadAvatar.isLoading && (
+                <Loader2Icon
+                  size={60}
+                  strokeWidth={3}
+                  className="absolute animate-spin text-white"
                 />
               )}
+              <Image
+                alt="logo"
+                priority
+                className={uploadAvatar.isLoading ? "opacity-40" : ""}
+                {...(imageSource
+                  ? {
+                    src: imageSource,
+                    fill: true,
+                  }
+                  : {
+                    src: "/images/image-plus.png",
+                    width: 80,
+                    height: 80,
+                  })}
+              />
             </div>
 
             <div className="flex-column flex w-36 flex-col items-center justify-center rounded bg-black p-2">
               <div className="flex flex-row">
                 <Brush color="white" className=" mr-2 inline h-4 w-4" />
                 <p className="text-sm text-white ">
-                  {preview ? "Editar a" : "Adicionar a"}
+                  {imageSource ? "Editar a" : "Adicionar a"}
                 </p>
               </div>
               <p className="text-sm text-white ">logo da empresa</p>
@@ -219,17 +199,48 @@ export const AvatarUpload: React.FC<{
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      {wrongImageType && (
-        <p className="w-44 text-sm text-red-500">*Tipo de imagem inválido</p>
-      )}
-      {fileSizeOverLimit && (
-        <p className="w-44 text-sm  text-red-500">*Tamanho máximo 1 MB</p>
-      )}
-      {uploadError && (
-        <p className="w-44 text-sm  text-red-500">
-          *Erro ao fazer upload do arquivo tente novamente
-        </p>
+
+      {errorMessage && (
+        <p className="w-44 text-sm text-red-500">{errorMessage}</p>
       )}
     </FormItem>
   );
-};
+}
+
+enum ErrorType {
+  InvalidImageType,
+  FileSizeOverLimit,
+  CantReadFile,
+  UploadError,
+}
+
+function useErrorMessage(errorType: ErrorType | null) {
+  if (errorType === null) {
+    return null;
+  }
+
+  const errorMap: Record<ErrorType, string> = {
+    [ErrorType.InvalidImageType]: "*Tipo de imagem inválido",
+    [ErrorType.FileSizeOverLimit]: "*Tamanho máximo 1 MB",
+    [ErrorType.CantReadFile]: "*Não foi possível ler o arquivo",
+    [ErrorType.UploadError]: "*Erro ao fazer upload do arquivo tente novamente",
+  };
+
+  return errorMap[errorType];
+}
+
+function readFileAsDataURL(file: File): Promise<string | null> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onerror = () => resolve(null);
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        return resolve(null);
+      }
+      resolve(reader.result);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
