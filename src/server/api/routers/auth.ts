@@ -150,8 +150,8 @@ export const authRouter = createTRPCRouter({
         const result = await cloudinaryV2.uploader.upload(dataUrl, {
           folder: "nossa-terra-avatars",
           crop: "fill",
-          width: 80,
-          height: 80,
+          width: 160,
+          height: 160,
         });
         return result.secure_url;
       } catch (error) {
