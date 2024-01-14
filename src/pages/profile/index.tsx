@@ -1,3 +1,4 @@
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { type InferGetServerSidePropsType } from "next";
 import { AppHeader } from "~/components/common/headers";
 import { Button } from "~/components/ui/button";
@@ -23,6 +24,14 @@ export default function ProfileScreen({ user }: Props) {
           </p>
           <p>{user.isActive ? "✅ isActive" : "❌ NotActive"}</p>
         </div>
+        {user.avatarImage && (
+          <Avatar>
+            <AvatarImage
+              className="w-40 h-40 rounded-full object-cover border-2"
+              src={user.avatarImage}
+            />
+          </Avatar>
+        )}
         <Button onClick={logout}>Log Out</Button>
       </div>
     </>
