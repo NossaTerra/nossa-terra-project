@@ -29,12 +29,6 @@ export const AvatarUpload: React.FC<{
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadAvatar = api.auth.uploadAvatar.useMutation();
 
-  const handleOndragOver = useCallback<
-    React.DragEventHandler<HTMLButtonElement>
-  >((event) => {
-    event.preventDefault();
-  }, []);
-
   const readFileAsDataURL = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -109,7 +103,7 @@ export const AvatarUpload: React.FC<{
     [uploadImage],
   );
 
-  const handleOndrop = useCallback<React.DragEventHandler<HTMLButtonElement>>(
+  const handleOnDrop = useCallback<React.DragEventHandler<HTMLButtonElement>>(
     (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -130,7 +124,13 @@ export const AvatarUpload: React.FC<{
     [handleFile],
   );
 
-  const handleAvatarImageChange = useCallback(
+  const handleOnDragOver = useCallback<
+    React.DragEventHandler<HTMLButtonElement>
+  >((event) => {
+    event.preventDefault();
+  }, []);
+
+  const onFileInputChange = useCallback(
     async (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
@@ -140,7 +140,7 @@ export const AvatarUpload: React.FC<{
     [handleFile],
   );
 
-  const handleClick = useCallback(() => {
+  const triggerFileInput = useCallback(() => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -148,12 +148,22 @@ export const AvatarUpload: React.FC<{
 
   return (
     <FormItem className="flex flex-col items-center justify-center">
+      <Input
+        id={id}
+        name={id}
+        className="hidden"
+        accept=".png, .jpeg, .jpg, .svg"
+        type="file"
+        ref={fileInputRef}
+        onChange={onFileInputChange}
+      />
+
       <TooltipProvider delayDuration={100}>
         <Tooltip>
           <TooltipTrigger
-            onClick={handleClick}
-            onDragOver={handleOndragOver}
-            onDrop={handleOndrop}
+            onClick={triggerFileInput}
+            onDragOver={handleOnDragOver}
+            onDrop={handleOnDrop}
             type="button"
             className="flex flex-col items-center gap-2"
           >
@@ -181,15 +191,6 @@ export const AvatarUpload: React.FC<{
                 />
               )}
             </div>
-            <Input
-              id={id}
-              name={id}
-              className="hidden"
-              accept=".png, .jpeg, .jpg, .svg"
-              type="file"
-              ref={fileInputRef}
-              onChange={handleAvatarImageChange}
-            />
 
             <div className="flex-column flex w-36 flex-col items-center justify-center rounded bg-black p-2">
               <div className="flex flex-row">
