@@ -13,6 +13,7 @@ import { protectedProcedure, publicProcedure } from "../trpc/procedures";
 import axios from "axios";
 import { addressDetailsApiSchema } from "~/server/api/addressApi";
 import { lengthFormattedCNPJ, lengthFormattedCPF } from "~/utils/formatters";
+import cloudinaryV2 from "~/utils/configs";
 
 export const authRouter = createTRPCRouter({
   getUser: publicProcedure.query(({ ctx: { user } }) => user),
@@ -65,6 +66,7 @@ export const authRouter = createTRPCRouter({
         email: z.string().email().min(2).max(60),
         name: z.string().min(2).max(120),
         password: z.string().min(8).max(60),
+        avatarImage: z.string().optional(),
         cpf: z.string().min(lengthFormattedCNPJ).max(lengthFormattedCNPJ),
         businessMainSector: businessSectorSchema,
         address: addressSchema,
@@ -137,6 +139,23 @@ export const authRouter = createTRPCRouter({
         );
         return await addressDetailsApiSchema.parseAsync(response.data);
       } catch (error) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+    }),
+
+  uploadAvatar: publicProcedure
+    .input(z.object({ dataUrl: z.string() }))
+    .mutation(async ({ input: { dataUrl } }) => {
+      try {
+        const result = await cloudinaryV2.uploader.upload(dataUrl, {
+          folder: "nossa-terra-avatars",
+          crop: "fill",
+          width: 80,
+          height: 80,
+        });
+        return result.secure_url;
+      } catch (error) {
+        console.log("cloudnary error", error);
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
     }),
