@@ -39,7 +39,7 @@ import {
 } from "~/components/ui/select";
 import { BusinessSectorLabel, businessSectors } from "~/server/api/auth/types";
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
-import { AvatarUpload } from "~/components/common/FileUpload";
+import { AvatarUpload } from "~/components/common/AvatarUpload";
 
 function SecondDataStepBuyerContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
