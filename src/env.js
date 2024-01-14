@@ -21,6 +21,24 @@ export const env = createEnv({
         (str) => !str.includes("ADDRESS_VIA_ZIP_CODE_API_URL_HERE"),
         "You forgot to change the default zip code API URL",
       ),
+    CLOUDINARY_API_KEY: z
+      .string()
+      .refine(
+        (str) => !str.includes("CLOUDINARY_API_KEY"),
+        "You forgot to change the default CLOUDINARY_API_KEY",
+      ),
+    CLOUDINARY_API_SECRET: z
+      .string()
+      .refine(
+        (str) => !str.includes("CLOUDINARY_API_SECRET"),
+        "You forgot to change the default CLOUDINARY_API_SECRET",
+      ),
+    CLOUDINARY_CLOUD_NAME: z
+      .string()
+      .refine(
+        (str) => !str.includes("CLOUDINARY_CLOUD_NAME"),
+        "You forgot to change the default CLOUDINARY_CLOUD_NAME",
+      ),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -43,6 +61,9 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     ADDRESS_VIA_ZIP_CODE_API_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
