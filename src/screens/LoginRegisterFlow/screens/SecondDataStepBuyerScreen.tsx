@@ -39,6 +39,7 @@ import {
 } from "~/components/ui/select";
 import { BusinessSectorLabel, businessSectors } from "~/server/api/auth/types";
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
+import { AvatarUpload } from "~/components/common/FileUpload";
 
 function SecondDataStepBuyerContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -50,10 +51,8 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
 
   const {
     isValidAddress,
-
     latitude,
     longitude,
-
     cityInputRef,
     provinceInputRef,
     streetInputRef,
@@ -66,6 +65,7 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
 
   const onSubmit: SubmitHandler<SecondDataStepBuyerFields> = useCallback(
     async ({
+      avatarImage,
       zipCode,
       city,
       province,
@@ -91,7 +91,7 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
         cpf,
         password,
         businessMainSector,
-
+        avatarImage,
         social: {
           phone,
           phoneUsesWhatsapp,
@@ -154,6 +154,12 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
         >
+          <div className="flex w-full items-center justify-center md:col-span-2 lg:absolute lg:right-[32vw] lg:w-0 ">
+            <AvatarUpload
+              id="avatarImage"
+              onChange={(filePath) => form.setValue("avatarImage", filePath)}
+            />
+          </div>
           <div>
             <FormField
               control={form.control}
