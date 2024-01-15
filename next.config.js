@@ -7,6 +7,9 @@ await import("./src/env.js");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  images: {
+    domains: ["res.cloudinary.com"],
+  },
   experimental: {
     swcPlugins: [
       [
