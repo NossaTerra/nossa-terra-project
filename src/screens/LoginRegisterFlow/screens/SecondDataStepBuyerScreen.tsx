@@ -39,7 +39,7 @@ import {
 } from "~/components/ui/select";
 import { BusinessSectorLabel, businessSectors } from "~/server/api/auth/types";
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
-import { AvatarUpload } from "~/components/common/FileUpload";
+import { AvatarUpload } from "~/components/common/AvatarUpload";
 
 function SecondDataStepBuyerContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -155,10 +155,7 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
           className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
         >
           <div className="flex w-full items-center justify-center md:col-span-2 lg:absolute lg:right-[32vw] lg:w-0 ">
-            <AvatarUpload
-              id="avatarImage"
-              onChange={(filePath) => form.setValue("avatarImage", filePath)}
-            />
+            <AvatarUpload form={form} />
           </div>
           <div>
             <FormField
