@@ -30,8 +30,6 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
   // The safe constraint was already infered by the generic
   const form = anoyinglyTypedForm as unknown as UseFormReturn<AddressFormData>;
 
-  const [isValidAddress, setIsValidAddress] = useState(false);
-
   const [latitude, setLatitude] = useState<number | undefined>();
   const [longitude, setLongitude] = useState<number | undefined>();
 
@@ -66,7 +64,6 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
       province,
       neighborhood,
     }: RouterOutputs["auth"]["getAddressDetails"]) => {
-      setIsValidAddress(true);
 
       // NOTE: this is not necessary if you use the AddressDetails
       // as a Zod object because you can do this transformation
@@ -78,26 +75,29 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
       if (city) {
         form.setValue("city", city);
         if (cityInputRef.current) cityInputRef.current.disabled = true;
+        form.clearErrors("city");
       }
       if (province) {
         form.setValue("province", province);
         if (provinceInputRef.current) provinceInputRef.current.disabled = true;
+        form.clearErrors("province");
       }
       if (street) {
         form.setValue("street", street);
         if (streetInputRef.current) streetInputRef.current.disabled = true;
+        form.clearErrors("street");
       }
       if (neighborhood) {
         form.setValue("neighborhood", neighborhood);
         if (neighborhoodInputRef.current)
           neighborhoodInputRef.current.disabled = true;
+          form.clearErrors("neighborhood");
       }
     },
     [form],
   );
 
   const onErrorFetchAddress = useCallback(() => {
-    setIsValidAddress(false);
     enableInputs();
 
     setLatitude(undefined);
@@ -139,7 +139,6 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
         if (validateZIPCode(zipCode)) {
           queryAndUpdateFields(zipCode);
         } else {
-          setIsValidAddress(false);
           enableInputs();
         }
       }
@@ -148,7 +147,6 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
   }, [enableInputs, form, queryAndUpdateFields]);
 
   return {
-    isValidAddress,
     isLoading,
 
     latitude,
