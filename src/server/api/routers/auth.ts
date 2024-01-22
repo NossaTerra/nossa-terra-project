@@ -25,6 +25,18 @@ export const authRouter = createTRPCRouter({
       return !!user;
     }),
 
+  getUserByEmail: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .query(async ({ ctx: { db }, input: { email } }) => {
+      try {
+        const user = await db.user.findUnique({ where: { email } });
+        return user;
+      } catch (error) {
+        console.log(error);
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+    }),
+
   registerSeller: publicProcedure
     .input(
       z.object({

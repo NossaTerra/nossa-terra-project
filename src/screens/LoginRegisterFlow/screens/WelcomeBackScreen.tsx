@@ -23,6 +23,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "~/hooks/useAuth";
 import { TRPCClientError } from "@trpc/client";
 import { type AppRouter } from "~/server/api/routers/_root";
+import { useRouter } from "next/router";
 
 function WelcomeBackContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -32,6 +33,11 @@ function WelcomeBackContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
   const { setError } = form;
+  const router = useRouter();
+
+  const handleForgetPassword = useCallback(async () => {
+    await router.push("/forgot-password");
+  }, [router]);
 
   const { login } = useAuth();
   const onSubmit: SubmitHandler<WelcomeBackFields> = useCallback(
@@ -121,6 +127,14 @@ function WelcomeBackContent({ className }: ClassNameProps) {
               </FormItem>
             )}
           />
+          <Button
+            variant="link"
+            className=" flex items-start  justify-start p-0 text-textSecondary hover:text-headingPrimary hover:underline"
+            type="button"
+            onClick={handleForgetPassword}
+          >
+            Esqueci a senha
+          </Button>
           <Button variant="primary" className="w-full" type="submit">
             Entrar
           </Button>
