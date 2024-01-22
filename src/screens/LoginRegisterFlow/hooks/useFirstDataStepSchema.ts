@@ -48,7 +48,9 @@ export function useFirstDataStepSchema(role?: ChosenRole) {
             .string({
               required_error: "Você deve inserir a confirmação de senha",
             })
-            .min(1),
+            .min(8, {
+              message: "A confirmação de senha deve ter no mínimo 8 caracteres",
+            }),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "As senhas devem ser iguais",
