@@ -161,14 +161,14 @@ export function AvatarUpload<FormData extends AvatarFormData>({
                 className={uploadAvatar.isLoading ? "opacity-40" : ""}
                 {...(imageSource
                   ? {
-                    src: imageSource,
-                    fill: true,
-                  }
+                      src: imageSource,
+                      fill: true,
+                    }
                   : {
-                    src: "/images/image-plus.png",
-                    width: 80,
-                    height: 80,
-                  })}
+                      src: "/images/image-plus.png",
+                      width: 80,
+                      height: 80,
+                    })}
               />
             </div>
 
