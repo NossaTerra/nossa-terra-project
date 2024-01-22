@@ -21,6 +21,13 @@ export const env = createEnv({
         (str) => !str.includes("ADDRESS_VIA_ZIP_CODE_API_URL_HERE"),
         "You forgot to change the default zip code API URL",
       ),
+    APP_URL: z
+      .string()
+      .url()
+      .refine(
+        (str) => !str.includes("APP_URL"),
+        "You forgot to change the default APP_URL",
+      ),
     CLOUDINARY_API_KEY: z
       .string()
       .refine(
@@ -38,6 +45,12 @@ export const env = createEnv({
       .refine(
         (str) => !str.includes("CLOUDINARY_CLOUD_NAME"),
         "You forgot to change the default CLOUDINARY_CLOUD_NAME",
+      ),
+    SENDGRID_API_KEY: z
+      .string()
+      .refine(
+        (str) => !str.includes("SENDGRID_API_KEY"),
+        "You forgot to change the default SENDGRID_API_KEY",
       ),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -64,6 +77,8 @@ export const env = createEnv({
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    APP_URL: process.env.APP_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
