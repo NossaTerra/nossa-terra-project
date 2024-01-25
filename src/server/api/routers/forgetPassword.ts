@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { env } from "~/env";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
 import { TRPCError } from "@trpc/server";
@@ -91,27 +92,25 @@ export const forgetPasswordRouter = createTRPCRouter({
 
   sendResetPasswordEmail: publicProcedure
     .input(z.object({ email: z.string().email(), token: z.string() }))
-    .mutation(async ({ ctx: {}, input: { email, token } }) => {
+    .mutation(async ({ ctx: { }, input: { email, token } }) => {
       const emailHtml = resetPasswordEmail(token);
 
-      if (process.env.SENDGRID_API_KEY) {
-        try {
-          const transporter = nodemailer.createTransport(
-            nodemailerSendgrid({
-              apiKey: process.env.SENDGRID_API_KEY,
-            }),
-          );
+      try {
+        const transporter = nodemailer.createTransport(
+          nodemailerSendgrid({
+            apiKey: env.SENDGRID_API_KEY,
+          }),
+        );
 
-          await transporter.sendMail({
-            from: '"Nossa Terra" <nossaterra.dev@gmail.com>',
-            to: email,
-            subject: "Redefinição de senha",
-            html: emailHtml,
-          });
-        } catch (e) {
-          console.error("Error sending email: ");
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-        }
+        await transporter.sendMail({
+          from: '"Nossa Terra" <nossaterra.dev@gmail.com>',
+          to: email,
+          subject: "Redefinição de senha",
+          html: emailHtml,
+        });
+      } catch (e) {
+        console.error("Error sending email: ");
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
     }),
 

@@ -5,6 +5,7 @@ import {
   sellerSocialSchema,
 } from "./../auth/types";
 import { z } from "zod";
+import { env } from "~/env";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
 import { TRPCError } from "@trpc/server";
@@ -144,7 +145,7 @@ export const authRouter = createTRPCRouter({
       const parsedZipCode = zipCode.replace("-", "");
       try {
         const response = await axios.get(
-          `${process.env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
+          `${env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
         );
         console.log(
           JSON.stringify(addressDetailsApiSchema.safeParse(response.data)),
