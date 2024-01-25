@@ -13,16 +13,30 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { api } from "~/utils/api";
 import { ArrowLeftIcon } from "lucide-react";
 import router, { useRouter } from "next/router";
-import {
-  useForgotPasswordSchema,
-  type ForgotPasswordFields,
-} from "~/screens/LoginRegisterFlow/hooks/useForgotPasswordSchema";
 import toast from "react-hot-toast";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
+import { z } from "zod";
+
+function useForgotPasswordSchema() {
+  // It's best to use a hook to get the schema because
+  // we can later add internationalized error messages
+
+  return useMemo(
+    () =>
+      z.object({
+        email: z.string().email(),
+      }),
+    [],
+  );
+}
+
+type ForgotPasswordFields = z.infer<
+  ReturnType<typeof useForgotPasswordSchema>
+>;
 
 function ForgetPasswordContent({ className }: ClassNameProps) {
   const schema = useForgotPasswordSchema();
