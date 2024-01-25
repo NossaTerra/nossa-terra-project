@@ -63,7 +63,7 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
     >
       <h1
         className={cn(
-          "font-poppins-700 text-headingPrimary md:flex md:flex-row",
+          "font-poppins-700 text-headingSecondary md:flex md:flex-row",
           "text-left md:text-right",
           "text-3xl md:text-4xl lg:text-5xl",
         )}
@@ -71,18 +71,19 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
         Esqueceu a sua{" "}
         <span
           className={cn(
-            "font-poppins-800 text-headingSecondary md:ml-2",
+            "font-poppins-800 text-headingPrimary md:ml-2",
             "text-3xl md:text-4xl lg:text-5xl",
             "inline-block md:block",
           )}
         >
-          Senha?
+          Senha
         </span>
+        ?
       </h1>
-      <h4 className="font-poppins-600 w-76 text-justify md:w-96">
+      <p className="font-poppins-400 w-76 text-justify md:w-96">
         Não se preocupe, digite seu endereço de email abaixo e vamos enviar um
         link para você redefinir a sua senha.
-      </h4>
+      </p>
       <Form {...form}>
         <form
           className="w-full md:max-w-xs lg:max-w-sm"
