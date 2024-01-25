@@ -29,31 +29,13 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
 
-  const generatePasswordResetToken =
-    api.forgetPassword.generatePasswordResetToken.useMutation();
   const sendPasswordReset =
     api.forgetPassword.sendResetPasswordEmail.useMutation();
-
-  const { getUserByEmail } = api.useUtils().auth;
 
   const onSubmit: SubmitHandler<ForgotPasswordFields> = useCallback(
     async ({ email }) => {
       try {
-        const user = await getUserByEmail.fetch({ email });
-        if (!user) {
-          return new Response(
-            JSON.stringify({
-              error: "User does not exist",
-            }),
-            {
-              status: 400,
-            },
-          );
-        }
-        const token = await generatePasswordResetToken.mutateAsync({
-          userId: user.id,
-        });
-        await sendPasswordReset.mutateAsync({ email: user.email, token });
+        await sendPasswordReset.mutateAsync({ email });
         await router.replace(`/password-reset-sent`);
         return new Response();
       } catch (e) {
@@ -68,7 +50,7 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
         );
       }
     },
-    [generatePasswordResetToken, getUserByEmail, sendPasswordReset],
+    [sendPasswordReset],
   );
 
   return (

@@ -9,50 +9,9 @@ import { generateRandomString, isWithinExpiration } from "lucia/utils";
 import nodemailer from "nodemailer";
 import nodemailerSendgrid from "nodemailer-sendgrid";
 import { resetPasswordEmail } from "~/utils/resetPasswordEmail";
+import { type TRPCContext } from "../trpc/context";
 
 export const forgetPasswordRouter = createTRPCRouter({
-  generatePasswordResetToken: publicProcedure
-    .input(z.object({ userId: z.string() }))
-    .mutation(async ({ ctx: { db }, input: { userId } }) => {
-      const EXPIRES_IN = 1000 * 60 * 60 * 2; // 2 hours
-
-      try {
-        const storedUserTokens = await db.passwordResetToken.findMany({
-          where: {
-            user_id: userId,
-            expires: {
-              gte: new Date().getTime() - EXPIRES_IN / 2,
-            },
-          },
-        });
-
-        if (storedUserTokens.length > 0) {
-          const reusableStoredToken = storedUserTokens.find((token) => {
-            return token.expires >= new Date().getTime() - EXPIRES_IN / 2;
-          });
-
-          if (reusableStoredToken) {
-            return reusableStoredToken.id;
-          }
-        }
-
-        const token = generateRandomString(63);
-
-        await db.passwordResetToken.create({
-          data: {
-            id: token,
-            expires: new Date().getTime() + EXPIRES_IN,
-            user_id: userId,
-          },
-        });
-
-        return token;
-      } catch (error) {
-        console.log(error);
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-    }),
-
   validatePasswordResetToken: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ ctx: { db }, input: { token } }) => {
@@ -91,25 +50,40 @@ export const forgetPasswordRouter = createTRPCRouter({
     }),
 
   sendResetPasswordEmail: publicProcedure
-    .input(z.object({ email: z.string().email(), token: z.string() }))
-    .mutation(async ({ ctx: { }, input: { email, token } }) => {
-      const emailHtml = resetPasswordEmail(token);
-
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ ctx: { db }, input: { email } }) => {
       try {
+        const user = await db.user.findUnique({ where: { email } });
+        if (!user) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User with this email not found",
+          });
+        }
+
+        const token = await getTokenResetPassword({
+          userId: user.id,
+          db,
+        });
+        const emailHtml = resetPasswordEmail(token);
+
         const transporter = nodemailer.createTransport(
           nodemailerSendgrid({
             apiKey: env.SENDGRID_API_KEY,
           }),
         );
 
-        await transporter.sendMail({
-          from: '"Nossa Terra" <nossaterra.dev@gmail.com>',
-          to: email,
-          subject: "Redefinição de senha",
-          html: emailHtml,
-        });
+        transporter
+          .sendMail({
+            from: '"Nossa Terra" <nossaterra.dev@gmail.com>',
+            to: email,
+            subject: "Redefinição de senha",
+            html: emailHtml,
+          })
+          .catch((error) => {
+            console.error("Error sending email: ", error);
+          });
       } catch (e) {
-        console.error("Error sending email: ");
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
     }),
@@ -140,3 +114,44 @@ export const forgetPasswordRouter = createTRPCRouter({
       }
     }),
 });
+
+async function getTokenResetPassword({
+  userId,
+  db,
+}: {
+  userId: string;
+  db: TRPCContext["db"];
+}) {
+  const EXPIRES_DURATION = 2 * 60 * 60 * 1000; // 2 hours
+  const thresholdTime = new Date().getTime() - EXPIRES_DURATION / 2;
+
+  try {
+    const usableToken = await db.passwordResetToken.findFirst({
+      where: {
+        user_id: userId,
+        expires: {
+          gte: thresholdTime,
+        },
+      },
+    });
+
+    if (usableToken) {
+      return usableToken.id;
+    }
+
+    const newToken = generateRandomString(63);
+
+    await db.passwordResetToken.create({
+      data: {
+        id: newToken,
+        expires: new Date().getTime() + EXPIRES_DURATION,
+        user_id: userId,
+      },
+    });
+
+    return newToken;
+  } catch (error) {
+    console.log(error);
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+  }
+}
