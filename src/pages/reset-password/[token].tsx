@@ -22,11 +22,16 @@ import {
 import { api } from "~/utils/api";
 import { emptyString } from "~/utils/constants";
 import toast from "react-hot-toast";
+import {
+  type InferGetServerSidePropsType,
+  type GetServerSideProps,
+} from "next";
+import { TokenStatus, checkResetPasswordToken } from "~/server/api/auth/token";
 
 function ResetPasswordContent({
   className,
   token,
-}: ClassNameProps & { token?: string }) {
+}: ClassNameProps & { token: string }) {
   const schema = useResetPasswordSchema();
   const router = useRouter();
 
@@ -38,16 +43,14 @@ function ResetPasswordContent({
 
   const onSubmit: SubmitHandler<ResetPasswordFields> = useCallback(
     async ({ password }) => {
-      if (token && token !== emptyString) {
-        try {
-          await resetPassword.mutateAsync({ password, token });
-          toast.success("Senha redefinida com sucesso!", {
-            duration: 1400,
-          });
-          await router.replace("/search");
-        } catch (err) {
-          toast.error("Erro ao redefinir a senha!");
-        }
+      try {
+        await resetPassword.mutateAsync({ password, token });
+        toast.success("Senha redefinida com sucesso!", {
+          duration: 1400,
+        });
+        await router.replace("/search");
+      } catch (err) {
+        toast.error("Erro ao redefinir a senha!");
       }
     },
     [resetPassword, router, token],
@@ -136,12 +139,35 @@ function ResetPasswordContent({
   );
 }
 
-export default function ResetPasswordScreen() {
+export const getServerSideProps = (async (context) => {
+  const token = context.query.token;
+  if (typeof token !== "string" || token === emptyString) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const tokenStatus = await checkResetPasswordToken(token);
+  if (tokenStatus === TokenStatus.Good) {
+    return {
+      props: {
+        token,
+      },
+    };
+  }
+
+  // TODO: handle "tokenStatus === TokenStatus.Expired" a little better
+  // Maybe show a message to the user?
+  return {
+    notFound: true,
+  };
+}) satisfies GetServerSideProps;
+
+export default function ResetPasswordScreen({
+  token,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  const { query } = router;
-  const goBack = useCallback(() => {
-    router.back();
-  }, [router]);
+  console.log(token);
 
   return (
     <div className="flex min-h-screen flex-grow flex-col">
@@ -149,7 +175,7 @@ export default function ResetPasswordScreen() {
         <Button
           className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
           variant="outline"
-          onClick={goBack}
+          onClick={router.back}
         >
           <ArrowLeftIcon />
           Voltar
@@ -158,9 +184,7 @@ export default function ResetPasswordScreen() {
           <NossaTerraLogo />
         </div>
       </header>
-      <ResetPasswordContent
-        token={typeof query.token === "string" ? query.token : ""}
-      />
+      <ResetPasswordContent token={token} />
     </div>
   );
 }
