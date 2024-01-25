@@ -12,43 +12,6 @@ import { resetPasswordEmail } from "~/utils/resetPasswordEmail";
 import { type TRPCContext } from "../trpc/context";
 
 export const forgetPasswordRouter = createTRPCRouter({
-  validatePasswordResetToken: publicProcedure
-    .input(z.object({ token: z.string() }))
-    .mutation(async ({ ctx: { db }, input: { token } }) => {
-      try {
-        const storedToken = await db.$transaction(async (trx) => {
-          const storedToken = await trx.passwordResetToken.findFirst({
-            where: {
-              id: token,
-            },
-          });
-
-          if (!storedToken) {
-            throw new TRPCError({ code: "UNAUTHORIZED" });
-          }
-
-          await trx.passwordResetToken.delete({
-            where: {
-              id: storedToken.id,
-            },
-          });
-
-          return storedToken;
-        });
-
-        const tokenExpires = Number(storedToken.expires); // bigint => number conversion
-
-        if (!isWithinExpiration(tokenExpires)) {
-          throw new TRPCError({ code: "PRECONDITION_FAILED" });
-        }
-
-        return storedToken.user_id;
-      } catch (error) {
-        console.log(error);
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-    }),
-
   sendResetPasswordEmail: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ ctx: { db }, input: { email } }) => {
@@ -92,27 +55,54 @@ export const forgetPasswordRouter = createTRPCRouter({
     .input(
       z.object({
         password: z.string().min(8).max(30),
-        userId: z.string(),
+        token: z.string(),
       }),
     )
-    .mutation(async ({ ctx: { authRequest }, input: { password, userId } }) => {
-      try {
-        let user = await auth.getUser(userId);
-        await auth.invalidateAllUserSessions(user.userId);
-        await auth.updateKeyPassword("email", user.email, password);
-        user = await auth.updateUserAttributes(user.userId, {});
-        const newSession = await auth.createSession({
-          userId: user.userId,
-          attributes: {},
-        });
-        authRequest.setSession(newSession);
-      } catch (e) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid or expired password reset link",
-        });
-      }
-    }),
+    .mutation(
+      async ({ ctx: { db, authRequest }, input: { password, token } }) => {
+        try {
+          const storedToken = await db.$transaction(async (trx) => {
+            const storedToken = await trx.passwordResetToken.findFirst({
+              where: {
+                id: token,
+              },
+            });
+
+            if (!storedToken) {
+              throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+
+            await trx.passwordResetToken.delete({
+              where: {
+                id: storedToken.id,
+              },
+            });
+
+            return storedToken;
+          });
+
+          const tokenExpires = Number(storedToken.expires); // bigint => number conversion
+          if (!isWithinExpiration(tokenExpires)) {
+            throw new TRPCError({ code: "PRECONDITION_FAILED" });
+          }
+
+          const user = await auth.getUser(storedToken.user_id);
+          await auth.invalidateAllUserSessions(user.userId);
+          await auth.updateKeyPassword("email", user.email, password);
+
+          const newSession = await auth.createSession({
+            userId: user.userId,
+            attributes: {},
+          });
+          authRequest.setSession(newSession);
+        } catch (e) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid or expired password reset link",
+          });
+        }
+      },
+    ),
 });
 
 async function getTokenResetPassword({

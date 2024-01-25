@@ -34,18 +34,13 @@ function ResetPasswordContent({
     resolver: zodResolver(schema),
   });
 
-  const validatePasswordResetToken =
-    api.forgetPassword.validatePasswordResetToken.useMutation();
   const resetPassword = api.forgetPassword.resetPassword.useMutation();
 
   const onSubmit: SubmitHandler<ResetPasswordFields> = useCallback(
     async ({ password }) => {
       if (token && token !== emptyString) {
         try {
-          const userId = await validatePasswordResetToken.mutateAsync({
-            token,
-          });
-          await resetPassword.mutateAsync({ password, userId });
+          await resetPassword.mutateAsync({ password, token });
           toast.success("Senha redefinida com sucesso!", {
             duration: 1400,
           });
@@ -55,7 +50,7 @@ function ResetPasswordContent({
         }
       }
     },
-    [resetPassword, router, token, validatePasswordResetToken],
+    [resetPassword, router, token],
   );
 
   return (
