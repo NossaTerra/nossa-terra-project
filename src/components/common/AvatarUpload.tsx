@@ -3,7 +3,6 @@ import React, {
   useState,
   useRef,
   useCallback,
-  useMemo,
 } from "react";
 
 import { Brush, Loader2Icon } from "lucide-react";
@@ -16,7 +15,7 @@ import {
 } from "../ui/tooltip";
 import { FormItem } from "../ui/form";
 import { kiloByte } from "~/utils/constants";
-import Image, { type ImageProps } from "next/image";
+import Image from "next/image";
 import { api } from "~/utils/api";
 import { type UseFormReturn } from "react-hook-form";
 

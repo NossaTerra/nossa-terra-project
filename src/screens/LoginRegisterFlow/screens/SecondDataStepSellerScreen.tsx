@@ -45,8 +45,6 @@ function SecondDataStepSellerContent({ className }: ClassNameProps) {
   });
 
   const {
-    isValidAddress,
-
     latitude,
     longitude,
 
@@ -390,7 +388,6 @@ function SecondDataStepSellerContent({ className }: ClassNameProps) {
           <div>
             <p className="pb-3 text-sm">*Campo obrigatório</p>
             <Button
-              disabled={!isValidAddress}
               variant="primary"
               className="w-full"
               type="submit"
