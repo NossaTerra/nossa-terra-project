@@ -22,6 +22,7 @@ import {
   type ForgotPasswordFields,
 } from "~/screens/LoginRegisterFlow/hooks/useForgotPasswordSchema";
 import toast from "react-hot-toast";
+import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 
 function ForgetPasswordContent({ className }: ClassNameProps) {
   const schema = useForgotPasswordSchema();
@@ -121,6 +122,8 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
     </main>
   );
 }
+
+export const getServerSideProps = redirectGetServerSideProps.Public;
 
 export default function ForgetPasswordScreen() {
   const router = useRouter();
