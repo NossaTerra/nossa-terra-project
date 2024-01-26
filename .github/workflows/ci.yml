@@ -18,6 +18,8 @@ jobs:
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      APP_URL: ${{ secrets.APP_URL }}
 
     runs-on: ubuntu-latest
 

@@ -23,6 +23,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "~/hooks/useAuth";
 import { TRPCClientError } from "@trpc/client";
 import { type AppRouter } from "~/server/api/routers/_root";
+import Link from "next/link";
 
 function WelcomeBackContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();
@@ -32,8 +33,8 @@ function WelcomeBackContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
   const { setError } = form;
-
   const { login } = useAuth();
+
   const onSubmit: SubmitHandler<WelcomeBackFields> = useCallback(
     async ({ password }) => {
       if (state.stepKey !== "welcomeBack") {
@@ -101,7 +102,7 @@ function WelcomeBackContent({ className }: ClassNameProps) {
             control={form.control}
             name="password"
             render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
+              <FormItem className="w-full text-gray-700">
                 <FormLabel
                   className="block text-sm font-medium"
                   htmlFor="email"
@@ -121,7 +122,16 @@ function WelcomeBackContent({ className }: ClassNameProps) {
               </FormItem>
             )}
           />
-          <Button variant="primary" className="w-full" type="submit">
+
+          <Button
+            variant="link"
+            asChild
+            className="mt-1 p-0 text-accent underline hover:text-headingSecondary"
+          >
+            <Link href="/forgot-password">Esqueci a senha</Link>
+          </Button>
+
+          <Button variant="primary" className="mt-8 w-full" type="submit">
             Entrar
           </Button>
         </form>

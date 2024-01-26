@@ -5,6 +5,7 @@ import {
   sellerSocialSchema,
 } from "./../auth/types";
 import { z } from "zod";
+import { env } from "~/env";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
 import { TRPCError } from "@trpc/server";
@@ -23,6 +24,18 @@ export const authRouter = createTRPCRouter({
     .query(async ({ ctx: { db }, input: { email } }) => {
       const user = await db.user.findUnique({ where: { email } });
       return !!user;
+    }),
+
+  getUserByEmail: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .query(async ({ ctx: { db }, input: { email } }) => {
+      try {
+        const user = await db.user.findUnique({ where: { email } });
+        return user;
+      } catch (error) {
+        console.log(error);
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
     }),
 
   registerSeller: publicProcedure
@@ -132,7 +145,7 @@ export const authRouter = createTRPCRouter({
       const parsedZipCode = zipCode.replace("-", "");
       try {
         const response = await axios.get(
-          `${process.env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
+          `${env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
         );
         console.log(
           JSON.stringify(addressDetailsApiSchema.safeParse(response.data)),
