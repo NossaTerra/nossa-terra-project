@@ -1,3 +1,5 @@
+import { env } from "~/env";
+
 export function resetPasswordEmail(token: string): string {
   return `
   <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
@@ -291,7 +293,7 @@ export function resetPasswordEmail(token: string): string {
                                                             <tr>
                                                               <td align="center" bgcolor="#1e803d" class="inner-td"
                                                                 style="border-radius:6px; font-size:16px; text-align:left; background-color:inherit;">
-                                                                <a href="${process.env.APP_URL}reset-password/${token}"
+                                                                <a href="${env.APP_URL}reset-password/${token}"
                                                                   style="background-color:#1e803d; border:1px solid #1e803d; border-color:#1e803d; border-radius:3px; border-width:1px; color:#f4efef; display:inline-block; font-size:14px; font-weight:normal; letter-spacing:0px; line-height:normal; padding:12px 50px 12px 50px; text-align:center; text-decoration:none; border-style:solid; font-family:inherit;"
                                                                   target="_blank">Criar nova senha</a>
                                                               </td>

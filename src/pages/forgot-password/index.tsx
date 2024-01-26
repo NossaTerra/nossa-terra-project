@@ -13,15 +13,28 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { api } from "~/utils/api";
 import { ArrowLeftIcon } from "lucide-react";
 import router, { useRouter } from "next/router";
-import {
-  useForgotPasswordSchema,
-  type ForgotPasswordFields,
-} from "~/screens/LoginRegisterFlow/hooks/useForgotPasswordSchema";
 import toast from "react-hot-toast";
+import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
+import { z } from "zod";
+
+function useForgotPasswordSchema() {
+  // It's best to use a hook to get the schema because
+  // we can later add internationalized error messages
+
+  return useMemo(
+    () =>
+      z.object({
+        email: z.string().email(),
+      }),
+    [],
+  );
+}
+
+type ForgotPasswordFields = z.infer<ReturnType<typeof useForgotPasswordSchema>>;
 
 function ForgetPasswordContent({ className }: ClassNameProps) {
   const schema = useForgotPasswordSchema();
@@ -29,31 +42,13 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
 
-  const generatePasswordResetToken =
-    api.forgetPassword.generatePasswordResetToken.useMutation();
   const sendPasswordReset =
     api.forgetPassword.sendResetPasswordEmail.useMutation();
-
-  const { getUserByEmail } = api.useUtils().auth;
 
   const onSubmit: SubmitHandler<ForgotPasswordFields> = useCallback(
     async ({ email }) => {
       try {
-        const user = await getUserByEmail.fetch({ email });
-        if (!user) {
-          return new Response(
-            JSON.stringify({
-              error: "User does not exist",
-            }),
-            {
-              status: 400,
-            },
-          );
-        }
-        const token = await generatePasswordResetToken.mutateAsync({
-          userId: user.id,
-        });
-        await sendPasswordReset.mutateAsync({ email: user.email, token });
+        await sendPasswordReset.mutateAsync({ email });
         await router.replace(`/password-reset-sent`);
         return new Response();
       } catch (e) {
@@ -68,7 +63,7 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
         );
       }
     },
-    [generatePasswordResetToken, getUserByEmail, sendPasswordReset],
+    [sendPasswordReset],
   );
 
   return (
@@ -81,7 +76,7 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
     >
       <h1
         className={cn(
-          "font-poppins-700 text-headingPrimary md:flex md:flex-row",
+          "font-poppins-700 text-headingSecondary md:flex md:flex-row",
           "text-left md:text-right",
           "text-3xl md:text-4xl lg:text-5xl",
         )}
@@ -89,18 +84,19 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
         Esqueceu a sua{" "}
         <span
           className={cn(
-            "font-poppins-800 text-headingSecondary md:ml-2",
+            "font-poppins-800 text-headingPrimary md:ml-2",
             "text-3xl md:text-4xl lg:text-5xl",
             "inline-block md:block",
           )}
         >
-          Senha?
+          Senha
         </span>
+        ?
       </h1>
-      <h4 className="font-poppins-600 w-76 text-justify md:w-96">
+      <p className="font-poppins-400 w-76 text-justify md:w-96">
         Não se preocupe, digite seu endereço de email abaixo e vamos enviar um
         link para você redefinir a sua senha.
-      </h4>
+      </p>
       <Form {...form}>
         <form
           className="w-full md:max-w-xs lg:max-w-sm"
@@ -138,6 +134,8 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
     </main>
   );
 }
+
+export const getServerSideProps = redirectGetServerSideProps.Public;
 
 export default function ForgetPasswordScreen() {
   const router = useRouter();

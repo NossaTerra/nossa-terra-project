@@ -27,7 +27,7 @@ export default function ProfileScreen({ user }: Props) {
         {user.avatarImage && (
           <Avatar>
             <AvatarImage
-              className="w-40 h-40 rounded-full object-cover border-2"
+              className="h-40 w-40 rounded-full border-2 object-cover"
               src={user.avatarImage}
             />
           </Avatar>

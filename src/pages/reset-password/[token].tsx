@@ -10,23 +10,56 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { ArrowLeftIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import { Input } from "~/components/ui/input";
 import { useRouter } from "next/router";
-import {
-  type ResetPasswordFields,
-  useResetPasswordSchema,
-} from "~/screens/LoginRegisterFlow/hooks/useResetPasswordSchema";
 import { api } from "~/utils/api";
 import { emptyString } from "~/utils/constants";
 import toast from "react-hot-toast";
+import {
+  type InferGetServerSidePropsType,
+  type GetServerSideProps,
+} from "next";
+import { TokenStatus, checkResetPasswordToken } from "~/server/api/auth/token";
+import { z } from "zod";
+
+function useResetPasswordSchema() {
+  // It's best to use a hook to get the schema because
+  // we can later add internationalized error messages
+
+  return useMemo(
+    () =>
+      z
+        .object({
+          password: z
+            .string({ required_error: "Você deve inserir uma senha" })
+            .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
+            .max(30, { message: "A senha deve ter no máximo 30 caracteres" }),
+
+          confirmPassword: z
+            .string({
+              required_error: "Você deve inserir a confirmação de senha",
+            })
+            .min(8, {
+              message: "A confirmação de senha deve ter no mínimo 8 caracteres",
+            }),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+          message: "As senhas devem ser iguais",
+          path: ["confirmPassword"],
+        }),
+    [],
+  );
+}
+
+type ResetPasswordFields = z.infer<ReturnType<typeof useResetPasswordSchema>>;
 
 function ResetPasswordContent({
   className,
   token,
-}: ClassNameProps & { token?: string }) {
+}: ClassNameProps & { token: string }) {
   const schema = useResetPasswordSchema();
   const router = useRouter();
 
@@ -34,28 +67,21 @@ function ResetPasswordContent({
     resolver: zodResolver(schema),
   });
 
-  const validatePasswordResetToken =
-    api.forgetPassword.validatePasswordResetToken.useMutation();
   const resetPassword = api.forgetPassword.resetPassword.useMutation();
 
   const onSubmit: SubmitHandler<ResetPasswordFields> = useCallback(
     async ({ password }) => {
-      if (token && token !== emptyString) {
-        try {
-          const userId = await validatePasswordResetToken.mutateAsync({
-            token,
-          });
-          await resetPassword.mutateAsync({ password, userId });
-          toast.success("Senha redefinida com sucesso!", {
-            duration: 1400,
-          });
-          await router.replace("/search");
-        } catch (err) {
-          toast.error("Erro ao redefinir a senha!");
-        }
+      try {
+        await resetPassword.mutateAsync({ password, token });
+        toast.success("Senha redefinida com sucesso!", {
+          duration: 1400,
+        });
+        await router.replace("/search");
+      } catch (err) {
+        toast.error("Erro ao redefinir a senha!");
       }
     },
-    [resetPassword, router, token, validatePasswordResetToken],
+    [resetPassword, router, token],
   );
 
   return (
@@ -141,12 +167,35 @@ function ResetPasswordContent({
   );
 }
 
-export default function ResetPasswordScreen() {
+export const getServerSideProps = (async (context) => {
+  const token = context.query.token;
+  if (typeof token !== "string" || token === emptyString) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const tokenStatus = await checkResetPasswordToken(token);
+  if (tokenStatus === TokenStatus.Good) {
+    return {
+      props: {
+        token,
+      },
+    };
+  }
+
+  // TODO: handle "tokenStatus === TokenStatus.Expired" a little better
+  // Maybe show a message to the user?
+  return {
+    notFound: true,
+  };
+}) satisfies GetServerSideProps;
+
+export default function ResetPasswordScreen({
+  token,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  const { query } = router;
-  const goBack = useCallback(() => {
-    router.back();
-  }, [router]);
+  console.log(token);
 
   return (
     <div className="flex min-h-screen flex-grow flex-col">
@@ -154,7 +203,7 @@ export default function ResetPasswordScreen() {
         <Button
           className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
           variant="outline"
-          onClick={goBack}
+          onClick={router.back}
         >
           <ArrowLeftIcon />
           Voltar
@@ -163,9 +212,7 @@ export default function ResetPasswordScreen() {
           <NossaTerraLogo />
         </div>
       </header>
-      <ResetPasswordContent
-        token={typeof query.token === "string" ? query.token : ""}
-      />
+      <ResetPasswordContent token={token} />
     </div>
   );
 }

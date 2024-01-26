@@ -28,13 +28,13 @@ function PasswordResetSentContent({ className }: ClassNameProps) {
       >
         Email enviado!
       </h1>
-      <h4 className="font-poppins-500 w-76 md:w-96 md:text-justify">
+      <p className="font-poppins-400 w-76 md:w-96 md:text-justify">
         Fique de olho na caixa de entrada do seu email, talvez você precise
         verificar a sua pasta de spam.
-      </h4>
-      <h4 className="font-poppins-600  text-bold w-76 md:w-96 md:text-justify">
+      </p>
+      <p className="font-poppins-600  text-bold w-76 md:w-96 md:text-justify">
         Lembre-se: O email pode demorar alguns minutos para chegar.
-      </h4>
+      </p>
       <Button variant="primary" className="w-40" type="button" onClick={goBack}>
         Voltar
       </Button>
