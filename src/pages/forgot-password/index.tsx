@@ -34,9 +34,7 @@ function useForgotPasswordSchema() {
   );
 }
 
-type ForgotPasswordFields = z.infer<
-  ReturnType<typeof useForgotPasswordSchema>
->;
+type ForgotPasswordFields = z.infer<ReturnType<typeof useForgotPasswordSchema>>;
 
 function ForgetPasswordContent({ className }: ClassNameProps) {
   const schema = useForgotPasswordSchema();

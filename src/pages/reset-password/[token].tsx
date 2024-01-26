@@ -54,9 +54,7 @@ function useResetPasswordSchema() {
   );
 }
 
-type ResetPasswordFields = z.infer<
-  ReturnType<typeof useResetPasswordSchema>
->;
+type ResetPasswordFields = z.infer<ReturnType<typeof useResetPasswordSchema>>;
 
 function ResetPasswordContent({
   className,
