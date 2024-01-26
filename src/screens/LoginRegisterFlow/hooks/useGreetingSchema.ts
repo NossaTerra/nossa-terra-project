@@ -8,7 +8,7 @@ export function useGreetingSchema() {
   return useMemo(
     () =>
       z.object({
-        email: z.string().email(),
+        email: z.string({ required_error: "Você deve inserir um email válido" }).email(),
       }),
     [],
   );
