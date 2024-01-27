@@ -36,7 +36,7 @@ export const forgetPasswordRouter = createTRPCRouter({
           }),
         );
 
-        transporter
+        await transporter
           .sendMail({
             from: '"Nossa Terra" <nossaterra.dev@gmail.com>',
             to: email,
