@@ -8,7 +8,7 @@ export function useWelcomeBackSchema() {
   return useMemo(
     () =>
       z.object({
-        password: z.string({ required_error: "Você deve inserir a senha do seu usuário" }).min(8),
+        password: z.string({ required_error: "Você deve inserir a senha do seu usuário" }).min(8, {message:'A senha deve ter ao menos 8 caracteres'}),
       }),
     [],
   );
