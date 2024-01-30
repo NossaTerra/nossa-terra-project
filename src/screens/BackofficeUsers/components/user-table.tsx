@@ -29,6 +29,7 @@ import {
   initialColumnVisibility,
   type UserColumnVisibilityState,
 } from "./user-table-columns";
+import { ModalProviderUserActions } from "./user-table-actions";
 
 function useUserTableQuery() {
   return api.backoffice.getAllBuyers.useQuery(undefined, {
@@ -74,6 +75,7 @@ export function UserTable() {
 
   return (
     <div className="space-y-4">
+      <ModalProviderUserActions />
       <UserTableToolbar table={table} />
       <div className="rounded-md border">
         <Table>

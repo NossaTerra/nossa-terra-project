@@ -26,4 +26,17 @@ export const backofficeRouter = createTRPCRouter({
         data: { activeState },
       });
     }),
+
+  // NOTE: Should we make this an adminProcedure???
+  deleteUser: backofficeProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      }),
+    )
+    .mutation(({ input: { userId }, ctx: { db } }) => {
+      return db.user.delete({
+        where: { id: userId },
+      });
+    }),
 });
