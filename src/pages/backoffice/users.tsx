@@ -1,5 +1,6 @@
 import { type InferGetServerSidePropsType } from "next";
 import { BackofficeHeader } from "~/components/common/headers";
+import { UserTable } from "~/screens/BackofficeUsers/components/user-table";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 
 export const getServerSideProps = redirectGetServerSideProps.Backoffice;
@@ -11,6 +12,9 @@ export default function BackofficeUserControlScreen({ user }: Props) {
       <BackofficeHeader user={user} />
       <div className="p-10">
         <h1 className="text-4xl font-bold">Controle de Usuários</h1>
+        <div className="pt-10">
+          <UserTable />
+        </div>
       </div>
     </>
   );

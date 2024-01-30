@@ -10,6 +10,12 @@ import { validateInstagram, validatePhone } from "~/utils/validators";
 import { UserActiveState, Role, BusinessSector } from "@prisma/client";
 export { UserActiveState, Role, BusinessSector } from "@prisma/client";
 
+export const UserActiveStateLabel = {
+  active: "Ativo",
+  inactive: "Inativo",
+  inactive_payment_problem: "Inadimplente",
+} as const satisfies Record<UserActiveState, string>;
+
 export const BusinessSectorLabel = {
   Exporter: "Exportador",
   Distributor: "Distribuidor",

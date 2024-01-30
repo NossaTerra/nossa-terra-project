@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { Check } from "lucide-react";
+import { CheckIcon, MinusIcon } from "lucide-react";
 
 import { cn } from "src/utils/ui";
 
@@ -13,7 +13,13 @@ const Checkbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "peer h-4 w-4 shrink-0 rounded-sm border border-slate-200 border-slate-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-slate-900 data-[state=checked]:text-slate-50 dark:border-slate-50 dark:border-slate-800 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 dark:data-[state=checked]:bg-slate-50 dark:data-[state=checked]:text-slate-900",
+      "peer h-4 w-4 shrink-0 rounded-sm border border-slate-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300",
+
+      "data-[state=checked]:bg-slate-900 data-[state=checked]:text-slate-50 ",
+      "dark:data-[state=checked]:bg-slate-50 dark:data-[state=checked]:text-slate-900",
+
+      "data-[state=indeterminate]:bg-zinc-500 data-[state=indeterminate]:text-white ",
+      "dark:data-[state=indeterminate]:bg-zinc-200 dark:data-[state=indeterminate]:text-black",
       className,
     )}
     {...props}
@@ -21,7 +27,11 @@ const Checkbox = React.forwardRef<
     <CheckboxPrimitive.Indicator
       className={cn("flex items-center justify-center text-current")}
     >
-      <Check className="h-4 w-4" />
+      {props.checked === "indeterminate" ? (
+        <MinusIcon className="h-4 w-4" />
+      ) : (
+        <CheckIcon className="h-4 w-4" />
+      )}
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
 ));
