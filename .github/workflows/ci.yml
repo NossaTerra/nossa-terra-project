@@ -52,8 +52,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Gen prisma client
-        run: pnpm db:push
+        run: pnpm db:push --force-reset
 
-      - name: Lint 
+      - name: Lint
         run: pnpm lint
-
