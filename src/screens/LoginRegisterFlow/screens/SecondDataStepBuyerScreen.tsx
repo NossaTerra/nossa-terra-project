@@ -504,11 +504,7 @@ function SecondDataStepBuyerContent({ className }: ClassNameProps) {
           />
           <div>
             <p className="pb-3 text-sm">*Campo obrigatório</p>
-            <Button
-              variant="primary"
-              className="w-full"
-              type="submit"
-            >
+            <Button variant="primary" className="w-full" type="submit">
               Cadastrar
             </Button>
           </div>

@@ -11,6 +11,7 @@ import { useCallback } from "react";
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
 import { AlertTriangleIcon } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface UserActionsStore {
   action: "activate" | "deactivate" | "delete" | null;
@@ -171,6 +172,7 @@ function DeleteDialogBody({ userData }: { userData: TUserData }) {
     await apiDeleteUser.mutateAsync({
       userId: userData.id,
     });
+    toast.success("Usuário deletado com sucesso!");
     closeModal();
   }, [apiDeleteUser, closeModal, userData.id]);
 
@@ -179,9 +181,7 @@ function DeleteDialogBody({ userData }: { userData: TUserData }) {
       <DialogContent>
         <DialogTitle>
           <AlertTriangleIcon className="mb-3" />
-          <div className="font-bold text-red-600">
-            Remover {userData.name}
-          </div>
+          <div className="font-bold text-red-600">Remover {userData.name}</div>
         </DialogTitle>
         <DialogDescription>
           Você tem certeza que deseja{" "}
