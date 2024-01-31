@@ -40,9 +40,9 @@ enum BusinessSector {
 
 model User {
     // LUCIA AUTH
-    id           String    @id @unique
-    auth_session Session[]
-    key          Key[]
+    id                  String               @id @unique
+    auth_session        Session[]
+    key                 Key[]
     passwordResetTokens PasswordResetToken[]
     // END
 
@@ -55,8 +55,6 @@ model User {
     cpf                String
     rg                 String?
     businessMainSector BusinessSector?
-    // QUESTION: why do we have both fields?
-    image              String?
     avatarImage        String?
 
     // Social Info
@@ -89,10 +87,10 @@ model Session {
 }
 
 model PasswordResetToken {
-    id             String @id @unique
-    user_id        String
-    expires        BigInt
-    user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
+    id      String @id @unique
+    user_id String
+    expires BigInt
+    user    User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
 
     @@index([user_id])
 }
