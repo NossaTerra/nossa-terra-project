@@ -71,7 +71,7 @@ export function useSecondDataStepBuyerSchema() {
               )
               .optional(),
             phoneUsesWhatsapp: z.boolean().optional().default(false),
-            secondaryPhoneUsesWhatsapp: z.boolean().optional(),
+            secondaryPhoneUsesWhatsapp: z.boolean().optional().default(false),
             avatarImage: z.string().optional(),
           }),
         )
