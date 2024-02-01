@@ -65,7 +65,10 @@ export function UserTableRowActions({ row }: { row: Row<TUserData> }) {
           Desativar
         </DropdownMenuItem>
         <DropdownMenuSeparator className="my-2" />
-        <DropdownMenuItem onClick={onDelete}>
+        <DropdownMenuItem
+          disabled={activeState !== UserActiveState.inactive}
+          onClick={onDelete}
+        >
           <Trash2Icon className="mr-2 h-4 w-4" /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
