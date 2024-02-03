@@ -40,14 +40,13 @@ export const lowerEndLengthFormattedPhone = 13;
 export const higherEndLengthFormattedPhone = 15;
 
 export function formatPhone(phone: string): string {
+  if (!phone) return ""
+  phone = phone.replace(/\D/g,'')
+  phone = phone.replace(/(\d{2})(\d)/,"($1) $2")
+  phone = phone.replace(/(\d)(\d{4})$/,"$1-$2")
+  console.log(phone, phone.length);
   return phone
-    .slice()
-    .replace(/\D/g, "")
-    .replace(/(\d{2})(\d)/, "($1) $2")
-    .replace(/(\d{4,5})(\d{4})/, "$1-$2")
-    .replace(/(-\d{4})\d+?$/, "$1");
 }
-
 // RG
 export function formatRG(rg: string): string {
   const rgDigits = rg.replace(/\D/g, "");

@@ -23,10 +23,10 @@ export function useSecondDataStepBuyerSchema() {
               .string({
                 required_error: "Por favor, insira um telefone da sua empresa",
               })
-              .min(lowerEndLengthFormattedPhone, {
+              .min(13, {
                 message: `O telefone deve ter no mínimo ${lowerEndLengthFormattedPhone} dígitos`,
               })
-              .max(higherEndLengthFormattedPhone, {
+              .max(15, {
                 message: `O telefone deve ter no máximo ${higherEndLengthFormattedPhone} dígitos`,
               })
               .refine(validatePhone, {

@@ -28,9 +28,9 @@ export const addressSchema = z.object({
   city: z.string().min(2).max(80),
   province: z.string().min(2).max(2),
   street: z.string().min(2).max(100),
-  neighborhood: z.string().min(2).max(80).optional(),
+  neighborhood: z.string().max(80).optional(),
   streetNumber: z.string().min(1).max(10).optional(),
-  complementary: z.string().min(2).max(100).optional(),
+  complementary: z.string().max(100).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 });
