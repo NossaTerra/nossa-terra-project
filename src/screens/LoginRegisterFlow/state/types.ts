@@ -2,9 +2,9 @@ import { type GreetingFields } from "../hooks/useGreetingSchema";
 import { type WelcomeBackFields } from "../hooks/useWelcomeBackSchema";
 import { type ChooseRoleFields } from "../hooks/useChooseRoleSchema";
 import { type ExaustiveMap } from "~/utils/typescript";
-import { type FirstDataStepFields } from "../hooks/useFirstDataStepSchema";
 import { type SecondDataStepSellerFields } from "../hooks/useSecondDataStepSellerSchema";
 import { type SecondDataStepBuyerFields } from "../hooks/useSecondDataStepBuyerSchema";
+import { type FirstDataStepFields } from "../hooks/useFirstDataStepSchema";
 
 export const stepKeys = [
   "greeting",

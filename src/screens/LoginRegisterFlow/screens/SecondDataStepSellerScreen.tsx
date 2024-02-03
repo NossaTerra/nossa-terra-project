@@ -96,7 +96,7 @@ export function SellerForm({
         password,
         rg,
         social: {
-          phone,
+          phone: formatPhone(phone),
           phoneUsesWhatsapp,
         },
         address: {

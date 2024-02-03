@@ -41,7 +41,7 @@ export function ProfileButton({
       {isEditing ? (
         <Dialog>
           <DialogTrigger className="mt-7" asChild>
-            <Button variant="default" onClick={onSave}>
+            <Button  disabled={form.formState.isSubmitting || Object.keys(form.formState.errors).length > 0} type="submit" variant="default" onClick={onSave}>
               Salvar Alterações
             </Button>
           </DialogTrigger>

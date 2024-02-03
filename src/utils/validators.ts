@@ -135,7 +135,7 @@ export function validateInstagram(instagram: string): boolean {
 // Phone validation
 export function validatePhone(phone: string): boolean {
   return (
-    phone.length >= lowerEndLengthFormattedPhone &&
+    phone.length >= lowerEndLengthFormattedPhone ||
     phone.length <= higherEndLengthFormattedPhone
   );
 }

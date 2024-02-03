@@ -99,7 +99,6 @@ export function BuyerForm({
         instagram,
         businessMainSector,
       }) => {
-        console.log("crazy");
         if (state.stepKey !== "secondDataStepBuyer") {
           return;
         }
@@ -113,9 +112,9 @@ export function BuyerForm({
           businessMainSector,
           avatarImage,
           social: {
-            phone,
+            phone: formatPhone(phone),
             phoneUsesWhatsapp,
-            secondaryPhone,
+            secondaryPhone:secondaryPhone? formatPhone(secondaryPhone): undefined,
             secondaryPhoneUsesWhatsapp,
             instagram,
           },
@@ -238,7 +237,7 @@ export function BuyerForm({
                     className="mt-3x w-full md:mt-0"
                     placeholder="(XX) XXXXX-XXXX"
                     {...field}
-                    value={formatPhone(field.value ?? emptyString)  }
+                    value={formatPhone(field.value ?? emptyString) }
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>

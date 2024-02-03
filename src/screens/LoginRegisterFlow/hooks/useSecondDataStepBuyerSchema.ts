@@ -5,8 +5,9 @@ import { emptyString } from "~/utils/constants";
 import {
   lowerEndLengthFormattedPhone,
   higherEndLengthFormattedPhone,
+  formatPhone,
 } from "~/utils/formatters";
-import { validatePhone, validateInstagram } from "~/utils/validators";
+import { validateInstagram } from "~/utils/validators";
 import { useAddressSchema } from "./useAddressSchema";
 
 export function useSecondDataStepBuyerSchema() {
@@ -23,15 +24,17 @@ export function useSecondDataStepBuyerSchema() {
               .string({
                 required_error: "Por favor, insira um telefone da sua empresa",
               })
-              .min(13, {
-                message: `O telefone deve ter no mínimo ${lowerEndLengthFormattedPhone} dígitos`,
-              })
-              .max(15, {
-                message: `O telefone deve ter no máximo ${higherEndLengthFormattedPhone} dígitos`,
-              })
-              .refine(validatePhone, {
-                message: "Número de telefone inválido",
-              }),
+              .refine(
+                (phone) => {
+                  return (
+                    formatPhone(phone).length >= lowerEndLengthFormattedPhone &&
+                    formatPhone(phone).length <= higherEndLengthFormattedPhone
+                  );
+                },
+                {
+                  message: "Telefone inválido",
+                },
+              ),
 
             businessMainSector: z
               .nativeEnum(BusinessSector)
@@ -51,9 +54,14 @@ export function useSecondDataStepBuyerSchema() {
             secondaryPhone: z
               .string()
               .refine(
-                (phone) => phone === emptyString || validatePhone(phone),
+                (phone) => {
+                  return (
+                    formatPhone(phone).length >= lowerEndLengthFormattedPhone &&
+                    formatPhone(phone).length <= higherEndLengthFormattedPhone || !phone
+                  );
+                },
                 {
-                  message: "Número de telefone secundário inválido",
+                  message: "Telefone inválido",
                 },
               )
               .optional(),
