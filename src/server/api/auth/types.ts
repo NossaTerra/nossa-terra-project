@@ -5,7 +5,7 @@ import {
   lowerEndLengthFormattedPhone,
   lengthFormattedZIPCode,
 } from "~/utils/formatters";
-import { validateInstagram, validatePhone } from "~/utils/validators";
+import { validateInstagram } from "~/utils/validators";
 
 import { UserActiveState, Role, BusinessSector } from "@prisma/client";
 export { UserActiveState, Role, BusinessSector } from "@prisma/client";
