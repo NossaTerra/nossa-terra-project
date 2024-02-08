@@ -43,23 +43,16 @@ export function useAddressSchema() {
           }),
         streetNumber: z
           .string()
-          .min(1, {
-            message: "O número do endereço deve ter no mínimo 1 caracter",
-          })
           .max(10, {
             message: "O número do endereço deve ter no máximo 10 caracteres",
           })
           .optional(),
         neighborhood: z
           .string()
-          .min(2, { message: "O bairro deve ter no mínimo 2 caracteres" })
           .max(80, { message: "O bairro deve ter no máximo 80 caracteres" })
           .optional(),
         complementary: z
           .string()
-          .min(2, {
-            message: "O complemento deve ter no mínimo 2 caracteres",
-          })
           .max(100, {
             message: "O complemento deve ter no máximo 100 caracteres",
           })
