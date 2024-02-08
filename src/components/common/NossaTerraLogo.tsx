@@ -6,6 +6,7 @@ export function NossaTerraLogo() {
       src="/images/logo-no-background.png"
       width={100}
       height={114}
+      priority
       alt="Nossa terra logo"
     />
   );
