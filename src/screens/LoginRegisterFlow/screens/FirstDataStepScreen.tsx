@@ -22,7 +22,7 @@ import { Input } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
 import { formatCPF, formatCNPJ, lengthFormattedCNPJ } from "~/utils/formatters";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
-import { cpfIsCNPJ } from "~/utils/helpers";
+import { cpfIsCNPJ } from "~/utils/formHelpers";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state } = useLoginRegisterFlow();
