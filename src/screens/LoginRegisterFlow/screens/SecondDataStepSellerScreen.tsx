@@ -32,372 +32,361 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
+import { type User } from "lucia";
+import { ProfileButton } from "~/components/forms/profileButton";
 
-function SecondDataStepSellerContent({ className }: ClassNameProps) {
+export function SellerForm({
+  user,
+  isEditing,
+}: Partial<ClassNameProps & { user?: User } & { isEditing?: boolean }>) {
   const { state, resetState } = useLoginRegisterFlow();
 
   const schema = useSecondDataStepSellerSchema();
   const form = useForm<SecondDataStepSellerFields>({
     resolver: zodResolver(schema),
+    mode: isEditing ? "onChange" : "onSubmit",
     defaultValues: {
-      zipCode: emptyString,
+      rg: user?.rg ?? emptyString,
+      phone: user?.phone ?? emptyString,
+      phoneUsesWhatsapp: user?.phoneUsesWhatsapp ?? false,
+      zipCode: user?.zipCode ?? emptyString,
+      city: user?.city ?? emptyString,
+      province: user?.province ?? emptyString,
+      street: user?.street ?? emptyString,
+      neighborhood: user?.neighborhood ?? emptyString,
+      streetNumber: user?.streetNumber ?? emptyString,
+      complementary: user?.complementary ?? emptyString,
     },
   });
 
   const {
     latitude,
     longitude,
-
     cityInputRef,
     provinceInputRef,
     streetInputRef,
     neighborhoodInputRef,
-  } = useAutomaticAddressFill({ form });
+  } = useAutomaticAddressFill({ form, isEditing });
 
   const register = api.auth.registerSeller.useMutation();
   const login = api.auth.login.useMutation();
   const router = useRouter();
 
-  const onSubmit: SubmitHandler<SecondDataStepSellerFields> = useCallback(
-    async ({
-      rg,
-      zipCode,
-      city,
-      province,
-      street,
-      neighborhood,
-      complementary,
-      streetNumber,
-      phone,
-      phoneUsesWhatsapp,
-    }) => {
-      if (state.stepKey !== "secondDataStepSeller") {
-        return;
-      }
-      const { email, name, password, cpf } = state.accumulatedContext;
-
-      await register.mutateAsync({
-        email,
-        name,
-        cpf,
-        password,
+  const onSubmitUserCreation: SubmitHandler<SecondDataStepSellerFields> =
+    useCallback(
+      async ({
         rg,
-        social: {
-          phone,
-          phoneUsesWhatsapp,
-        },
-        address: {
-          zipCode,
-          city,
-          province,
-          street,
-          neighborhood,
-          complementary,
-          streetNumber,
-          latitude,
-          longitude,
-        },
-      });
+        zipCode,
+        city,
+        province,
+        street,
+        neighborhood,
+        complementary,
+        streetNumber,
+        phone,
+        phoneUsesWhatsapp,
+      }) => {
+        if (state.stepKey !== "secondDataStepSeller") {
+          return;
+        }
+        const { email, name, password, cpf } = state.accumulatedContext;
 
-      await login.mutateAsync({
-        email,
-        password,
-      });
+        await register.mutateAsync({
+          email,
+          name,
+          cpf,
+          password,
+          rg,
+          social: {
+            phone: formatPhone(phone),
+            phoneUsesWhatsapp,
+          },
+          address: {
+            zipCode,
+            city,
+            province,
+            street,
+            neighborhood,
+            complementary,
+            streetNumber,
+            latitude,
+            longitude,
+          },
+        });
 
-      await router.replace("/search");
-      resetState();
-    },
-    [
-      state.stepKey,
-      state.accumulatedContext,
-      register,
-      latitude,
-      longitude,
-      login,
-      router,
-      resetState,
-    ],
-  );
+        await login.mutateAsync({
+          email,
+          password,
+        });
+
+        await router.replace("/search");
+        resetState();
+      },
+      [
+        state.stepKey,
+        state.accumulatedContext,
+        register,
+        latitude,
+        longitude,
+        login,
+        router,
+        resetState,
+      ],
+    );
 
   return (
-    <main
-      className={cn(
-        "flex flex-col items-start justify-start gap-8 md:justify-start",
-        "px-8 py-6 lg:px-14",
-        className,
-      )}
-    >
-      <h1
-        className={cn(
-          "font-poppins-800 text-headingPrimary",
-          "text-4xl lg:text-5xl",
-          "inline-block md:block",
-        )}
+    <Form {...form}>
+      <form
+        className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
+        onSubmit={
+          isEditing
+            ? form.handleSubmit(onSubmitUserCreation)
+            : form.handleSubmit(onSubmitUserCreation)
+        }
       >
-        Estamos <span className="text-headingSecondary">quase lá!</span>
-      </h1>
-
-      <Form {...form}>
-        <form
-          className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+        <FormField
+          control={form.control}
+          name="rg"
+          render={({ field, fieldState }) => (
+            <FormItem className="w-full text-gray-700">
+              <FormLabel className="block text-sm font-medium" htmlFor="rg">
+                RG*
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  placeholder="RG"
+                  {...field}
+                  value={formatRG(field.value ?? emptyString)}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <div>
           <FormField
             control={form.control}
-            name="rg"
+            name="phone"
             render={({ field, fieldState }) => (
               <FormItem className="w-full text-gray-700">
-                <FormLabel className="block text-sm font-medium" htmlFor="rg">
-                  RG*
+                <FormLabel
+                  className="block text-sm font-medium"
+                  htmlFor="phone"
+                >
+                  Telefone*
                 </FormLabel>
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="RG"
+                    placeholder="(XX) XXXXX-XXXX"
                     {...field}
-                    value={formatRG(field.value ?? emptyString)}
+                    value={formatPhone(field.value) ?? emptyString}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
               </FormItem>
             )}
           />
-          <div>
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field, fieldState }) => (
-                <FormItem className="w-full text-gray-700">
-                  <FormLabel
-                    className="block text-sm font-medium"
-                    htmlFor="phone"
-                  >
-                    Telefone*
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="mt-3x w-full md:mt-0"
-                      placeholder="(XX) XXXXX-XXXX"
-                      {...field}
-                      value={formatPhone(field.value ?? emptyString)}
+          <FormField
+            control={form.control}
+            name="phoneUsesWhatsapp"
+            render={({ field, fieldState }) => (
+              <FormItem className="ml-0.5">
+                <FormControl>
+                  <div className="p-l-1 mb-1.5 mt-2 flex flex-row">
+                    <Checkbox
+                      id="acceptWhatsapp"
+                      className="mr-2 self-center"
+                      checked={field.value ?? false}
+                      onCheckedChange={field.onChange}
                     />
-                  </FormControl>
-                  <FormMessage>{fieldState.error?.message}</FormMessage>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phoneUsesWhatsapp"
-              render={({ field, fieldState }) => (
-                <FormItem className="ml-0.5">
-                  <FormControl>
-                    <div className="p-l-1 mb-1.5 mt-2 flex flex-row">
-                      <Checkbox
-                        id="acceptWhatsapp"
-                        className="mr-2 self-center"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                      <label htmlFor="acceptWhatsapp" className="text-sm">
-                        <div className="mt-1 flex flex-row items-center justify-center">
-                          <span className="mr-1.5"> Aceita Whatsapp </span>
-                          <Image
-                            priority
-                            src="/images/icons/whatsapp-icon.svg"
-                            height={19}
-                            width={19}
-                            alt="WhatsApp Icon"
-                          />
-                        </div>
-                      </label>
-                    </div>
-                  </FormControl>
-                  <FormMessage>{fieldState.error?.message}</FormMessage>
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="zipCode"
-            render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="zipCode"
-                >
-                  CEP*
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    maxLength={lengthFormattedZIPCode}
-                    placeholder="Ex: 99999- 999"
-                    {...field}
-                    value={formatZIPCode(field.value)}
-                  />
-                </FormControl>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel className="block text-sm font-medium" htmlFor="city">
-                  Cidade*
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="Cidade"
-                    {...field}
-                    ref={cityInputRef}
-                    value={field.value ?? emptyString}
-                  />
-                </FormControl>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="province"
-            render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="province"
-                >
-                  Estado*
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="Estado"
-                    {...field}
-                    ref={provinceInputRef}
-                    value={field.value ?? emptyString}
-                  />
-                </FormControl>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="street"
-            render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="street"
-                >
-                  <div>
-                    {" "}
-                    <MapPin className="mr-1 inline h-4 w-4" />
-                    Endereço*
+                    <label htmlFor="acceptWhatsapp" className="text-sm">
+                      <div className="mt-1 flex flex-row items-center justify-center">
+                        <span className="mr-1.5"> Aceita Whatsapp </span>
+                        <Image
+                          priority
+                          src="/images/icons/whatsapp-icon.svg"
+                          height={19}
+                          width={19}
+                          alt="WhatsApp Icon"
+                        />
+                      </div>
+                    </label>
                   </div>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="Endereço"
-                    {...field}
-                    ref={streetInputRef}
-                    value={field.value ?? emptyString}
-                  />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="neighborhood"
-            render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="neighborhood"
-                >
-                  Bairro
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="Bairro"
-                    {...field}
-                    ref={neighborhoodInputRef}
-                    value={field.value ?? emptyString}
-                  />
-                </FormControl>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="streetNumber"
-            render={({ field, fieldState }) => (
-              <FormItem className="mb-4 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="streetNumber"
-                >
-                  Número
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="Número"
-                    {...field}
-                    value={field.value ?? emptyString}
-                  />
-                </FormControl>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="complementary"
-            render={({ field, fieldState }) => (
-              <FormItem className="mt-1 w-full text-gray-700">
-                <FormLabel
-                  className="block text-sm font-medium"
-                  htmlFor="complementary"
-                >
-                  Complemento
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="Complemento"
-                    {...field}
-                    value={field.value ?? emptyString}
-                  />
-                </FormControl>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <div>
-            <p className="pb-3 text-sm">*Campo obrigatório</p>
-            <Button
-              variant="primary"
-              className="w-full"
-              type="submit"
-            >
-              Cadastrar
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </main>
+        </div>
+        <FormField
+          control={form.control}
+          name="zipCode"
+          render={({ field, fieldState }) => (
+            <FormItem className="mb-4 w-full text-gray-700">
+              <FormLabel
+                className="block text-sm font-medium"
+                htmlFor="zipCode"
+              >
+                CEP*
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  maxLength={lengthFormattedZIPCode}
+                  placeholder="Ex: 99999- 999"
+                  {...field}
+                  value={formatZIPCode(field.value)}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field, fieldState }) => (
+            <FormItem className="mb-4 w-full text-gray-700">
+              <FormLabel className="block text-sm font-medium" htmlFor="city">
+                Cidade*
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  placeholder="Cidade"
+                  {...field}
+                  ref={cityInputRef}
+                  value={field.value ?? emptyString}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="province"
+          render={({ field, fieldState }) => (
+            <FormItem className="mb-4 w-full text-gray-700">
+              <FormLabel
+                className="block text-sm font-medium"
+                htmlFor="province"
+              >
+                Estado*
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  placeholder="Estado"
+                  {...field}
+                  ref={provinceInputRef}
+                  value={field.value ?? emptyString}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="street"
+          render={({ field, fieldState }) => (
+            <FormItem className="mb-4 w-full text-gray-700">
+              <FormLabel className="block text-sm font-medium" htmlFor="street">
+                <div>
+                  {" "}
+                  <MapPin className="mr-1 inline h-4 w-4" />
+                  Endereço*
+                </div>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  placeholder="Endereço"
+                  {...field}
+                  ref={streetInputRef}
+                  value={field.value ?? emptyString}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="neighborhood"
+          render={({ field, fieldState }) => (
+            <FormItem className="mb-4 w-full text-gray-700">
+              <FormLabel
+                className="block text-sm font-medium"
+                htmlFor="neighborhood"
+              >
+                Bairro
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  placeholder="Bairro"
+                  {...field}
+                  ref={neighborhoodInputRef}
+                  value={field.value ?? emptyString}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="streetNumber"
+          render={({ field, fieldState }) => (
+            <FormItem className="mb-4 w-full text-gray-700">
+              <FormLabel
+                className="block text-sm font-medium"
+                htmlFor="streetNumber"
+              >
+                Número
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  placeholder="Número"
+                  {...field}
+                  value={field.value ?? emptyString}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="complementary"
+          render={({ field, fieldState }) => (
+            <FormItem className="mt-1 w-full text-gray-700">
+              <FormLabel
+                className="block text-sm font-medium"
+                htmlFor="complementary"
+              >
+                Complemento
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="mt-3x w-full md:mt-0"
+                  placeholder="Complemento"
+                  {...field}
+                  value={field.value ?? emptyString}
+                />
+              </FormControl>
+              <FormMessage>{fieldState.error?.message}</FormMessage>
+            </FormItem>
+          )}
+        />
+        <ProfileButton isEditing={isEditing} user={user} form={form} />
+      </form>
+    </Form>
   );
 }
 
@@ -430,7 +419,23 @@ export function SecondDataStepSellerScreen() {
           <NossaTerraLogo />
         </div>
       </header>
-      <SecondDataStepSellerContent />
+      <main
+        className={cn(
+          "flex flex-col items-start justify-start gap-8 md:justify-start",
+          "px-8 py-6 lg:px-14",
+        )}
+      >
+        <h1
+          className={cn(
+            "font-poppins-800 text-headingPrimary",
+            "text-4xl lg:text-5xl",
+            "inline-block md:block",
+          )}
+        >
+          Estamos <span className="text-headingSecondary">quase lá!</span>
+        </h1>
+        <SellerForm />
+      </main>
     </div>
   );
 }
