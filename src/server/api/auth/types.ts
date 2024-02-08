@@ -54,7 +54,8 @@ export const buyerSocialSchema = sellerSocialSchema.merge(
       .optional(),
     secondaryPhone: z
       .string()
-      .refine((phone) => phone === emptyString || validatePhone(phone))
+      .min(lowerEndLengthFormattedPhone)
+      .max(higherEndLengthFormattedPhone)
       .optional(),
     secondaryPhoneUsesWhatsapp: z.boolean().optional(),
   }),

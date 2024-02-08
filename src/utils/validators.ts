@@ -1,8 +1,6 @@
 // CPF code validation
 import {
-  higherEndLengthFormattedPhone,
   higherEndLengthInstagram,
-  lowerEndLengthFormattedPhone,
   lowerEndLengthInstagram,
 } from "./formatters";
 
@@ -129,14 +127,6 @@ export function validateInstagram(instagram: string): boolean {
     /^@[^:\/]+$/.test(instagram) &&
     instagram.length >= lowerEndLengthInstagram &&
     instagram.length <= higherEndLengthInstagram
-  );
-}
-
-// Phone validation
-export function validatePhone(phone: string): boolean {
-  return (
-    phone.length >= lowerEndLengthFormattedPhone &&
-    phone.length <= higherEndLengthFormattedPhone
   );
 }
 
