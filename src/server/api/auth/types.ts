@@ -29,7 +29,7 @@ export const addressSchema = z.object({
   province: z.string().min(2).max(2),
   street: z.string().min(2).max(100),
   neighborhood: z.string().max(80).optional(),
-  streetNumber: z.string().min(1).max(10).optional(),
+  streetNumber: z.string().max(10).optional(),
   complementary: z.string().max(100).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
