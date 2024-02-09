@@ -69,7 +69,7 @@ function NavBar({ children }: PropsWithChildren) {
 
 export function AppHeader({ user }: { user: User }) {
   return (
-    <div className="flex w-full items-center justify-between p-10">
+    <div className="flex w-full items-center justify-between px-10 pb-7 pt-10">
       <NavBar>
         <NavItem
           href="/search"

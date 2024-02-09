@@ -16,9 +16,7 @@ import {
 } from "~/components/ui/select";
 import { type TUserData } from "./user-table";
 
-export function UserTablePagination({
-  table,
-}: { table: Table<TUserData> }) {
+export function UserTablePagination({ table }: { table: Table<TUserData> }) {
   return (
     <div className="flex items-center justify-between px-2">
       <div className="text-muted-foreground flex-1 text-sm">

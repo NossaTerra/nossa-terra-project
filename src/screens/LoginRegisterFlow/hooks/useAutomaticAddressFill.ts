@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
 import { type RouterOutputs, api } from "~/utils/api";
+import { emptyString } from "~/utils/constants";
 import { validateZIPCode } from "~/utils/validators";
 
 // OBS: Vai facilitar bastante essa parte se a gente fizer a extração do
@@ -64,34 +65,32 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
       province,
       neighborhood,
     }: RouterOutputs["auth"]["getAddressDetails"]) => {
-
-      // NOTE: this is not necessary if you use the AddressDetails
-      // as a Zod object because you can do this transformation
-      // inside the zod object!
       setLatitude(location?.coordinates?.latitude);
       setLongitude(location?.coordinates?.longitude);
       form.clearErrors("zipCode");
 
+      //NOTE: form fields must be set regardless
+      form.setValue("city", city ?? emptyString);
+      form.setValue("province", province ?? emptyString);
+      form.setValue("street", street ?? emptyString);
+      form.setValue("neighborhood", neighborhood ?? emptyString);
+
       if (city) {
-        form.setValue("city", city);
         if (cityInputRef.current) cityInputRef.current.disabled = true;
         form.clearErrors("city");
       }
       if (province) {
-        form.setValue("province", province);
         if (provinceInputRef.current) provinceInputRef.current.disabled = true;
         form.clearErrors("province");
       }
       if (street) {
-        form.setValue("street", street);
         if (streetInputRef.current) streetInputRef.current.disabled = true;
         form.clearErrors("street");
       }
       if (neighborhood) {
-        form.setValue("neighborhood", neighborhood);
         if (neighborhoodInputRef.current)
           neighborhoodInputRef.current.disabled = true;
-          form.clearErrors("neighborhood");
+        form.clearErrors("neighborhood");
       }
     },
     [form],
@@ -145,6 +144,20 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     });
     return () => unsubscribe();
   }, [enableInputs, form, queryAndUpdateFields]);
+
+  const { data: user } = api.auth.getUser.useQuery();
+  useEffect(() => {
+    if (user && !form.formState.dirtyFields.zipCode) {
+      [
+        cityInputRef,
+        provinceInputRef,
+        streetInputRef,
+        neighborhoodInputRef,
+      ].forEach((ref) => {
+        if (ref.current) ref.current.disabled = true;
+      });
+    }
+  }, [form.formState.dirtyFields.zipCode, user]);
 
   return {
     isLoading,

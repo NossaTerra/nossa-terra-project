@@ -1,9 +1,4 @@
-import React, {
-  type ChangeEvent,
-  useState,
-  useRef,
-  useCallback,
-} from "react";
+import React, { type ChangeEvent, useState, useRef, useCallback } from "react";
 
 import { Brush, Loader2Icon } from "lucide-react";
 import { Input } from "../ui/input";
@@ -37,10 +32,12 @@ type AvatarFormData<Key extends string = AvatarFormKey> = {
 
 interface Props<FormData extends AvatarFormData> {
   form: UseFormReturn<FormData>;
+  userAvatar?: string;
 }
 
 export function AvatarUpload<FormData extends AvatarFormData>({
   form: anoyinglyTypedForm,
+  userAvatar,
 }: Props<FormData>) {
   // NOTE: the typesafety here is messy because ReactHookForms's
   // internal types, but it is great actually!
@@ -124,7 +121,8 @@ export function AvatarUpload<FormData extends AvatarFormData>({
     }
   }, []);
 
-  const imageSource = localImagePreview ?? form.watch(avatarFormKey);
+  const imageSource =
+    localImagePreview ?? form.watch(avatarFormKey) ?? userAvatar;
 
   return (
     <FormItem className="flex flex-col items-center justify-center">

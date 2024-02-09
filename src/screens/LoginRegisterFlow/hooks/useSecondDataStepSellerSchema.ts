@@ -3,8 +3,9 @@ import { z } from "zod";
 import {
   lowerEndLengthFormattedPhone,
   higherEndLengthFormattedPhone,
+  formatPhone,
 } from "~/utils/formatters";
-import { validateRG, validatePhone } from "~/utils/validators";
+import { validateRG } from "~/utils/validators";
 import { useAddressSchema } from "./useAddressSchema";
 
 export function useSecondDataStepSellerSchema() {
@@ -26,13 +27,17 @@ export function useSecondDataStepSellerSchema() {
             .string({
               required_error: "Por favor, insira um telefone da sua empresa",
             })
-            .min(lowerEndLengthFormattedPhone, {
-              message: `O telefone deve ter no mínimo ${lowerEndLengthFormattedPhone} dígitos`,
-            })
-            .max(higherEndLengthFormattedPhone, {
-              message: `O telefone deve ter no máximo  ${higherEndLengthFormattedPhone} dígitos`,
-            })
-            .refine(validatePhone, { message: "Número de telefone inválido" }),
+            .refine(
+              (phone) => {
+                return (
+                  formatPhone(phone).length >= lowerEndLengthFormattedPhone &&
+                  formatPhone(phone).length <= higherEndLengthFormattedPhone
+                );
+              },
+              {
+                message: "Telefone inválido",
+              },
+            ),
           phoneUsesWhatsapp: z.boolean().optional().default(false),
         }),
       ),

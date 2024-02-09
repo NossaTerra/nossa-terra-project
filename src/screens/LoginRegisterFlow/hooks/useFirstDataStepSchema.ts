@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { z } from "zod";
 import { validateCNPJ, validateCPF } from "~/utils/validators";
 import type { ChooseRoleFields } from "./useChooseRoleSchema";
-import { cpfIsCNPJ } from "~/utils/helpers";
+import { cpfIsCNPJ } from "~/utils/formHelpers";
 
 export type ChosenRole = ChooseRoleFields["role"];
 
