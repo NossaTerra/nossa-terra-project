@@ -65,7 +65,8 @@ export function ProfileButton({
   const onEdit = useCallback(async () => {
     if (user && user?.role === "buyer") {
       try {
-        const buyerForm: SecondDataStepBuyerFields = form.getValues() as SecondDataStepBuyerFields;
+        const buyerForm: SecondDataStepBuyerFields =
+          form.getValues() as SecondDataStepBuyerFields;
         await editBuyer.mutateAsync({
           id: user.id,
           attributes: {
@@ -100,7 +101,8 @@ export function ProfileButton({
       }
     } else if (user && user?.role === "seller") {
       try {
-        const sellerForm: SecondDataStepSellerFields = form.getValues() as SecondDataStepSellerFields;;
+        const sellerForm: SecondDataStepSellerFields =
+          form.getValues() as SecondDataStepSellerFields;
         await editSeller.mutateAsync({
           id: user.id,
           attributes: {
