@@ -37,14 +37,14 @@ import { ProfileButton } from "~/components/forms/profileButton";
 
 export function SellerForm({
   user,
-  isEditing,
-}: Partial<ClassNameProps & { user?: User } & { isEditing?: boolean }>) {
+  isEditingProfile,
+}: Partial<ClassNameProps & { user?: User } & { isEditingProfile?: boolean }>) {
   const { state, resetState } = useLoginRegisterFlow();
 
   const schema = useSecondDataStepSellerSchema();
   const form = useForm<SecondDataStepSellerFields>({
     resolver: zodResolver(schema),
-    mode: isEditing ? "onChange" : "onSubmit",
+    mode: isEditingProfile ? "onChange" : "onSubmit",
     defaultValues: {
       rg: user?.rg ?? emptyString,
       phone: user?.phone ?? emptyString,
@@ -66,7 +66,7 @@ export function SellerForm({
     provinceInputRef,
     streetInputRef,
     neighborhoodInputRef,
-  } = useAutomaticAddressFill({ form, isEditing });
+  } = useAutomaticAddressFill({ form });
 
   const register = api.auth.registerSeller.useMutation();
   const login = api.auth.login.useMutation();
@@ -139,7 +139,7 @@ export function SellerForm({
       <form
         className="grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]"
         onSubmit={
-          isEditing
+          isEditingProfile
             ? form.handleSubmit(onSubmitUserCreation)
             : form.handleSubmit(onSubmitUserCreation)
         }
@@ -384,7 +384,7 @@ export function SellerForm({
             </FormItem>
           )}
         />
-        <ProfileButton isEditing={isEditing} user={user} form={form} />
+        <ProfileButton isEditing={isEditingProfile} user={user} form={form} />
       </form>
     </Form>
   );

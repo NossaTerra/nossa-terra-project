@@ -55,13 +55,15 @@ export const getBuyerDiffObject = <T extends FieldValues>(
     field: string,
     formValue: string | boolean | undefined,
   ): string => {
-    const hasValidFormValue = formValue !== null && formValue !== undefined &&
-      fieldToFieldName.hasOwnProperty(field) 
+    const hasValidFormValue =
+      formValue !== null &&
+      formValue !== undefined &&
+      fieldToFieldName.hasOwnProperty(field);
 
     if (hasValidFormValue) {
       switch (field) {
         case "avatarImage":
-          return "Nova imagem de logo adicionada"
+          return "Nova imagem de logo adicionada";
         case "phoneUsesWhatsapp":
           return whatsAppCheckboxToMessage(!!formValue).toString();
         case "secondaryPhoneUsesWhatsapp":
@@ -84,8 +86,7 @@ export const getBuyerDiffObject = <T extends FieldValues>(
           : (form.getValues()[field] as string | boolean | undefined);
 
       const shouldAddToFieldObject =
-        userValue !== formValue &&
-        fieldToFieldName.hasOwnProperty(field);
+        userValue !== formValue && fieldToFieldName.hasOwnProperty(field);
 
       if (shouldAddToFieldObject) {
         diffObject[field] = {
@@ -129,10 +130,11 @@ export const getSellerDiffObject = <T extends FieldValues>(
     field: string,
     formValue: string | boolean | undefined,
   ): string => {
+    const hasValidFormValue =
+      formValue !== null &&
+      formValue !== undefined &&
+      fieldToFieldName.hasOwnProperty(field);
 
-    const hasValidFormValue = formValue !== null && formValue !== undefined &&
-      fieldToFieldName.hasOwnProperty(field) 
-      
     if (hasValidFormValue) {
       switch (field) {
         case "phoneUsesWhatsapp":
@@ -152,14 +154,13 @@ export const getSellerDiffObject = <T extends FieldValues>(
           ? formatPhone((form.getValues()[field] as string | undefined) ?? "")
           : (form.getValues()[field] as string | boolean | undefined);
       const shouldAddToFieldObject =
-        userValue !== formValue &&
-        fieldToFieldName.hasOwnProperty(field)
+        userValue !== formValue && fieldToFieldName.hasOwnProperty(field);
 
       if (shouldAddToFieldObject) {
         diffObject[field] = {
           fieldName: fieldToFieldName[field],
-          currentValue: currentValueDisplayedToUser(field, formValue)
-        }
+          currentValue: currentValueDisplayedToUser(field, formValue),
+        };
       }
     }
   };

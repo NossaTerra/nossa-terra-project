@@ -17,7 +17,11 @@ import { useRouter } from "next/router";
 import { z } from "zod";
 import { useInvokeCallbackOnce } from "~/hooks/useInvokeCallbackOnce";
 import { useToastMustSignIn } from "~/screens/LoginRegisterFlow/useToastMustSignIn";
-import { Direction, variants, transition } from "~/animation/horizontalCrossfade";
+import {
+  Direction,
+  variants,
+  transition,
+} from "~/animation/horizontalCrossfade";
 
 export const getServerSideProps = redirectGetServerSideProps.Public;
 

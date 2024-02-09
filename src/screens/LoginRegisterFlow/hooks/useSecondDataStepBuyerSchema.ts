@@ -56,8 +56,11 @@ export function useSecondDataStepBuyerSchema() {
               .refine(
                 (phone) => {
                   return (
-                    formatPhone(phone).length >= lowerEndLengthFormattedPhone &&
-                    formatPhone(phone).length <= higherEndLengthFormattedPhone || !phone
+                    (formatPhone(phone).length >=
+                      lowerEndLengthFormattedPhone &&
+                      formatPhone(phone).length <=
+                        higherEndLengthFormattedPhone) ||
+                    !phone
                   );
                 },
                 {

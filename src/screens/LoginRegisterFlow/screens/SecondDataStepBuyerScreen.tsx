@@ -49,14 +49,14 @@ import { ProfileButton } from "~/components/forms/profileButton";
 export function BuyerForm({
   className,
   user,
-  isEditing = false,
-}: Partial<ClassNameProps & { user?: User } & { isEditing?: boolean }>) {
+  isEditingProfile = false,
+}: Partial<ClassNameProps & { user?: User } & { isEditingProfile?: boolean }>) {
   const { state, resetState } = useLoginRegisterFlow();
 
   const schema = useSecondDataStepBuyerSchema();
   const form = useForm<SecondDataStepBuyerFields>({
     resolver: zodResolver(schema),
-    mode: isEditing ? "onChange" : "onSubmit",
+    mode: isEditingProfile ? "onChange" : "onSubmit",
     defaultValues: {
       avatarImage: user?.avatarImage ?? emptyString,
       phone: user?.phone ?? emptyString,
@@ -82,7 +82,7 @@ export function BuyerForm({
     provinceInputRef,
     streetInputRef,
     neighborhoodInputRef,
-  } = useAutomaticAddressFill({ form, isEditing });
+  } = useAutomaticAddressFill({ form });
 
   const registerBuyer = api.auth.registerBuyer.useMutation();
   const login = api.auth.login.useMutation();
@@ -162,11 +162,7 @@ export function BuyerForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={
-          isEditing
-            ? form.handleSubmit(onSubmitUserCreation)
-            : form.handleSubmit(onSubmitUserCreation)
-        }
+        onSubmit={form.handleSubmit(onSubmitUserCreation)}
         className={cn(
           "grid w-full grid-cols-1 justify-start gap-x-16 gap-y-6 md:max-w-[72vw] md:grid-cols-2 lg:ml-0 lg:max-w-[51vw]",
           className,
@@ -519,7 +515,7 @@ export function BuyerForm({
           )}
         />
         <ProfileButton
-          isEditing={isEditing}
+          isEditing={isEditingProfile}
           user={user}
           form={form}
           userLatitude={latitude}
