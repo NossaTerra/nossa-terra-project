@@ -68,7 +68,7 @@ export function ProfileButton({
         const buyerForm: SecondDataStepBuyerFields = form.getValues() as SecondDataStepBuyerFields;
         await editBuyer.mutateAsync({
           id: user.id,
-          input: {
+          attributes: {
             avatarImage: buyerForm.avatarImage,
             businessMainSector: buyerForm.businessMainSector,
             social: {
@@ -103,7 +103,7 @@ export function ProfileButton({
         const sellerForm: SecondDataStepSellerFields = form.getValues() as SecondDataStepSellerFields;;
         await editSeller.mutateAsync({
           id: user.id,
-          input: {
+          attributes: {
             rg: sellerForm.rg,
             social: {
               phone: formatPhone(sellerForm.phone),
