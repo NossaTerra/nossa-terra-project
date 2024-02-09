@@ -33,16 +33,17 @@ export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export default function ProfileScreen({ user }: Props) {
-  const [isEditing, setIsEditing] = useState(false);
-  const direction = isEditing ? Direction.Left : Direction.Right;
-  const showLogoutButton = !isEditing || user.role === "seller";
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const direction = isEditingProfile ? Direction.Left : Direction.Right;
+  const showLogoutButton = !isEditingProfile || user.role === "seller";
+
   return (
     <>
       <AppHeader user={user} />
       <div className="relative px-6 md:px-14 ">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
-            key={isEditing.toString()}
+            key={isEditingProfile.toString()}
             initial="enter"
             animate="center"
             exit="exit"
@@ -52,27 +53,34 @@ export default function ProfileScreen({ user }: Props) {
             className="md:w-screen"
           >
             {user.role === "seller" && (
-              <>
-                <SellerForm isEditing user={user} className="mb-10 md:pl-2" />
-              </>
+              <SellerForm
+                isEditingProfile
+                user={user}
+                className="mb-10 md:pl-2"
+              />
             )}
-            {isEditing && user.role === "buyer" && (
+            {user.role === "buyer" && isEditingProfile && (
               <>
                 <Button
                   className="mb-8 gap-3 p-4 text-lg"
                   variant="outline"
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => setIsEditingProfile(false)}
                 >
                   <ArrowLeftIcon />
                   Voltar
                 </Button>
-                <BuyerForm isEditing user={user} className="mb-8 md:pl-2" />
+
+                <BuyerForm
+                  isEditingProfile
+                  user={user}
+                  className="mb-8 md:pl-2"
+                />
               </>
             )}
-            {!isEditing && user.role === "buyer" && (
+            {user.role === "buyer" && !isEditingProfile && (
               <CurrentProfileCardScreen
                 user={user}
-                onEditing={() => setIsEditing(true)}
+                onEditing={() => setIsEditingProfile(true)}
               />
             )}
           </motion.div>

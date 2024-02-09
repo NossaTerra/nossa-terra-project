@@ -1,4 +1,4 @@
-import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
 import { type RouterOutputs, api } from "~/utils/api";
 import { emptyString } from "~/utils/constants";
@@ -19,12 +19,10 @@ interface AddressFormData {
 
 interface Props<FormData extends AddressFormData> {
   form: UseFormReturn<FormData>;
-  isEditing?: boolean;  // New variable
 }
 
 export function useAutomaticAddressFill<FormData extends AddressFormData>({
   form: anoyinglyTypedForm,
-  isEditing
 }: Props<FormData>) {
   // NOTE: the typesafety here is messy because ReactHookForms's
   // internal types, but it is great actually!
@@ -67,34 +65,28 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
       province,
       neighborhood,
     }: RouterOutputs["auth"]["getAddressDetails"]) => {
-
-      // NOTE: this is not necessary if you use the AddressDetails
-      // as a Zod object because you can do this transformation
-      // inside the zod object!
       setLatitude(location?.coordinates?.latitude);
       setLongitude(location?.coordinates?.longitude);
       form.clearErrors("zipCode");
-      
-      //NOTE: form field must be set regardless
+
+      //NOTE: form fields must be set regardless
       form.setValue("city", city ?? emptyString);
+      form.setValue("province", province ?? emptyString);
+      form.setValue("street", street ?? emptyString);
+      form.setValue("neighborhood", neighborhood ?? emptyString);
+
       if (city) {
         if (cityInputRef.current) cityInputRef.current.disabled = true;
         form.clearErrors("city");
       }
-       //NOTE: form field must be set regardless
-      form.setValue("province", province ?? emptyString);
       if (province) {
         if (provinceInputRef.current) provinceInputRef.current.disabled = true;
         form.clearErrors("province");
       }
-       //NOTE: form field must be set regardless
-      form.setValue("street", street ?? emptyString);
       if (street) {
         if (streetInputRef.current) streetInputRef.current.disabled = true;
         form.clearErrors("street");
       }
-       //NOTE: form field must be set regardless
-      form.setValue("neighborhood", neighborhood ?? emptyString);
       if (neighborhood) {
         if (neighborhoodInputRef.current)
           neighborhoodInputRef.current.disabled = true;
@@ -153,24 +145,19 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     return () => unsubscribe();
   }, [enableInputs, form, queryAndUpdateFields]);
 
-
-  /*NOTE:  If user is editing and haven't changed the zip code, the already saved address information should not be edited, 
-   user must change the zip code if wants to change address info */
+  const { data: user } = api.auth.getUser.useQuery();
   useEffect(() => {
-    const disableInputIfValueExists = (inputRef: RefObject<HTMLInputElement>, value?: string) => {
-      if (!!value && inputRef.current) {
-        inputRef.current.disabled = true;
-      }
-    };
-    if (isEditing) {
-      const { city, province, street, neighborhood } = form.getValues();
-  
-      disableInputIfValueExists(cityInputRef, city);
-      disableInputIfValueExists(provinceInputRef, province);
-      disableInputIfValueExists(streetInputRef, street);
-      disableInputIfValueExists(neighborhoodInputRef, neighborhood);
+    if (user && !form.formState.dirtyFields.zipCode) {
+      [
+        cityInputRef,
+        provinceInputRef,
+        streetInputRef,
+        neighborhoodInputRef,
+      ].forEach((ref) => {
+        if (ref.current) ref.current.disabled = true;
+      });
     }
-  }, [form, isEditing]);
+  }, [form.formState.dirtyFields.zipCode, user]);
 
   return {
     isLoading,
