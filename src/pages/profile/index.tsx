@@ -7,7 +7,7 @@ import Image from "next/image";
 import { MapPinIcon, Brush, LogOut, ArrowLeftIcon } from "lucide-react";
 
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Direction,
@@ -141,8 +141,42 @@ export function LogOutButton({ isSeller }: { isSeller: boolean }) {
 }
 
 export function UserAnnouncementCard({ user }: Props) {
-  const shouldShowWhatsAppIcon =
-    user.secondaryPhoneUsesWhatsapp ?? user.phoneUsesWhatsapp;
+  const commonPhones = useMemo(() => {
+    const phones: string[] = [];
+
+    if (user.phoneUsesWhatsapp === false) {
+      phones.push(user.phone);
+    }
+    if (user.secondaryPhone && user?.secondaryPhoneUsesWhatsapp === false) {
+      phones.push(user.secondaryPhone);
+    }
+
+    return phones;
+  }, [
+    user.phone,
+    user.phoneUsesWhatsapp,
+    user.secondaryPhone,
+    user?.secondaryPhoneUsesWhatsapp,
+  ]);
+
+  const whatsAppPhones = useMemo(() => {
+    const phones: string[] = [];
+
+    if (user.phoneUsesWhatsapp) {
+      phones.push(user.phone);
+    }
+    if (user.secondaryPhone && user?.secondaryPhoneUsesWhatsapp) {
+      phones.push(user.secondaryPhone);
+    }
+
+    return phones;
+  }, [
+    user.phone,
+    user.phoneUsesWhatsapp,
+    user.secondaryPhone,
+    user?.secondaryPhoneUsesWhatsapp,
+  ]);
+
   return (
     <div className="md:max-w-2xl md:py-7 ">
       <div className="rounded-lg border-2 border-black p-5">
@@ -189,39 +223,41 @@ export function UserAnnouncementCard({ user }: Props) {
               )}
             </div>
             <div className="flex flex-col items-start gap-3 md:flex md:flex-row md:gap-10">
-              <div className="mt-1 flex items-start justify-center">
-                <Image
-                  priority
-                  className="mt-0.5"
-                  src="/images/icons/phone-icon.svg"
-                  height={20}
-                  width={20}
-                  alt="Phone Icon"
-                />
-                <div className="ml-3 flex flex-col">
-                  <span className="text-sm">{user.phone}</span>
-                  {user.secondaryPhone && (
-                    <span className="text-sm">{user.secondaryPhone}</span>
-                  )}
-                </div>
-              </div>
-              {shouldShowWhatsAppIcon && (
+              {whatsAppPhones.length > 0 && (
                 <div className="mt-1 flex items-start justify-center">
                   <Image
                     priority
                     className="mt-0.5"
                     src="/images/icons/whatsapp-icon.svg"
-                    height={22}
-                    width={22}
+                    height={20}
+                    width={20}
                     alt="Phone Icon"
                   />
                   <div className="ml-3 flex flex-col">
-                    {user.phone && user.phoneUsesWhatsapp && (
-                      <span className="text-sm">{user.phone}</span>
-                    )}
-                    {user.secondaryPhone && user.secondaryPhoneUsesWhatsapp && (
-                      <span className="text-sm">{user.secondaryPhone}</span>
-                    )}
+                    {whatsAppPhones.map((phone, index) => (
+                      <span key={index} className="text-sm">
+                        {phone}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {commonPhones.length > 0 && (
+                <div className="mt-1 flex items-start justify-center">
+                  <Image
+                    priority
+                    className="mt-0.5"
+                    src="/images/icons/phone-icon.svg"
+                    height={20}
+                    width={20}
+                    alt="Phone Icon"
+                  />
+                  <div className="ml-3 flex flex-col">
+                    {commonPhones.map((phone, index) => (
+                      <span key={index} className="text-sm">
+                        {phone}
+                      </span>
+                    ))}
                   </div>
                 </div>
               )}
