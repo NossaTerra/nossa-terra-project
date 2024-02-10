@@ -163,7 +163,7 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     if (user && !form.formState.dirtyFields.zipCode) {
       disableFilledFields(form.getValues());
     }
-  }, [disableFilledFields, form, form.formState.dirtyFields.zipCode, user]);
+  }, [disableFilledFields, form, user]);
 
   return {
     isLoading,
