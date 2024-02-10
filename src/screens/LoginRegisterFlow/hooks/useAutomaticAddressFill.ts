@@ -38,23 +38,47 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
   const provinceInputRef = useRef<HTMLInputElement | null>(null);
   const streetInputRef = useRef<HTMLInputElement | null>(null);
   const neighborhoodInputRef = useRef<HTMLInputElement | null>(null);
-  const affectedInputRefs = useMemo(
+
+  const mapAffectedFieldInputRef = useMemo(
     () =>
-      [
-        cityInputRef,
-        provinceInputRef,
-        streetInputRef,
-        neighborhoodInputRef,
-      ] as const,
+      ({
+        city: cityInputRef,
+        province: provinceInputRef,
+        street: streetInputRef,
+        neighborhood: neighborhoodInputRef,
+      }) as const,
     [],
   );
 
-  const enableInputs = useCallback(
+  const enableFields = useCallback(
     () =>
-      affectedInputRefs.forEach((ref) => {
+      Object.values(mapAffectedFieldInputRef).forEach((ref) => {
         if (ref.current) ref.current.disabled = false;
       }),
-    [affectedInputRefs],
+    [mapAffectedFieldInputRef],
+  );
+
+  type AffectedField = keyof typeof mapAffectedFieldInputRef;
+  type AffectedFieldsValues = {
+    [key in AffectedField]?: string | null | undefined;
+  };
+
+  const disableFilledFields = useCallback(
+    (fieldValues: AffectedFieldsValues) => {
+      const fields = Object.keys(mapAffectedFieldInputRef) as AffectedField[];
+
+      fields.forEach((field) => {
+        if (!fieldValues[field]) {
+          return;
+        }
+        form.clearErrors(field);
+        const inputRef = mapAffectedFieldInputRef[field];
+        if (inputRef.current) {
+          inputRef.current.disabled = true;
+        }
+      });
+    },
+    [form, mapAffectedFieldInputRef],
   );
 
   const onSuccessFetchAddress = useCallback(
@@ -75,29 +99,18 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
       form.setValue("street", street ?? emptyString);
       form.setValue("neighborhood", neighborhood ?? emptyString);
 
-      if (city) {
-        if (cityInputRef.current) cityInputRef.current.disabled = true;
-        form.clearErrors("city");
-      }
-      if (province) {
-        if (provinceInputRef.current) provinceInputRef.current.disabled = true;
-        form.clearErrors("province");
-      }
-      if (street) {
-        if (streetInputRef.current) streetInputRef.current.disabled = true;
-        form.clearErrors("street");
-      }
-      if (neighborhood) {
-        if (neighborhoodInputRef.current)
-          neighborhoodInputRef.current.disabled = true;
-        form.clearErrors("neighborhood");
-      }
+      disableFilledFields({
+        city,
+        province,
+        street,
+        neighborhood,
+      });
     },
-    [form],
+    [form, disableFilledFields],
   );
 
   const onErrorFetchAddress = useCallback(() => {
-    enableInputs();
+    enableFields();
 
     setLatitude(undefined);
     setLongitude(undefined);
@@ -110,7 +123,7 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     form.resetField("province");
     form.resetField("street");
     form.resetField("neighborhood");
-  }, [enableInputs, form]);
+  }, [enableFields, form]);
 
   // NOTE: It's best to call the React Query Client directly without using its hooks
   // React Query hooks are great when the fetch is triggered by a React State changing
@@ -138,26 +151,19 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
         if (validateZIPCode(zipCode)) {
           queryAndUpdateFields(zipCode);
         } else {
-          enableInputs();
+          enableFields();
         }
       }
     });
     return () => unsubscribe();
-  }, [enableInputs, form, queryAndUpdateFields]);
+  }, [enableFields, form, queryAndUpdateFields]);
 
   const { data: user } = api.auth.getUser.useQuery();
   useEffect(() => {
     if (user && !form.formState.dirtyFields.zipCode) {
-      [
-        cityInputRef,
-        provinceInputRef,
-        streetInputRef,
-        neighborhoodInputRef,
-      ].forEach((ref) => {
-        if (ref.current) ref.current.disabled = true;
-      });
+      disableFilledFields(form.getValues());
     }
-  }, [form.formState.dirtyFields.zipCode, user]);
+  }, [disableFilledFields, form, form.formState.dirtyFields.zipCode, user]);
 
   return {
     isLoading,
