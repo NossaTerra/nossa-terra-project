@@ -10,7 +10,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 
 import { MoreHorizontalIcon, Trash2Icon } from "lucide-react";
-import { UserActiveState } from "~/server/api/auth/types";
+import { UserActiveState } from "~/server/types/user.type";
 import { type TUserData } from "./user-table";
 import { useUserTableActions } from "./user-table-actions";
 import { useCallback } from "react";

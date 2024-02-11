@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { t, middleware } from "./trpc";
-import { RoleTypeSchema, type Role } from "../auth/types";
+import { RoleTypeSchema, type Role } from "../../types/user.type";
 import { type ZodEnum } from "zod";
 
 const isAuthMiddleware = middleware(({ ctx, next }) => {

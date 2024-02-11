@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import { RoleTypeSchema } from "~/server/api/auth/types";
+import { RoleTypeSchema } from "~/server/types/user.type";
 
 export function useChooseRoleSchema() {
   // It's best to use a hook to get the schema because

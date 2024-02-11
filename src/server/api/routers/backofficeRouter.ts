@@ -1,4 +1,4 @@
-import { UserActiveState } from "./../auth/types";
+import { UserActiveState } from "../../types/user.type";
 import { z } from "zod";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
