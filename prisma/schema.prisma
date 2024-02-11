@@ -105,4 +105,15 @@ model Key {
     @@map("Key")
 }
 
-// -----------------------------------------
+enum ProductType {
+    coffee
+}
+
+model Product {
+    id String @id @unique @default(cuid())
+
+    name String
+    type ProductType
+
+    mainColor String
+}
