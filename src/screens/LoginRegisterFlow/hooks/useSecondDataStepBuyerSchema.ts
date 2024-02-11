@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import { BusinessSector } from "~/server/api/auth/types";
+import { BusinessSector } from "~/server/types/user.type";
 import { emptyString } from "~/utils/constants";
 import {
   lowerEndLengthFormattedPhone,
@@ -59,7 +59,7 @@ export function useSecondDataStepBuyerSchema() {
                     (formatPhone(phone).length >=
                       lowerEndLengthFormattedPhone &&
                       formatPhone(phone).length <=
-                        higherEndLengthFormattedPhone) ||
+                      higherEndLengthFormattedPhone) ||
                     !phone
                   );
                 },

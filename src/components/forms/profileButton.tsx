@@ -13,7 +13,7 @@ import {
 } from "~/utils/formHelpers";
 import { Button } from "../ui/button";
 import { useState, useCallback } from "react";
-import { type User } from "~/server/api/auth/types";
+import { type User } from "~/server/types/user.type";
 import { type UseFormReturn } from "react-hook-form";
 import { type SecondDataStepBuyerFields } from "~/screens/LoginRegisterFlow/hooks/useSecondDataStepBuyerSchema";
 import { type SecondDataStepSellerFields } from "~/screens/LoginRegisterFlow/hooks/useSecondDataStepSellerSchema";
@@ -33,8 +33,8 @@ export function ProfileButton({
   userLongitude?: number | undefined;
   isEditing: boolean | undefined;
   form:
-    | UseFormReturn<SecondDataStepBuyerFields>
-    | UseFormReturn<SecondDataStepSellerFields>;
+  | UseFormReturn<SecondDataStepBuyerFields>
+  | UseFormReturn<SecondDataStepSellerFields>;
 }) {
   const [diffEditingObject, setDiffEditingObject] = useState<DiffObject>(
     {} as DiffObject,
@@ -49,13 +49,13 @@ export function ProfileButton({
       setDiffEditingObject(
         user?.role === "buyer"
           ? getBuyerDiffObject(
-              form as UseFormReturn<SecondDataStepBuyerFields>,
-              user,
-            )
+            form as UseFormReturn<SecondDataStepBuyerFields>,
+            user,
+          )
           : getSellerDiffObject(
-              form as UseFormReturn<SecondDataStepSellerFields>,
-              user,
-            ),
+            form as UseFormReturn<SecondDataStepSellerFields>,
+            user,
+          ),
       );
     }
   }, [form, isEditing, user]);

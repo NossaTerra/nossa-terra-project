@@ -1,7 +1,7 @@
 import { type GetServerSidePropsContext, type GetServerSideProps } from "next";
 import { auth } from "./lucia";
 import { getInitialRoute } from "./getInitialRoute";
-import { RoleTypeSchema, type Role } from "./types";
+import { RoleTypeSchema, type Role } from "../../types/user.type";
 import { type ZodEnum } from "zod";
 
 const getUser = async (context: GetServerSidePropsContext) => {

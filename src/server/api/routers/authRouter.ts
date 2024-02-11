@@ -3,7 +3,7 @@ import {
   BusinessSector,
   buyerSocialSchema,
   sellerSocialSchema,
-} from "./../auth/types";
+} from "../../types/user.type";
 import { z } from "zod";
 import { env } from "~/env";
 

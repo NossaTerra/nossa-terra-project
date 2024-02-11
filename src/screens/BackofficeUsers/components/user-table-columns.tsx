@@ -9,7 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar";
 import {
   BusinessSectorLabel,
   UserActiveStateLabel,
-} from "~/server/api/auth/types";
+} from "~/server/types/user.type";
 import { Badge } from "~/components/ui/badge";
 
 export const userColumns = [

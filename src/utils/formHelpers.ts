@@ -1,9 +1,9 @@
 import { type ChosenRole } from "~/screens/LoginRegisterFlow/hooks/useFirstDataStepSchema";
 import { formatPhone, lengthFormattedCPF } from "./formatters";
-import { type BusinessSector, type User } from "~/server/api/auth/types";
+import { type BusinessSector, type User } from "~/server/types/user.type";
 import { type FieldValues, type UseFormReturn } from "react-hook-form";
 import { type SecondDataStepBuyerFields } from "~/screens/LoginRegisterFlow/hooks/useSecondDataStepBuyerSchema";
-import { BusinessSectorLabel } from "~/server/api/auth/types";
+import { BusinessSectorLabel } from "~/server/types/user.type";
 import { emptyString } from "./constants";
 import { type SecondDataStepSellerFields } from "~/screens/LoginRegisterFlow/hooks/useSecondDataStepSellerSchema";
 

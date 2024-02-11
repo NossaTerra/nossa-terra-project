@@ -16,7 +16,7 @@ import {
   UserActiveStateLabel,
   UserActiveState,
   BusinessSector,
-} from "~/server/api/auth/types";
+} from "~/server/types/user.type";
 import { useMemo } from "react";
 import { Badge } from "~/components/ui/badge";
 

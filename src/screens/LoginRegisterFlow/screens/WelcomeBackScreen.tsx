@@ -22,7 +22,7 @@ import { useLoginRegisterFlow } from "../state/machine";
 import { ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "~/hooks/useAuth";
 import { TRPCClientError } from "@trpc/client";
-import { type AppRouter } from "~/server/api/routers/_root";
+import { type AppRouter } from "~/server/api/routers/_rootRouter";
 import Link from "next/link";
 
 function WelcomeBackContent({ className }: ClassNameProps) {

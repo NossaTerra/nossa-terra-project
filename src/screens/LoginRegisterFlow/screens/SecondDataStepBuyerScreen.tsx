@@ -41,7 +41,7 @@ import {
   BusinessSector,
   BusinessSectorLabel,
   type User,
-} from "~/server/api/auth/types";
+} from "~/server/types/user.type";
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
 import { AvatarUpload } from "~/components/common/AvatarUpload";
 import { ProfileButton } from "~/components/forms/profileButton";

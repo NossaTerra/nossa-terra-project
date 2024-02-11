@@ -1,8 +1,8 @@
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
-import { authRouter } from "./auth";
-import { profileRouter } from "./profile";
-import { forgetPasswordRouter } from "./forgetPassword";
-import { backofficeRouter } from "./backoffice";
+import { authRouter } from "./authRouter";
+import { profileRouter } from "./profileRouter";
+import { forgetPasswordRouter } from "./forgetPasswordRouter";
+import { backofficeRouter } from "./backofficeRouter";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
