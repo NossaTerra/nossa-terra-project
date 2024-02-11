@@ -1,0 +1,86 @@
+import { ProductType, type Product } from "@prisma/client";
+
+const arabicaNames = [
+  "CAFÉ 17/18 PRONTO CEREJA -SEMI-WASHED",
+  "CAFÉ 14/16 PRONTO CEREJA - SEMI-WASHED",
+  "CAFÉ 17/18 PRONTO FINO - FINE CUP",
+  "CAFÉ 14/16 PRONTO FINO - FINE CUP",
+  "CAFÉ 17/18 PRONTO BOM - GOOD CUP-",
+  "CAFÉ 14/16 PRONTO BOM - GOOD CUP -",
+  "CAFÉ 17/18 RIO MINAS PRONTO",
+  "CAFÉ 14/16 RIO MINAS PRONTO",
+  "CAFÉ 17/18 RIO ZONA PRONTO",
+  "CAFÉ 14/16 RIO ZONA PRONTO",
+  "GRINDERS 12 UP FINO - FINE CUP",
+  "GRINDERS 12 UP - GOOD CUP",
+  "GRINDERS 13 UP - FINE CUP",
+  "GRINDERS 13 UP - GOOD CUP",
+  "CAFÉ CEREJA SEMI-WASHED  - 25%P17AC  - 10% CATAÇÃO",
+  "CAFÉ CEREJA SEMI-WASHED  - 25%P17AC  - 15% CATAÇÃO",
+  "CAFÉ FINO - FINE CUP  - 25% P17AC  -15 %CATAÇÃO ",
+  "CAFÉ FINO - FINE CUP  - 25% P17AC  -20 %CATAÇÃO",
+  "CAFÉ BOM - GOOD CUP – 25% P17AC – 20%CATAÇÃO",
+  "CAFÉ BOM – GOOD CUP – 25% P17AC – 25% CATAÇÃO",
+  "CAFÉ BOM – GOOD CUP – 25% P17AC – 30% CATAÇÃO",
+  "CAFÉ DURO ATÉ 2 RIADAS   - GOOD CUP – 25% P17AC – 20% CATAÇÃO",
+  "CAFÉ DURO ATÉ 2 RIADAS   - GOOD CUP – 25% P17AC – 25% CATAÇÃO",
+  "CAFÉ DURO ATÉ 2 RIADAS   - GOOD CUP – 25% P17AC – 30% CATAÇÃ",
+  "CAFÉ DURO RIADO - GOOD CUP – 25% P17AC – 20% CATAÇÃO",
+  "CAFÉ DURO RIADO - GOOD CUP – 25% P17AC – 25% CATAÇÃO",
+  "CAFÉ DURO RIADO - GOOD CUP – 25% P17AC – 30% CATAÇÃO",
+  "CAFÉ DURO RIADO RIO - GOOD CUP – 25% P17AC – 20% CATAÇÃO",
+  "CAFÉ DURO RIADO RIO - GOOD CUP – 25% P17AC – 25% CATAÇÃO ",
+  "CAFÉ DURO RIADO RIO - GOOD CUP – 25% P17AC – 30% CATAÇÃO ",
+  "CAFÉ RIO MINAS PANO – 25%P17AC – 20% CATAÇÃO",
+  "CAFÉ RIO MINAS PANO – 25% P17AC – 25%CATAÇÃO",
+  "CAFÉ RIO VARREÇÃO – 25% P17AC – 20% CATAÇÃO",
+  "CAFÉ RIO VARREÇÃO – 25% P17AC – 25%CATAÇÃO ",
+  "CAFÉ RIO ZONA PANO – 25%P17AC – 20%CATAÇÃO",
+  "CAFÉ RIO ZONA PANO – 25%P17 – 20% CATAÇÃO ",
+  "CAFÉ RIO ZONA PANO -25%P17AC – 25% CATAÇÃO",
+  "CONSUMO 600 DEFEITOS 1X1",
+  "CONSUMO 800 DEFEITOS 2X2",
+  "CONSUMO RIO 600 DEFEITOS 1X1",
+  "CONSUMO RIO 800 DEFEITOS 2X2",
+] as const;
+
+const robustaNames = [
+  "CONILLON 12UP PRONTO",
+  "CONILLON 13 UP PRONTO",
+  "CONILLON 14 UP PRONTO",
+  "CONILLON 16 UP PRONTO",
+  "CONILLON – 200 DEF 1X1 ",
+  "CONILLON – 300 DEF 1X1",
+  "CONILLON – 500 DEF",
+  "CONILLON – 600 DEF",
+] as const;
+
+const colorPool = {
+  "Castleton green": "#006954",
+  "Payne's gray": "#0e5e7a",
+  "Atomic tangerine": "#f7915e",
+  Jasmine: "#ffd374",
+  "Prussian blue": "#063447",
+  Auburn: "#963831",
+  Eggplant: "#4a3941",
+  Celadon: "#b9d29d",
+  "Rich black": "#001219",
+  "Midnight green": "#005f73",
+  "Dark cyan": "#0a9396",
+  "Tiffany Blue": "#94d2bd",
+  Vanilla: "#e9d8a6",
+  Gamboge: "#ee9b00",
+  "Alloy orange": "#ca6702",
+  Rust: "#bb3e03",
+  Rufous: "#ae2012",
+} as const;
+
+const colors = Object.values(colorPool);
+
+export const initialProducts = [...arabicaNames, ...robustaNames].map(
+  (name, index) => ({
+    name,
+    type: ProductType.coffee,
+    mainColor: colors[index % colors.length]!,
+  }),
+) satisfies Omit<Product, "id">[];
