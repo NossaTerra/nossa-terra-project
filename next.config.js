@@ -7,6 +7,21 @@ await import("./src/env.js");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+
+  // appRouter "like" definitions
+  // Remove this if we move to app router at some points
+  pageExtensions: [
+    "page.tsx",
+    "page.ts",
+    "page.jsx",
+    "page.js",
+
+    // API endpoints
+    "route.tsx",
+    "route.ts",
+    "route.jsx",
+    "route.js",
+  ],
   images: {
     remotePatterns: [
       {
