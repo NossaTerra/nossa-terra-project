@@ -1,6 +1,6 @@
 import { type InferGetServerSidePropsType } from "next";
 import { BackofficeHeader } from "~/components/common/headers";
-import { UserTable } from "~/screens/BackofficeUsers/components/user-table";
+import { UserTable } from "./components/user-table";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 
 export const getServerSideProps = redirectGetServerSideProps.Backoffice;
