@@ -12,3 +12,11 @@ export const productSchema = z.object({
   mainColor: z.string(),
   type: z.nativeEnum(ProductType),
 });
+
+export function getProductImageSrc(productType: ProductType) {
+  if (productType === ProductType.coffee) {
+    return "/images/products/coffee.svg";
+  }
+
+  return "/images/placeholder.png";
+}
