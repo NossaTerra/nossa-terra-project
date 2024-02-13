@@ -77,10 +77,16 @@ const colorPool = {
 
 const colors = Object.values(colorPool);
 
-export const initialProducts = [...arabicaNames, ...robustaNames].map(
-  (name, index) => ({
-    name,
-    type: ProductType.coffee,
-    mainColor: colors[index % colors.length]!,
-  }),
-) satisfies Omit<Product, "id">[];
+const arabicaProducts = arabicaNames.map((name, index) => ({
+  name,
+  type: ProductType.CoffeeArabica,
+  mainColor: colors[index % colors.length]!,
+})) satisfies Omit<Product, "id">[];
+
+const robustaProducts = arabicaNames.map((name, index) => ({
+  name,
+  type: ProductType.CoffeeRobusta,
+  mainColor: colors[index % colors.length]!,
+})) satisfies Omit<Product, "id">[];
+
+export const initialProducts = [...arabicaProducts, ...robustaProducts];

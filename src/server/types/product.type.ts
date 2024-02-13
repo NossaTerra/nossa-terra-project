@@ -3,7 +3,8 @@ import { ProductType } from "@prisma/client";
 export { ProductType } from "@prisma/client";
 
 export const ProductTypeLabel = {
-  coffee: "café",
+  CoffeeRobusta: "Robusta",
+  CoffeeArabica: "Arabica",
 } as const satisfies Record<ProductType, string>;
 
 export const productSchema = z.object({
@@ -14,8 +15,11 @@ export const productSchema = z.object({
 });
 
 export function getProductImageSrc(productType: ProductType) {
-  if (productType === ProductType.coffee) {
-    return "/images/products/coffee.svg";
+  if (productType === ProductType.CoffeeArabica) {
+    return "/images/products/small_arabica.png";
+  }
+  if (productType === ProductType.CoffeeRobusta) {
+    return "/images/products/small_robusta.png";
   }
 
   return "/images/placeholder.png";
