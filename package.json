@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:gen": "prisma generate",
+    "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
     "dev": "next dev",
     "format": "prettier --check \"**/*.{js,cjs,mjs,ts,tsx,md,json}\"",

@@ -106,7 +106,8 @@ model Key {
 }
 
 enum ProductType {
-    coffee
+    CoffeeArabica
+    CoffeeRobusta
 }
 
 model Product {

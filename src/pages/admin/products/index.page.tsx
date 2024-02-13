@@ -23,7 +23,10 @@ import { Input } from "~/components/ui/input";
 import { ProductType, type Product } from "@prisma/client";
 import Image from "next/image";
 import { Separator } from "~/components/ui/separator";
-import { getProductImageSrc } from "~/server/types/product.type";
+import {
+  ProductTypeLabel,
+  getProductImageSrc,
+} from "~/server/types/product.type";
 
 export const getServerSideProps = redirectGetServerSideProps.Admin;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -110,7 +113,7 @@ function ProductsShowcase() {
       createProduct.mutate({
         name: "Novo Café",
         mainColor: "brown",
-        type: ProductType.coffee,
+        type: ProductType.CoffeeArabica,
       }),
     [createProduct],
   );
@@ -208,12 +211,46 @@ function ProductRow({ product }: { product: Product }) {
               }
             />
             <Label className="w-24 text-end font-bold">Cor Principal</Label>
-            <Input
-              value={newProduct.mainColor}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, mainColor: e.target.value })
-              }
-            />
+            <div className="flex flex-row">
+              <Input
+                className="w-30"
+                type="color"
+                value={newProduct.mainColor}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, mainColor: e.target.value })
+                }
+              />
+              <Input
+                value={newProduct.mainColor}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, mainColor: e.target.value })
+                }
+              />
+            </div>
+            <Label className="w-24 text-end font-bold">Tipo</Label>
+            <div className="flex flex-row flex-wrap gap-4">
+              {Object.values(ProductType).map((type) => (
+                <div
+                  role="button"
+                  key={type}
+                  className={cn(
+                    "relative flex cursor-pointer gap-4 overflow-hidden rounded-lg border-4 border-slate-200 p-4 pr-14 shadow-xl transition-colors duration-300 hover:bg-slate-200",
+                    { "border-slate-800": type === newProduct.type },
+                  )}
+                  onClick={() => setNewProduct({ ...newProduct, type })}
+                >
+                  <span>{ProductTypeLabel[type]}</span>
+                  <Image
+                    priority
+                    src={getProductImageSrc(type)}
+                    height={60}
+                    width={60}
+                    alt="marca dágua do produto"
+                    className="absolute -bottom-2 -right-2 opacity-90"
+                  />
+                </div>
+              ))}
+            </div>
             <div />
             <DialogClose asChild>
               <Button onClick={onClickSave}>Salvar</Button>
@@ -281,13 +318,13 @@ function ProductCard({
       <Image
         priority
         src={getProductImageSrc(product.type)}
-        height={60}
-        width={60}
+        height={90}
+        width={90}
         alt="marca dágua do produto"
-        className="absolute -bottom-2 right-3 opacity-40"
+        className="absolute -bottom-4 -right-3 opacity-60"
       />
 
-      <div className="pl-6 pr-14 text-lg">{product.name}</div>
+      <div className="pl-6 pr-12 text-lg">{product.name}</div>
     </div>
   );
 }
