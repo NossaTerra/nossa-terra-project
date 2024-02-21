@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   DollarSignIcon,
   FolderOpenIcon,
+  LogOut,
   MenuIcon,
   PhoneIcon,
   SearchIcon,
@@ -16,20 +17,30 @@ import {
 import { useRouter } from "next/router";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
+import { useAuth } from "~/hooks/useAuth";
 
 interface NavItem {
   href: string;
   label: string;
   icon: JSX.Element;
+  isHighlightable?: boolean;
+  onClick?: () => void;
 }
 
-function NavItem({ href, label, icon }: NavItem) {
+function NavItem({
+  href,
+  label,
+  icon,
+  onClick,
+  isHighlightable = true,
+}: NavItem) {
   const { pathname } = useRouter();
   const isSelected =
-    href === "/" ? pathname === href : pathname.startsWith(href);
+    href === "/" ? pathname === href : pathname.startsWith(href) && isHighlightable;
 
   return (
     <Link
+      onClick={onClick}
       href={href}
       className={cn(
         "flex w-full flex-row items-center justify-start gap-2 lg:w-auto",
@@ -120,6 +131,7 @@ export function AppHeader({
 }
 
 export function BackofficeHeader({ user }: { user: User }) {
+  const { logout } = useAuth();
   return (
     <div className="flex w-full items-center justify-between p-10">
       <NavBar>
@@ -140,6 +152,13 @@ export function BackofficeHeader({ user }: { user: User }) {
             icon={<TagsIcon />}
           />
         )}
+        <NavItem
+          onClick={logout}
+          href="/"
+          isHighlightable={false}
+          label="Sair"
+          icon={<LogOut />}
+        />
       </NavBar>
       <NossaTerraLogo />
     </div>
