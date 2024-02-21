@@ -174,12 +174,7 @@ export function WelcomeBackScreen() {
       <WelcomeBackContent className="flex grow" />
 
       <footer className="flex flex-col justify-center">
-        <ImageCarousel
-          pathArray={["", "", "", "", "", "", ""]}
-          height={220}
-          width={220}
-          className="hidden md:block"
-        />
+        <ImageCarousel className="hidden md:block" />
         <div className="flex justify-center p-12 md:hidden">
           <NossaTerraLogo />
         </div>

@@ -43,6 +43,7 @@ import {
 } from "~/components/ui/tooltip";
 import useZipCodeToast from "../hooks/useZipCodeToast";
 import toast from "react-hot-toast";
+import ImageCarousel from "~/components/common/ImageCarrousel";
 
 export function SellerForm({
   user,
@@ -468,6 +469,7 @@ export function SecondDataStepSellerScreen() {
           Estamos <span className="text-headingSecondary">quase lá!</span>
         </h1>
         <SellerForm />
+        <ImageCarousel className="mt-10" />
       </main>
     </div>
   );

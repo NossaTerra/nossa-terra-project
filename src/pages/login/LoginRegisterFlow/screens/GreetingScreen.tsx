@@ -148,23 +148,13 @@ export function GreetingScreen() {
         <div className="hidden px-12 md:block">
           <NossaTerraLogo />
         </div>
-        <ImageCarousel
-          pathArray={["", "", "", "", "", "", ""]}
-          height={220}
-          width={220}
-          className="block md:hidden"
-        />
+        <ImageCarousel className="block md:hidden" />
       </header>
 
       <GreetingContent className="flex grow" />
 
       <footer className="flex flex-col justify-center">
-        <ImageCarousel
-          pathArray={["", "", "", "", "", "", ""]}
-          height={220}
-          width={220}
-          className="hidden md:block"
-        />
+        <ImageCarousel className="hidden md:block" />
         <div className="flex justify-center p-12 md:hidden">
           <NossaTerraLogo />
         </div>
