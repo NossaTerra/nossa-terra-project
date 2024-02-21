@@ -1,3 +1,4 @@
+import { adRouter } from "./adRouter";
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
 import { authRouter } from "./authRouter";
 import { profileRouter } from "./profileRouter";
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   product: productRouter,
   search: searchRouter,
   listing: listingRouter,
+  ad: adRouter,
 });
 
 export type AppRouter = typeof appRouter;
