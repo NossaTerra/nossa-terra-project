@@ -140,3 +140,21 @@ model Listing {
     @@index([userId])
     @@index([productId])
 }
+
+enum AdType {
+    Banner
+    Small
+    Medium
+}
+
+
+model Ad {
+    id String @id @unique @default(cuid())
+
+    name String
+    type AdType
+    adImage  String
+
+    link String?
+    isActive Boolean
+}
