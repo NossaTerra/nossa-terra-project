@@ -176,7 +176,7 @@ export function AvatarUpload<FormData extends AvatarFormData>({
                   {imageSource ? "Editar a" : "Adicionar a"}
                 </p>
               </div>
-              <p className="text-sm text-white ">logo da empresa</p>
+              <p className="text-sm text-white ">logo da empresa (opcional)</p>
             </div>
           </TooltipTrigger>
           <TooltipContent
