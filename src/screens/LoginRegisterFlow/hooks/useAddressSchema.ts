@@ -15,12 +15,15 @@ export function useAddressSchema() {
             required_error: "Você deve inserir o CEP da sua empresa",
           })
           .min(lengthFormattedZIPCode, {
-            message: `O CEP deve ter no mínimo ${lengthFormattedZIPCode} dígitos`,
+            message: `O CEP deve ter no mínimo ${lengthFormattedZIPCode} dígitos, caso more na zona rural digite um CEP válido qualquer do seu município.`,
           })
           .max(lengthFormattedZIPCode, {
-            message: `O CEP deve ter no máximo ${lengthFormattedZIPCode} dígitos`,
+            message: `O CEP deve ter no máximo ${lengthFormattedZIPCode} dígitos, se more na zona rural digite um CEP válido qualquer do seu município.`,
           })
-          .refine(validateZIPCode, { message: "CEP inválido" }),
+          .refine(validateZIPCode, {
+            message:
+              "CEP inválido, se more na zona rural digite um cep válido qualquer do seu município.",
+          }),
         city: z
           .string({
             required_error: "Por favor, insira a cidade da sua empresa",
