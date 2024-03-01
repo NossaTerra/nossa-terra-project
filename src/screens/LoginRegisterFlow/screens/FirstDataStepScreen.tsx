@@ -18,7 +18,7 @@ import {
   type FirstDataStepFields,
   useFirstDataStepSchema,
 } from "../hooks/useFirstDataStepSchema";
-import { Input } from "~/components/ui/input";
+import { Input, PasswordInput } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
 import { formatCPF, formatCNPJ, lengthFormattedCNPJ } from "~/utils/formatters";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
@@ -204,7 +204,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                   Senha*
                 </FormLabel>
                 <FormControl>
-                  <Input
+                  <PasswordInput
                     className="mt-3x w-full md:mt-0"
                     placeholder="Senha"
                     {...field}
@@ -228,7 +228,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                   Confirmar Senha*
                 </FormLabel>
                 <FormControl>
-                  <Input
+                  <PasswordInput
                     className="mt-3x w-full md:mt-0"
                     placeholder="Senha"
                     {...field}
