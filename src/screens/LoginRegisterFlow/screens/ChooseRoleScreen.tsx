@@ -19,6 +19,7 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { useLoginRegisterFlow } from "../state/machine";
 import { ArrowLeftIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
+import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
 
 function ChooseRoleContent({ className }: ClassNameProps) {
   const { state, chooseRoleAction } = useLoginRegisterFlow();
@@ -119,6 +120,7 @@ function ChooseRoleContent({ className }: ClassNameProps) {
 
 export function ChooseRoleScreen() {
   const { chooseRoleAction } = useLoginRegisterFlow();
+  useScrollToTop();
 
   const goBack = useCallback(
     () =>
