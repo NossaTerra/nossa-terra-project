@@ -14,11 +14,17 @@ export const env = createEnv({
         (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
         "You forgot to change the default URL",
       ),
-    ADDRESS_VIA_ZIP_CODE_API_URL: z
+    ADDRESS_ZIP_CODE_API_URL: z
       .string()
       .url()
       .refine(
-        (str) => !str.includes("ADDRESS_VIA_ZIP_CODE_API_URL_HERE"),
+        (str) => !str.includes("ADDRESS_ZIP_CODE_API_URL_HERE"),
+        "You forgot to change the default zip code API URL",
+      ),
+    ADDRESS_ZIP_CODE_API_KEY: z
+      .string()
+      .refine(
+        (str) => !str.includes("ADDRESS_ZIP_CODE_API_KEY"),
         "You forgot to change the default zip code API URL",
       ),
     APP_URL: z
@@ -72,13 +78,14 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
-    ADDRESS_VIA_ZIP_CODE_API_URL: process.env.ADDRESS_VIA_ZIP_CODE_API_URL,
+    ADDRESS_ZIP_CODE_API_URL: process.env.ADDRESS_ZIP_CODE_API_URL,
     NODE_ENV: process.env.NODE_ENV,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     APP_URL: process.env.APP_URL,
+    ADDRESS_ZIP_CODE_API_KEY: process.env.ADDRESS_ZIP_CODE_API_KEY,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

@@ -5,13 +5,13 @@ import {
   sellerSocialSchema,
 } from "../../types/user.type";
 import { z } from "zod";
-// import { env } from "~/env";
+import { env } from "~/env";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { auth } from "../auth/lucia";
 import { protectedProcedure, publicProcedure } from "../trpc/procedures";
-// import axios from "axios";
+import axios from "axios";
 import { addressDetailsApiSchema } from "~/server/api/addressApi";
 import { lengthFormattedCNPJ, lengthFormattedCPF } from "~/utils/formatters";
 import cloudinaryV2 from "~/utils/configs";
@@ -143,35 +143,19 @@ export const authRouter = createTRPCRouter({
   getAddressDetails: publicProcedure
     .input(z.object({ zipCode: z.string().min(1).max(9) }))
     .query(async ({ input: { zipCode } }) => {
-      // const parsedZipCode = zipCode.replace("-", "");
+      const parsedZipCode = zipCode.replace("-", "");
       try {
-        // const response = await axios.get(
-        //   `${env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
-        // );
-
-        // FIXME: Mocking the response for now
-        const response = {
-          data: {
-            cep: zipCode,
-            state: "MO",
-            city: "Mock",
-            neighborhood: "Mock",
-            street: "Mock",
-            service: "Mock",
-            location: {
-              type: "Mock",
-              coordinates: {
-                longitude: null,
-                latitude: null,
-              },
+        const response = await axios.get(
+          `${env.ADDRESS_ZIP_CODE_API_URL}${parsedZipCode}`,
+          {
+            headers: {
+              Authorization: `Bearer ${env.ADDRESS_ZIP_CODE_API_KEY}`,
             },
           },
-        };
-
-        console.log(
-          JSON.stringify(addressDetailsApiSchema.safeParse(response.data)),
         );
-        return await addressDetailsApiSchema.parseAsync(response.data);
+        return await addressDetailsApiSchema.parseAsync(
+          (response.data as { result: unknown })?.result,
+        );
       } catch (error) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }

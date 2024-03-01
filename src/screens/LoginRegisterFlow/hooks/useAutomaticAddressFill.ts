@@ -12,7 +12,7 @@ interface AddressFormData {
   city: string;
   province: string;
   street: string;
-  neighborhood?: string | undefined;
+  district?: string | undefined;
   complementary?: string | undefined;
   streetNumber?: string | undefined;
 }
@@ -37,7 +37,7 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
   const cityInputRef = useRef<HTMLInputElement | null>(null);
   const provinceInputRef = useRef<HTMLInputElement | null>(null);
   const streetInputRef = useRef<HTMLInputElement | null>(null);
-  const neighborhoodInputRef = useRef<HTMLInputElement | null>(null);
+  const districtInputRef = useRef<HTMLInputElement | null>(null);
 
   const mapAffectedFieldInputRef = useMemo(
     () =>
@@ -45,7 +45,7 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
         city: cityInputRef,
         province: provinceInputRef,
         street: streetInputRef,
-        neighborhood: neighborhoodInputRef,
+        district: districtInputRef,
       }) as const,
     [],
   );
@@ -85,25 +85,30 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     ({
       street,
       city,
-      location,
+      coordinates,
       province,
-      neighborhood,
+      district,
     }: RouterOutputs["auth"]["getAddressDetails"]) => {
-      setLatitude(location?.coordinates?.latitude);
-      setLongitude(location?.coordinates?.longitude);
+      if (!!coordinates?.latitude) {
+        setLatitude(coordinates.latitude);
+      }
+      if (!!coordinates?.longitude) {
+        setLongitude(coordinates?.longitude);
+      }
+
       form.clearErrors("zipCode");
 
       //NOTE: form fields must be set regardless
       form.setValue("city", city ?? emptyString);
       form.setValue("province", province ?? emptyString);
       form.setValue("street", street ?? emptyString);
-      form.setValue("neighborhood", neighborhood ?? emptyString);
+      form.setValue("district", district ?? emptyString);
 
       disableFilledFields({
         city,
         province,
         street,
-        neighborhood,
+        district,
       });
     },
     [form, disableFilledFields],
@@ -122,7 +127,7 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     form.resetField("city");
     form.resetField("province");
     form.resetField("street");
-    form.resetField("neighborhood");
+    form.resetField("district");
   }, [enableFields, form]);
 
   // NOTE: It's best to call the React Query Client directly without using its hooks
@@ -174,6 +179,6 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     cityInputRef,
     provinceInputRef,
     streetInputRef,
-    neighborhoodInputRef,
+    districtInputRef,
   };
 }

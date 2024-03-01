@@ -27,7 +27,7 @@ const fieldToFieldName = {
   rg: "RG",
   province: "Estado",
   street: "Endereço",
-  neighborhood: "Bairro",
+  district: "Bairro",
   streetNumber: "Número",
   complementary: "Complemento",
   businessMainSector: "Principal Ramo de atividade",
@@ -107,7 +107,7 @@ export const getBuyerDiffObject = <T extends FieldValues>(
   compareAndAddDiff("city");
   compareAndAddDiff("province");
   compareAndAddDiff("street");
-  compareAndAddDiff("neighborhood");
+  compareAndAddDiff("district");
   compareAndAddDiff("streetNumber");
   compareAndAddDiff("complementary");
   compareAndAddDiff("businessMainSector");
@@ -172,7 +172,7 @@ export const getSellerDiffObject = <T extends FieldValues>(
   compareAndAddDiff("city");
   compareAndAddDiff("province");
   compareAndAddDiff("street");
-  compareAndAddDiff("neighborhood");
+  compareAndAddDiff("district");
   compareAndAddDiff("streetNumber");
   compareAndAddDiff("complementary");
 

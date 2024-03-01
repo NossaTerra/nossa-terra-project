@@ -6,7 +6,7 @@
         "code": "invalid_type",
         "expected": "string",
         "received": "null",
-        "path": ["neighborhood"],
+        "path": ["district"],
         "message": "Expected string, received null"
       },
       {

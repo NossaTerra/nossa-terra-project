@@ -1,30 +1,22 @@
 import { z } from "zod";
 
-const convertCoordinate = (coordinate?: string | undefined | null) => {
-  if (!coordinate) return undefined;
-  return parseFloat(coordinate);
-};
-
 export const addressDetailsApiSchema = z
   .object({
-    cep: z.string(),
-    state: z.ostring().nullable(),
+    zipcode: z.string().nullable(),
+    stateShortname: z.ostring().nullable(),
     city: z.ostring().nullable(),
-    neighborhood: z.ostring().nullable(),
+    district: z.ostring().nullable(),
     street: z.ostring().nullable(),
     service: z.ostring().nullable(),
-    location: z
+    coordinates: z
       .object({
-        type: z.string(),
-        coordinates: z.object({
-          longitude: z.ostring().nullable().transform(convertCoordinate),
-          latitude: z.ostring().nullable().transform(convertCoordinate),
-        }),
+        longitude: z.onumber().nullable(),
+        latitude: z.onumber().nullable(),
       })
       .optional(),
   })
-  .transform(({ state, ...rest }) => ({
-    province: state,
+  .transform(({ stateShortname, ...rest }) => ({
+    province: stateShortname,
     ...rest,
   }));
 

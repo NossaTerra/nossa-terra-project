@@ -53,7 +53,7 @@ export function SellerForm({
       city: user?.city ?? emptyString,
       province: user?.province ?? emptyString,
       street: user?.street ?? emptyString,
-      neighborhood: user?.neighborhood ?? emptyString,
+      district: user?.district ?? emptyString,
       streetNumber: user?.streetNumber ?? emptyString,
       complementary: user?.complementary ?? emptyString,
     },
@@ -65,7 +65,7 @@ export function SellerForm({
     cityInputRef,
     provinceInputRef,
     streetInputRef,
-    neighborhoodInputRef,
+    districtInputRef,
   } = useAutomaticAddressFill({ form });
 
   const register = api.auth.registerSeller.useMutation();
@@ -80,7 +80,7 @@ export function SellerForm({
         city,
         province,
         street,
-        neighborhood,
+        district,
         complementary,
         streetNumber,
         phone,
@@ -106,7 +106,7 @@ export function SellerForm({
             city,
             province,
             street,
-            neighborhood,
+            district,
             complementary,
             streetNumber,
             latitude,
@@ -316,12 +316,12 @@ export function SellerForm({
         />
         <FormField
           control={form.control}
-          name="neighborhood"
+          name="district"
           render={({ field, fieldState }) => (
             <FormItem className="mb-4 w-full text-gray-700">
               <FormLabel
                 className="block text-sm font-medium"
-                htmlFor="neighborhood"
+                htmlFor="district"
               >
                 Bairro
               </FormLabel>
@@ -330,7 +330,7 @@ export function SellerForm({
                   className="mt-3x w-full md:mt-0"
                   placeholder="Bairro"
                   {...field}
-                  ref={neighborhoodInputRef}
+                  ref={districtInputRef}
                   value={field.value ?? emptyString}
                 />
               </FormControl>
