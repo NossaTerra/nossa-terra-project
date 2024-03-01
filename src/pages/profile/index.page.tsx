@@ -113,12 +113,13 @@ export function CurrentProfileCardScreen({
 }
 
 export function LogOutButton({ isSeller }: { isSeller: boolean }) {
-  const { logout } = useAuth();
+  const { logout, logoutLoading } = useAuth();
 
   return (
     <Dialog modal>
       <DialogTrigger asChild>
         <Button
+          isLoading={logoutLoading}
           variant={"ghost"}
           className={cn(
             isSeller

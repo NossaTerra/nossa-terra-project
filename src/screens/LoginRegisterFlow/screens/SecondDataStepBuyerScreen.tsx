@@ -95,6 +95,7 @@ export function BuyerForm({
   } = useAutomaticAddressFill({ form });
 
   const registerBuyer = api.auth.registerBuyer.useMutation();
+  const isLoadingRegistration = registerBuyer.isLoading;
   const login = api.auth.login.useMutation();
   const router = useRouter();
 
@@ -540,6 +541,7 @@ export function BuyerForm({
           )}
         />
         <ProfileButton
+          isLoadingRegistration={isLoadingRegistration}
           isEditing={isEditingProfile}
           user={user}
           form={form}

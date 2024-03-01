@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "src/utils/ui";
 import { type NonUndefined } from "node_modules/react-hook-form/dist/types/utils";
+import { Loader2 } from "lucide-react";
 
 export const linkClassNames =
   "text-accent underline hover:text-headingSecondary underline-offset-4 hover:underline dark:text-slate-50";
@@ -42,22 +43,42 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  isLoading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      isLoading = false,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
+        disabled={isLoading}
         ref={ref}
         {...props}
-      />
+      >
+        {isLoading ? (
+          <Loader2 color="black" className=" mr-2 h-5 w-5 animate-spin" />
+        ) : (
+          children
+        )}
+      </Comp>
     );
   },
 );
+
 Button.displayName = "Button";
 export type ButtonVariantType = NonUndefined<
   Parameters<typeof buttonVariants>[0]
