@@ -17,6 +17,7 @@ import {
   variants,
   transition,
 } from "~/animation/horizontalCrossfade";
+import useBeforeUnloadAndPopState from "~/screens/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
 
 export const getServerSideProps = redirectGetServerSideProps.Public;
 
@@ -36,6 +37,7 @@ function useToastWhenRedirected() {
 
 export default function RootScreen() {
   useToastWhenRedirected();
+  useBeforeUnloadAndPopState();
 
   const stepKey = useLoginRegisterFlow((s) => s.state.stepKey);
   const lastCommand = useLoginRegisterFlow((s) => s.lastCommand);
