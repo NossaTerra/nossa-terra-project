@@ -10,6 +10,12 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "~/components/ui/tooltip";
 import { useCallback } from "react";
 import { useLoginRegisterFlow } from "../state/machine";
 import { ArrowLeftIcon } from "lucide-react";
@@ -45,6 +51,8 @@ import {
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
 import { AvatarUpload } from "~/components/common/AvatarUpload";
 import { ProfileButton } from "~/components/forms/profileButton";
+import useZipCodeToast from "~/screens/LoginRegisterFlow/hooks/useZipCodeToast";
+import { toast } from "react-hot-toast";
 
 export function BuyerForm({
   className,
@@ -52,6 +60,7 @@ export function BuyerForm({
   isEditingProfile = false,
 }: Partial<ClassNameProps & { user?: User } & { isEditingProfile?: boolean }>) {
   const { state, resetState } = useLoginRegisterFlow();
+  const toastRefId = useZipCodeToast().current;
 
   const schema = useSecondDataStepBuyerSchema();
   const form = useForm<SecondDataStepBuyerFields>({
@@ -147,6 +156,7 @@ export function BuyerForm({
         });
 
         await router.replace("/search");
+        toast.remove(toastRefId);
         resetState();
       },
       [
@@ -157,6 +167,7 @@ export function BuyerForm({
         longitude,
         login,
         router,
+        toastRefId,
         resetState,
       ],
     );
@@ -320,24 +331,36 @@ export function BuyerForm({
           control={form.control}
           name="zipCode"
           render={({ field, fieldState }) => (
-            <FormItem className="mb-4 w-full text-gray-700">
-              <FormLabel
-                className="block text-sm font-medium"
-                htmlFor="zipCode"
-              >
-                CEP*
-              </FormLabel>
-              <FormControl>
-                <Input
-                  className="mt-3x w-full md:mt-0"
-                  maxLength={lengthFormattedZIPCode}
-                  placeholder="Ex: 99999- 999"
-                  {...field}
-                  value={formatZIPCode(field.value ?? emptyString)}
-                />
-              </FormControl>
-              <FormMessage>{fieldState.error?.message}</FormMessage>
-            </FormItem>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger className="cursor-pointer" asChild>
+                  <FormItem className="mb-4 w-full text-gray-700">
+                    <FormLabel
+                      className="block text-sm font-medium"
+                      htmlFor="zipCode"
+                    >
+                      CEP*
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="mt-3x w-full md:mt-0"
+                        maxLength={lengthFormattedZIPCode}
+                        placeholder="Ex: 99999- 999"
+                        {...field}
+                        value={formatZIPCode(field.value ?? emptyString)}
+                      />
+                    </FormControl>
+                    <FormMessage>{fieldState.error?.message}</FormMessage>
+                  </FormItem>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="mt-2 text-sm ">
+                    Mora na zona rural e não possui CEP? Basta Adicionar um CEP
+                    qualquer de seu município
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         />
         <FormField

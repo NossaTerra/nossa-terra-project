@@ -2,10 +2,12 @@ import { useEffect, useRef } from "react";
 
 interface Props {
   callback: () => void;
+  cleanUp?: () => void;
   shouldInvoke?: boolean;
 }
 
 export const useInvokeCallbackOnce = ({
+  cleanUp,
   callback,
   shouldInvoke = true,
 }: Props) => {
@@ -16,5 +18,10 @@ export const useInvokeCallbackOnce = ({
       alreadyFiredRef.current = true;
       callback();
     }
-  }, [shouldInvoke, callback]);
+    if (!!cleanUp && !shouldInvoke) {
+      return () => {
+        cleanUp();
+      };
+    }
+  }, [shouldInvoke, callback, cleanUp]);
 };
