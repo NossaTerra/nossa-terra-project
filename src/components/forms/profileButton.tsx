@@ -27,14 +27,16 @@ export function ProfileButton({
   form,
   userLatitude,
   userLongitude,
+  isLoadingRegistration,
 }: {
   user?: User;
   userLatitude?: number | undefined;
   userLongitude?: number | undefined;
   isEditing: boolean | undefined;
+  isLoadingRegistration?: boolean;
   form:
-    | UseFormReturn<SecondDataStepBuyerFields>
-    | UseFormReturn<SecondDataStepSellerFields>;
+  | UseFormReturn<SecondDataStepBuyerFields>
+  | UseFormReturn<SecondDataStepSellerFields>;
 }) {
   const [diffEditingObject, setDiffEditingObject] = useState<DiffObject>(
     {} as DiffObject,
@@ -49,13 +51,13 @@ export function ProfileButton({
       setDiffEditingObject(
         user?.role === "buyer"
           ? getBuyerDiffObject(
-              form as UseFormReturn<SecondDataStepBuyerFields>,
-              user,
-            )
+            form as UseFormReturn<SecondDataStepBuyerFields>,
+            user,
+          )
           : getSellerDiffObject(
-              form as UseFormReturn<SecondDataStepSellerFields>,
-              user,
-            ),
+            form as UseFormReturn<SecondDataStepSellerFields>,
+            user,
+          ),
       );
     }
   }, [form, isEditing, user]);
@@ -140,6 +142,7 @@ export function ProfileButton({
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="mt-3 w-full" asChild>
             <Button
+              isLoading={editBuyer.isLoading || editSeller.isLoading}
               disabled={!form.formState.isValid}
               type="submit"
               variant="default"
@@ -177,6 +180,7 @@ export function ProfileButton({
               </div>
               {Object.keys(diffEditingObject).length !== 0 && (
                 <Button
+                  isLoading={editBuyer.isLoading || editSeller.isLoading}
                   onClick={onEdit}
                   className="ml-auto w-44"
                   type="submit"
@@ -192,7 +196,12 @@ export function ProfileButton({
         </Dialog>
       ) : (
         <div>
-          <Button variant="primary" className="mt-3 w-full" type="submit">
+          <Button
+            isLoading={!!isLoadingRegistration}
+            variant="primary"
+            className="mt-3 w-full"
+            type="submit"
+          >
             Cadastrar
           </Button>
         </div>

@@ -2,9 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import ImageCarousel from "~/components/common/ImageCarrousel";
-import { Input } from "~/components/ui/input";
-import { Button } from "~/components/ui/button";
 import { PasswordInput } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   Form,
@@ -35,7 +34,7 @@ function WelcomeBackContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
   const { setError } = form;
-  const { login } = useAuth();
+  const { login, loginLoading } = useAuth();
 
   const onSubmit: SubmitHandler<WelcomeBackFields> = useCallback(
     async ({ password }) => {
@@ -129,7 +128,12 @@ function WelcomeBackContent({ className }: ClassNameProps) {
             <Link href="/forgot-password">Esqueci a senha</Link>
           </Button>
 
-          <Button variant="primary" className="mt-8 w-full" type="submit">
+          <Button
+            isLoading={loginLoading}
+            variant="primary"
+            className="mt-8 w-full"
+            type="submit"
+          >
             Entrar
           </Button>
         </form>

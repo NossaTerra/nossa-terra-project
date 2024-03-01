@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   useGreetingSchema,
   type GreetingFields,
@@ -30,22 +30,28 @@ function GreetingContent({ className }: ClassNameProps) {
     resolver: zodResolver(schema),
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const { checkUserExists } = api.useUtils().auth;
   const onSubmit: SubmitHandler<GreetingFields> = useCallback(
     async ({ email }) => {
-      const userExists = await checkUserExists.fetch({ email });
-      if (userExists) {
-        greetingAction({
-          command: "loginFlow",
-          data: { email },
-          nextStep: "welcomeBack",
-        });
-      } else {
-        greetingAction({
-          command: "newUserFlow",
-          data: { email },
-          nextStep: "chooseRole",
-        });
+      try {
+        setIsLoading(true);
+        const userExists = await checkUserExists.fetch({ email });
+        if (userExists) {
+          greetingAction({
+            command: "loginFlow",
+            data: { email },
+            nextStep: "welcomeBack",
+          });
+        } else {
+          greetingAction({
+            command: "newUserFlow",
+            data: { email },
+            nextStep: "chooseRole",
+          });
+        }
+      } finally {
+        setIsLoading(false);
       }
     },
     [checkUserExists, greetingAction],
@@ -119,7 +125,12 @@ function GreetingContent({ className }: ClassNameProps) {
                 </FormItem>
               )}
             />
-            <Button variant="primary" className="w-full" type="submit">
+            <Button
+              isLoading={isLoading}
+              variant="primary"
+              className="w-full"
+              type="submit"
+            >
               Continuar
             </Button>
           </form>

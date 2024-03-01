@@ -82,6 +82,7 @@ export function SellerForm({
   const register = api.auth.registerSeller.useMutation();
   const login = api.auth.login.useMutation();
   const router = useRouter();
+  const isLoadingRegistration = register.isLoading;
 
   const onSubmitUserCreation: SubmitHandler<SecondDataStepSellerFields> =
     useCallback(
@@ -409,7 +410,12 @@ export function SellerForm({
             </FormItem>
           )}
         />
-        <ProfileButton isEditing={isEditingProfile} user={user} form={form} />
+        <ProfileButton
+          isLoadingRegistration={isLoadingRegistration}
+          isEditing={isEditingProfile}
+          user={user}
+          form={form}
+        />
       </form>
     </Form>
   );
