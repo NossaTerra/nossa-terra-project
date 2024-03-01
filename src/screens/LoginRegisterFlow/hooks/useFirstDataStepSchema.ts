@@ -36,7 +36,19 @@ export function useFirstDataStepSchema(role?: ChosenRole) {
           password: z
             .string({ required_error: "Você deve inserir uma senha" })
             .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
-            .max(30, { message: "A senha deve ter no máximo 30 caracteres" }),
+            .max(30, { message: "A senha deve ter no máximo 30 caracteres" })
+            .refine((value) => /[A-Z]/.test(value), {
+              message:
+                "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
+            })
+            .refine((value) => /[a-z]/.test(value), {
+              message:
+                "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
+            })
+            .refine((value) => /\d/.test(value), {
+              message:
+                "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
+            }),
           agreeToTermsAndConditions: z
             .boolean({
               required_error: "Você deve concordar com os Termos e Condições",
