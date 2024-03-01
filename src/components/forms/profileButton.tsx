@@ -29,7 +29,7 @@ export function ProfileButton({
   userLongitude,
 }: {
   user?: User;
-  userLatitude?: number | undefined;
+  userLatitude?: number | undefined ;
   userLongitude?: number | undefined;
   isEditing: boolean | undefined;
   form:
@@ -86,7 +86,7 @@ export function ProfileButton({
               city: buyerForm.city,
               province: buyerForm.province,
               street: buyerForm.street,
-              neighborhood: buyerForm.neighborhood,
+              district: buyerForm.district,
               complementary: buyerForm.complementary,
               streetNumber: buyerForm.streetNumber,
               latitude: userLatitude,
@@ -116,7 +116,7 @@ export function ProfileButton({
               city: sellerForm.city,
               province: sellerForm.province,
               street: sellerForm.street,
-              neighborhood: sellerForm.neighborhood,
+              district: sellerForm.district,
               complementary: sellerForm.complementary,
               streetNumber: sellerForm.streetNumber,
               latitude: userLatitude,

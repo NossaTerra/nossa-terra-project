@@ -69,7 +69,7 @@ model User {
     city          String
     province      String
     street        String?
-    neighborhood  String?
+    district  String?
     streetNumber  String?
     complementary String?
     latitude      Float?

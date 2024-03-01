@@ -47,7 +47,7 @@ export function useAddressSchema() {
             message: "O número do endereço deve ter no máximo 10 caracteres",
           })
           .optional(),
-        neighborhood: z
+        district: z
           .string()
           .max(80, { message: "O bairro deve ter no máximo 80 caracteres" })
           .optional(),

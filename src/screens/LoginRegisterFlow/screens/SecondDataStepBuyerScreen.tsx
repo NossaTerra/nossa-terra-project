@@ -68,7 +68,7 @@ export function BuyerForm({
       city: user?.city ?? emptyString,
       province: user?.province ?? emptyString,
       street: user?.street ?? emptyString,
-      neighborhood: user?.neighborhood ?? emptyString,
+      district: user?.district ?? emptyString,
       streetNumber: user?.streetNumber ?? emptyString,
       complementary: user?.complementary ?? emptyString,
       businessMainSector: user?.businessMainSector ?? undefined,
@@ -81,7 +81,7 @@ export function BuyerForm({
     cityInputRef,
     provinceInputRef,
     streetInputRef,
-    neighborhoodInputRef,
+    districtInputRef,
   } = useAutomaticAddressFill({ form });
 
   const registerBuyer = api.auth.registerBuyer.useMutation();
@@ -96,7 +96,7 @@ export function BuyerForm({
         city,
         province,
         street,
-        neighborhood,
+        district,
         complementary,
         streetNumber,
         phone,
@@ -109,6 +109,7 @@ export function BuyerForm({
         if (state.stepKey !== "secondDataStepBuyer") {
           return;
         }
+
         const { email, name, password, cpf } = state.accumulatedContext;
 
         await registerBuyer.mutateAsync({
@@ -132,7 +133,7 @@ export function BuyerForm({
             city,
             province,
             street,
-            neighborhood,
+            district,
             complementary,
             streetNumber,
             latitude,
@@ -411,12 +412,12 @@ export function BuyerForm({
         />
         <FormField
           control={form.control}
-          name="neighborhood"
+          name="district"
           render={({ field, fieldState }) => (
             <FormItem className="mb-4 w-full text-gray-700">
               <FormLabel
                 className="block text-sm font-medium"
-                htmlFor="neighborhood"
+                htmlFor="district"
               >
                 Bairro
               </FormLabel>
@@ -426,7 +427,7 @@ export function BuyerForm({
                   placeholder="Bairro"
                   {...field}
                   value={field.value ?? emptyString}
-                  ref={neighborhoodInputRef}
+                  ref={districtInputRef}
                 />
               </FormControl>
               <FormMessage>{fieldState.error?.message}</FormMessage>
