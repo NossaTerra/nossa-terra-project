@@ -51,6 +51,7 @@ import {
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
 import { AvatarUpload } from "~/components/common/AvatarUpload";
 import { ProfileButton } from "~/components/forms/profileButton";
+import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
 import useZipCodeToast from "~/screens/LoginRegisterFlow/hooks/useZipCodeToast";
 import { toast } from "react-hot-toast";
 
@@ -551,6 +552,8 @@ export function BuyerForm({
 }
 
 export function SecondDataStepBuyerScreen() {
+  useScrollToTop();
+
   const secondDataStepBuyerAction = useLoginRegisterFlow(
     (s) => s.secondDataStepBuyerAction,
   );

@@ -23,6 +23,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { formatCPF, formatCNPJ, lengthFormattedCNPJ } from "~/utils/formatters";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
 import { cpfIsCNPJ } from "~/utils/formHelpers";
+import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
 
 function FirstDataStepContent({ className }: ClassNameProps) {
   const { state } = useLoginRegisterFlow();
@@ -275,6 +276,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
 }
 
 export function FirstDataStepScreen() {
+  useScrollToTop();
   const firstDataStepAction = useLoginRegisterFlow(
     (s) => s.firstDataStepAction,
   );

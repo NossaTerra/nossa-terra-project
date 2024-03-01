@@ -20,6 +20,7 @@ import {
 } from "../hooks/useGreetingSchema";
 import { useLoginRegisterFlow } from "../state/machine";
 import { api } from "~/utils/api";
+import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
 
 function GreetingContent({ className }: ClassNameProps) {
   const greetingAction = useLoginRegisterFlow((s) => s.greetingAction);
@@ -129,6 +130,7 @@ function GreetingContent({ className }: ClassNameProps) {
 }
 
 export function GreetingScreen() {
+  useScrollToTop();
   return (
     <div className="flex min-h-screen flex-grow flex-col">
       <header className="flex items-start justify-center pt-12 md:justify-end">
