@@ -4,6 +4,7 @@ import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import ImageCarousel from "~/components/common/ImageCarrousel";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { PasswordInput } from "~/components/ui/input";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   Form,
@@ -111,7 +112,7 @@ function WelcomeBackContent({ className }: ClassNameProps) {
                   Senha
                 </FormLabel>
                 <FormControl>
-                  <Input
+                  <PasswordInput
                     className="mt-3x w-full md:mt-0"
                     placeholder="Senha"
                     {...field}
