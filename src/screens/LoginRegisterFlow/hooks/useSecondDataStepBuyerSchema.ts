@@ -59,7 +59,7 @@ export function useSecondDataStepBuyerSchema() {
                     (formatPhone(phone).length >=
                       lowerEndLengthFormattedPhone &&
                       formatPhone(phone).length <=
-                      higherEndLengthFormattedPhone) ||
+                        higherEndLengthFormattedPhone) ||
                     !phone
                   );
                 },

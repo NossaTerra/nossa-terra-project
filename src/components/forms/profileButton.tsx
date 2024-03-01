@@ -29,12 +29,12 @@ export function ProfileButton({
   userLongitude,
 }: {
   user?: User;
-  userLatitude?: number | undefined ;
+  userLatitude?: number | undefined;
   userLongitude?: number | undefined;
   isEditing: boolean | undefined;
   form:
-  | UseFormReturn<SecondDataStepBuyerFields>
-  | UseFormReturn<SecondDataStepSellerFields>;
+    | UseFormReturn<SecondDataStepBuyerFields>
+    | UseFormReturn<SecondDataStepSellerFields>;
 }) {
   const [diffEditingObject, setDiffEditingObject] = useState<DiffObject>(
     {} as DiffObject,
@@ -49,13 +49,13 @@ export function ProfileButton({
       setDiffEditingObject(
         user?.role === "buyer"
           ? getBuyerDiffObject(
-            form as UseFormReturn<SecondDataStepBuyerFields>,
-            user,
-          )
+              form as UseFormReturn<SecondDataStepBuyerFields>,
+              user,
+            )
           : getSellerDiffObject(
-            form as UseFormReturn<SecondDataStepSellerFields>,
-            user,
-          ),
+              form as UseFormReturn<SecondDataStepSellerFields>,
+              user,
+            ),
       );
     }
   }, [form, isEditing, user]);
