@@ -29,6 +29,7 @@ module.exports = {
         headingPrimary: "#15B16D",
         headingSecondary: "#2A1D10",
         basedDark: "#08120D",
+        priceTag: "#224636",
       },
       spacing: {
         tiny: "0.125rem", //2px

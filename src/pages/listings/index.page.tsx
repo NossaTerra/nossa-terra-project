@@ -34,6 +34,12 @@ export default function MyListingsScreen({ user }: Props) {
       <AppHeader user={user} />
       <div className="px-10">
         <H1>Meus Anúncios</H1>
+
+        <div className="mt-5">
+          <Link href="/listings/new" className={linkClassNames}>
+            Criar Novo Anúncio
+          </Link>
+        </div>
       </div>
     </div>
   );
