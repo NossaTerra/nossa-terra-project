@@ -7,7 +7,7 @@ export function H1({ children, className }: Props) {
   return (
     <h1
       className={cn(
-        "scroll-m-20 py-10 text-4xl font-bold tracking-tight lg:text-5xl",
+        "scroll-m-20 py-4 text-3xl font-bold tracking-tight sm:py-10 sm:text-4xl lg:text-5xl",
         className,
       )}
     >

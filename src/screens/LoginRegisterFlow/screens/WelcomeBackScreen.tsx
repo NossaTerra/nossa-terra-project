@@ -123,11 +123,7 @@ function WelcomeBackContent({ className }: ClassNameProps) {
             )}
           />
 
-          <Button
-            variant="link"
-            asChild
-            className="mt-1 p-0 text-accent underline hover:text-headingSecondary"
-          >
+          <Button variant="link" asChild className="mt-1 p-0">
             <Link href="/forgot-password">Esqueci a senha</Link>
           </Button>
 
