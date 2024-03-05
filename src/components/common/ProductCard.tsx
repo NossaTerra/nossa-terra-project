@@ -5,9 +5,13 @@ import { cn } from "~/utils/ui";
 
 export function ProductCard({
   product,
+  footer,
   className,
   ...rest
-}: { product: Product } & React.HTMLAttributes<HTMLDivElement>) {
+}: {
+  product: Product;
+  footer?: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
@@ -31,7 +35,10 @@ export function ProductCard({
         className="absolute -bottom-4 -right-3 opacity-60"
       />
 
-      <div className="pl-6 pr-12 text-lg">{product.name}</div>
+      <div className="pl-6 pr-12">
+        <p className="text-lg">{product.name}</p>
+        {footer}
+      </div>
     </div>
   );
 }
