@@ -143,11 +143,31 @@ export const authRouter = createTRPCRouter({
   getAddressDetails: publicProcedure
     .input(z.object({ zipCode: z.string().min(1).max(9) }))
     .query(async ({ input: { zipCode } }) => {
-      const parsedZipCode = zipCode.replace("-", "");
+      // const parsedZipCode = zipCode.replace("-", "");
       try {
-        const response = await axios.get(
-          `${env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
-        );
+        // const response = await axios.get(
+        //   `${env.ADDRESS_VIA_ZIP_CODE_API_URL}${parsedZipCode}`,
+        // );
+
+        // FIXME: Mocking the response for now
+        const response = {
+          data: {
+            cep: zipCode,
+            state: "MO",
+            city: "Mock",
+            neighborhood: "Mock",
+            street: "Mock",
+            service: "Mock",
+            location: {
+              type: "Mock",
+              coordinates: {
+                longitude: null,
+                latitude: null,
+              },
+            },
+          },
+        };
+
         console.log(
           JSON.stringify(addressDetailsApiSchema.safeParse(response.data)),
         );
