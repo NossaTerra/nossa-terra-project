@@ -2,14 +2,12 @@ import { type InferGetServerSidePropsType } from "next";
 import { AppHeader } from "~/components/common/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { H1, H3, P } from "~/components/ui/typography";
+import { H1, H2, P } from "~/components/ui/typography";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
-import { Button, buttonVariants, linkClassNames } from "~/components/ui/button";
+import { Button, linkClassNames } from "~/components/ui/button";
 import { type ClassNameProps, cn } from "~/utils/ui";
-import { api } from "~/utils/api";
-import {
-  PlusIcon,
-} from "lucide-react";
+import { type MyListing, api } from "~/utils/api";
+import { HourglassIcon, PauseOctagonIcon, PlusIcon } from "lucide-react";
 import { ListingCard } from "./ListingCard";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
@@ -37,7 +35,7 @@ export default function MyListingsScreen({ user }: Props) {
   return (
     <div>
       <AppHeader user={user} />
-      <div className="px-10">
+      <div className="px-10 pb-16">
         <H1>Meus Anúncios</H1>
         <MyListingsDashboard className="mt-5" />
       </div>
@@ -115,7 +113,7 @@ function InactivePaymentMessage({ className }: ClassNameProps) {
 function MyListingsDashboard({ className }: ClassNameProps) {
   const { data: myListings, isLoading } = api.listing.getMyListings.useQuery();
 
-  if (!isLoading && myListings?.length === 0) {
+  if (!isLoading && !myListings?.activeListings?.length) {
     return (
       <div
         className={cn(
@@ -145,10 +143,35 @@ function MyListingsDashboard({ className }: ClassNameProps) {
       </Button>
 
       <div className="mt-8 flex flex-wrap gap-8">
-        {myListings?.map((listing) => (
+        {myListings?.activeListings.map((listing) => (
           <ListingCard key={listing.id} listing={listing} />
         ))}
       </div>
+
+      {!!myListings?.pausedListings?.length && (
+        <>
+          <H2 className="mt-16 flex items-center gap-4">
+            <HourglassIcon size={24} />
+            Anúncios Pausados
+          </H2>
+          <p className="text-lg">
+            Só é possível ter um anúncio de cada vez para cada produto...{" "}
+          </p>
+          <p className="text-lg">
+            Já que você fez um anúncio mais recente para esses produtos, os
+            anúncios a seguir foram desativados.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-8">
+            {myListings.pausedListings.map((listing) => (
+              <ListingCard
+                key={listing.id}
+                listing={listing}
+                className="opacity-70"
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
