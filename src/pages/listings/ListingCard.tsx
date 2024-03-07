@@ -24,8 +24,12 @@ import {
 } from "~/components/ui/dialog";
 import { useCallback, useState } from "react";
 import { EditListingForm, type ListingFormData } from "./EditListingForm";
+import { cn, type ClassNameProps } from "~/utils/ui";
 
-export function ListingCard({ listing }: { listing: MyListing }) {
+export function ListingCard({
+  listing,
+  className,
+}: { listing: MyListing } & ClassNameProps) {
   const listingTime = new Date(listing.updatedAt);
   const timeString = getDisplayTime(listingTime);
 
@@ -48,7 +52,7 @@ export function ListingCard({ listing }: { listing: MyListing }) {
 
       <ProductCard
         product={listing.product}
-        className="w-full max-w-[28em]"
+        className={cn("w-full max-w-[28em]", className)}
         footer={
           <>
             <p className="mt-8 flex items-center gap-2">
