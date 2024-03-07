@@ -2,10 +2,15 @@ import { type InferGetServerSidePropsType } from "next";
 import { AppHeader } from "~/components/common/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { H1, P } from "~/components/ui/typography";
+import { H1, H3, P } from "~/components/ui/typography";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
-import { linkClassNames } from "~/components/ui/button";
+import { Button, buttonVariants, linkClassNames } from "~/components/ui/button";
 import { type ClassNameProps, cn } from "~/utils/ui";
+import { api } from "~/utils/api";
+import {
+  PlusIcon,
+} from "lucide-react";
+import { ListingCard } from "./ListingCard";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -34,12 +39,7 @@ export default function MyListingsScreen({ user }: Props) {
       <AppHeader user={user} />
       <div className="px-10">
         <H1>Meus Anúncios</H1>
-
-        <div className="mt-5">
-          <Link href="/listings/new" className={linkClassNames}>
-            Criar Novo Anúncio
-          </Link>
-        </div>
+        <MyListingsDashboard className="mt-5" />
       </div>
     </div>
   );
@@ -107,6 +107,47 @@ function InactivePaymentMessage({ className }: ClassNameProps) {
           </Link>
         </P>
         <P className="md:text-lg lg:text-xl">Estamos aqui para ajudar!</P>
+      </div>
+    </div>
+  );
+}
+
+function MyListingsDashboard({ className }: ClassNameProps) {
+  const { data: myListings, isLoading } = api.listing.getMyListings.useQuery();
+
+  if (!isLoading && myListings?.length === 0) {
+    return (
+      <div
+        className={cn(
+          "w-[20em] space-y-8 rounded-xl border-4 border-gray-800 bg-cardShade p-6 text-center",
+          className,
+        )}
+      >
+        <h3 className="text-xl font-medium">
+          Você não possui anúncios, quer fazer um?
+        </h3>
+
+        <Button asChild variant="primary">
+          <Link href="/listings/new" className="flex w-full items-center gap-2">
+            <PlusIcon size={20} /> Novo Anúncio
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={className}>
+      <Button asChild variant="primary">
+        <Link href="/listings/new" className="flex items-center gap-2">
+          <PlusIcon size={20} /> Novo Anúncio
+        </Link>
+      </Button>
+
+      <div className="mt-8 flex flex-wrap gap-8">
+        {myListings?.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} />
+        ))}
       </div>
     </div>
   );

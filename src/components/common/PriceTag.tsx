@@ -5,12 +5,10 @@ export function PriceTag({
   className,
   ...rest
 }: { value: number } & React.HTMLAttributes<HTMLDivElement>) {
-  console.log(value);
-
   return (
     <div
       className={cn(
-        "bg-priceTag w-fit rounded-lg px-4 py-2 text-xl text-white",
+        "w-fit rounded-lg bg-priceTag px-4 py-2 text-xl text-white",
         className,
       )}
       {...rest}
