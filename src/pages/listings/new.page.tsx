@@ -1,5 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type Product } from "@prisma/client";
 import { ArrowLeftIcon, SearchIcon, XIcon } from "lucide-react";
 import { type InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
@@ -11,25 +9,14 @@ import {
   useMemo,
   useState,
 } from "react";
-import { type SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Button } from "~/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { H1, H3 } from "~/components/ui/typography";
+import { H3 } from "~/components/ui/typography";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
-import { PriceTag } from "~/components/common/PriceTag";
+import { EditListingForm, type ListingFormData } from "./EditListingForm";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -151,6 +138,27 @@ function ListingDetailsColumn({ className }: ClassNameProps) {
   const { data: products } = api.product.getAll.useQuery();
   const product = products?.find((product) => product.id === selectedProductId);
 
+  const apiUtils = api.useUtils();
+  const createListing = api.listing.createListing.useMutation({
+    onSuccess() {
+      void apiUtils.listing.getMyListings.invalidate();
+    },
+  });
+
+  const onNewListingFormSubmit = useCallback(
+    async (data: ListingFormData) => {
+      if (!product) {
+        return;
+      }
+      await createListing.mutateAsync({
+        price: data.price,
+        productId: product.id,
+      });
+      await router.push("/listings");
+    },
+    [createListing, product, router],
+  );
+
   return (
     <div className={cn("sticky top-0 h-svh w-full", className)}>
       {!product && (
@@ -176,104 +184,13 @@ function ListingDetailsColumn({ className }: ClassNameProps) {
                 <XIcon />
               </Link>
             </Button>
-            <EditListingForm product={product} />
+            <EditListingForm
+              product={product}
+              onSuccess={onNewListingFormSubmit}
+            />
           </div>
         </div>
       )}
     </div>
-  );
-}
-
-function useEditListingSchema() {
-  return useMemo(
-    () =>
-      z.object({
-        price: z
-          .string({ required_error: "Você deve inserir um preço" })
-          .min(1, {
-            message: "Você deve inserir um preço",
-          })
-          .transform(Number),
-      }),
-    [],
-  );
-}
-
-type ListingData = z.infer<ReturnType<typeof useEditListingSchema>>;
-
-function EditListingForm({
-  product,
-  onSuccess,
-}: {
-  product: Product;
-  onSuccess?: (data: ListingData) => void;
-}) {
-  const schema = useEditListingSchema();
-  const form = useForm<ListingData>({
-    resolver: zodResolver(schema),
-  });
-
-  const onSubmit: SubmitHandler<ListingData> = useCallback(
-    (data) => {
-      console.log(data);
-      onSuccess?.(data);
-    },
-    [onSuccess],
-  );
-
-  const price = Number(form.watch("price") ?? "0");
-
-  return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full flex-wrap gap-10"
-      >
-        <div className="w-full max-w-[28em]">
-          <H3 className="p-0 pb-8">Produto</H3>
-          <ProductCard
-            key={product.id}
-            product={product}
-            className="mb-8 w-full"
-            footer={
-              <PriceTag
-                value={price}
-                className={cn("mt-4", { "opacity-70": price === 0 })}
-              />
-            }
-          />
-        </div>
-
-        <div className="w-full max-w-[28em]">
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field, fieldState }) => (
-              <FormItem className="text-gray-700">
-                <FormLabel className="block" htmlFor="price">
-                  <H3 className="p-0 pb-8">Preço</H3>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Preço"
-                    {...field}
-                    type="number"
-                    step={0.01}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Preço por 60kg (saca) de produto
-                </FormDescription>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-
-          <Button variant="primary" className="mt-8 w-full" type="submit">
-            Confirmar
-          </Button>
-        </div>
-      </form>
-    </Form>
   );
 }

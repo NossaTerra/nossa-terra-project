@@ -3,15 +3,19 @@ import { getProductImageSrc } from "~/server/types/product.type";
 import Image from "next/image";
 import { cn } from "~/utils/ui";
 
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  product: Product;
+  footer?: React.ReactNode;
+  topRightElement?: React.ReactNode;
+}
+
 export function ProductCard({
   product,
   footer,
+  topRightElement,
   className,
   ...rest
-}: {
-  product: Product;
-  footer?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>) {
+}: Props) {
   return (
     <div
       className={cn(
@@ -34,11 +38,14 @@ export function ProductCard({
         alt="marca dágua do produto"
         className="absolute -bottom-4 -right-3 opacity-60"
       />
-
-      <div className="pl-6 pr-12">
+      <div className="pl-6 pr-16">
         <p className="text-lg">{product.name}</p>
         {footer}
       </div>
+
+      {topRightElement && (
+        <div className="right-2 top-2">{topRightElement}</div>
+      )}
     </div>
   );
 }
