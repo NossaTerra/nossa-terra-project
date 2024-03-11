@@ -70,13 +70,13 @@ export function ListingCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <BrushIcon size={20} /> Edit
+                <BrushIcon size={20} /> Editar
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setIsDeleting(true)}
                 className="text-red-900"
               >
-                <Trash2Icon size={20} /> Delete
+                <Trash2Icon size={20} /> Remover
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
