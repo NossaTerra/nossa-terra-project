@@ -8,7 +8,9 @@ import { Button, linkClassNames } from "~/components/ui/button";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { type MyListing, api } from "~/utils/api";
 import { HourglassIcon, PauseOctagonIcon, PlusIcon } from "lucide-react";
+import { getProductImageSrc } from "~/server/types/product.type";
 import { ListingCard } from "./ListingCard";
+import { ProductType } from "@prisma/client";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -114,24 +116,7 @@ function MyListingsDashboard({ className }: ClassNameProps) {
   const { data: myListings, isLoading } = api.listing.getMyListings.useQuery();
 
   if (!isLoading && !myListings?.activeListings?.length) {
-    return (
-      <div
-        className={cn(
-          "w-[20em] space-y-8 rounded-xl border-4 border-gray-800 bg-cardShade p-6 text-center",
-          className,
-        )}
-      >
-        <h3 className="text-xl font-medium">
-          Você não possui anúncios, quer fazer um?
-        </h3>
-
-        <Button asChild variant="primary">
-          <Link href="/listings/new" className="flex w-full items-center gap-2">
-            <PlusIcon size={20} /> Novo Anúncio
-          </Link>
-        </Button>
-      </div>
-    );
+    return <EmptyStateNoListings className={className} />;
   }
 
   return (
@@ -172,6 +157,53 @@ function MyListingsDashboard({ className }: ClassNameProps) {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function EmptyStateNoListings({ className }: ClassNameProps) {
+  return (
+    <div
+      className={cn(
+        "bg-background relative flex min-h-40 max-w-[40em] overflow-hidden rounded-lg border-[2.5px] border-gray-800 p-6 shadow-xl",
+        className,
+      )}
+    >
+      <div className="absolute -bottom-4 -left-5 opacity-60">
+        {Array.from({ length: 4 }).map((_, i) => {
+          const product =
+            Object.values(ProductType)[i % Object.values(ProductType).length];
+
+          if (!product) {
+            return null;
+          }
+
+          return (
+            <Image
+              priority
+              src={getProductImageSrc(product)}
+              height={90}
+              width={90}
+              alt=""
+            />
+          );
+        })}
+      </div>
+
+      <div className="flex flex-1 flex-col justify-between pl-20">
+        <H2 className="py-4 font-medium">Crie aqui seu primeiro anúncio</H2>
+
+        <Button
+          asChild
+          variant="primary"
+          size="lg"
+          className="mb-4 mt-4 text-xl"
+        >
+          <Link href="/listings/new" className="flex w-fit items-center gap-2">
+            <PlusIcon size={20} /> Novo Anúncio
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
