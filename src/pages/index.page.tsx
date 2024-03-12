@@ -6,12 +6,7 @@ import { SecondDataStepSellerScreen } from "~/screens/LoginRegisterFlow/screens/
 import { useLoginRegisterFlow } from "~/screens/LoginRegisterFlow/state/machine";
 import { SecondDataStepBuyerScreen } from "~/screens/LoginRegisterFlow/screens/SecondDataStepBuyerScreen";
 
-import {
-  AnimatePresence,
-  type Variants,
-  motion,
-  type Transition,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { useRouter } from "next/router";
 import { z } from "zod";

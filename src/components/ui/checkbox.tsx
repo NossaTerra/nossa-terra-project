@@ -7,7 +7,6 @@ import Image from "next/image";
 
 import { cn } from "src/utils/ui";
 import { type ProductType } from "@prisma/client";
-import { type } from "os";
 import {
   ProductTypeLabel,
   getProductImageSrc,
