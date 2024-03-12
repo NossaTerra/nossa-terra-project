@@ -83,7 +83,7 @@ const arabicaProducts = arabicaNames.map((name, index) => ({
   mainColor: colors[index % colors.length]!,
 })) satisfies Omit<Product, "id">[];
 
-const robustaProducts = arabicaNames.map((name, index) => ({
+const robustaProducts = robustaNames.map((name, index) => ({
   name,
   type: ProductType.CoffeeRobusta,
   mainColor: colors[index % colors.length]!,

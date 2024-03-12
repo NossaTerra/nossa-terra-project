@@ -5,13 +5,13 @@ import {
   sellerSocialSchema,
 } from "../../types/user.type";
 import { z } from "zod";
-import { env } from "~/env";
+// import { env } from "~/env";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { auth } from "../auth/lucia";
 import { protectedProcedure, publicProcedure } from "../trpc/procedures";
-import axios from "axios";
+// import axios from "axios";
 import { addressDetailsApiSchema } from "~/server/api/addressApi";
 import { lengthFormattedCNPJ, lengthFormattedCPF } from "~/utils/formatters";
 import cloudinaryV2 from "~/utils/configs";

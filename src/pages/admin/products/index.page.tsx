@@ -158,6 +158,7 @@ function ProductsShowcase() {
 }
 
 function ProductRow({ product }: { product: Product }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id: _, ...productContent } = product;
   const [newProduct, setNewProduct] = useState(productContent);
 
