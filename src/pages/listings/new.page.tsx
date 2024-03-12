@@ -1,22 +1,15 @@
-import { ArrowLeftIcon, SearchIcon, XIcon } from "lucide-react";
+import { ArrowLeftIcon, XIcon } from "lucide-react";
 import { type InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import {
-  type ChangeEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { ProductCard } from "~/components/common/ProductCard";
+import { useCallback, useEffect } from "react";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import { H3 } from "~/components/ui/typography";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { EditListingForm, type ListingFormData } from "./EditListingForm";
+import { ProductSearchColumn } from "~/components/common/ProductSearchColumn";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -69,64 +62,6 @@ function ListingCreationFlow() {
             },
           )}
         />
-      </div>
-    </div>
-  );
-}
-
-function ProductSearchColumn({ className }: ClassNameProps) {
-  const router = useRouter();
-  // TODO: maybe react to the loading state or make this query in server side rendering
-  const { data: products } = api.product.getAll.useQuery();
-  const [searchString, setSearchString] = useState("");
-  const onInputChange: ChangeEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      setSearchString(event.target.value);
-    },
-    [],
-  );
-
-  const filteredProducts = useMemo(() => {
-    if (!products) return [];
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(searchString.toLowerCase()),
-    );
-  }, [products, searchString]);
-
-  return (
-    <div className={cn("flex flex-col items-center", className)}>
-      <div className="sticky top-0 z-10 w-full items-center">
-        <div className="flex w-full justify-center bg-backgroundPrimary">
-          <div className="w-full max-w-[36em] px-8 py-8">
-            <H3>Escolher Produto</H3>
-            <div className="flex flex-row gap-4">
-              <SearchIcon />{" "}
-              <Input value={searchString} onChange={onInputChange} />
-            </div>
-          </div>
-        </div>
-        <div className="h-4 w-full bg-gradient-to-b from-backgroundPrimary to-transparent" />
-      </div>
-
-      <div className="flex flex-col items-center gap-4 px-6">
-        {filteredProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            className="w-full max-w-[28em] transition-transform duration-300 hover:scale-110 hover:bg-slate-100"
-            role="button"
-            onClick={() =>
-              router.push(
-                {
-                  pathname: router.pathname,
-                  query: { product: product.id },
-                },
-                undefined,
-                { shallow: true },
-              )
-            }
-          />
-        ))}
       </div>
     </div>
   );
