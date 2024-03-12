@@ -4,7 +4,7 @@ export { ProductType } from "@prisma/client";
 
 export const ProductTypeLabel = {
   CoffeeRobusta: "Robusta",
-  CoffeeArabica: "Arabica",
+  CoffeeArabica: "Arábica",
 } as const satisfies Record<ProductType, string>;
 
 export const productSchema = z.object({
