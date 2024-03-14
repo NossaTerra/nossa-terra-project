@@ -19,7 +19,7 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { useLoginRegisterFlow } from "../state/machine";
 import { ArrowLeftIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
+import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
 
 function ChooseRoleContent({ className }: ClassNameProps) {
   const { state, chooseRoleAction } = useLoginRegisterFlow();

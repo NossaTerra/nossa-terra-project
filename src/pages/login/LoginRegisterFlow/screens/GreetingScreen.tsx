@@ -20,7 +20,7 @@ import {
 } from "../hooks/useGreetingSchema";
 import { useLoginRegisterFlow } from "../state/machine";
 import { api } from "~/utils/api";
-import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
+import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
 
 function GreetingContent({ className }: ClassNameProps) {
   const greetingAction = useLoginRegisterFlow((s) => s.greetingAction);

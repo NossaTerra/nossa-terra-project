@@ -3,7 +3,7 @@ import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import { Button } from "~/components/ui/button";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
-import useBeforeUnloadAndPopState from "~/screens/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
+import useBeforeUnloadAndPopState from "~/pages/login/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
 
 function PasswordResetSentContent({ className }: ClassNameProps) {
   const router = useRouter();

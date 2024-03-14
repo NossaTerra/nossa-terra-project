@@ -51,8 +51,8 @@ import {
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
 import { AvatarUpload } from "~/components/common/AvatarUpload";
 import { ProfileButton } from "~/components/forms/profileButton";
-import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
-import useZipCodeToast from "~/screens/LoginRegisterFlow/hooks/useZipCodeToast";
+import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
+import useZipCodeToast from "~/pages/login/LoginRegisterFlow/hooks/useZipCodeToast";
 import { toast } from "react-hot-toast";
 
 export function BuyerForm({

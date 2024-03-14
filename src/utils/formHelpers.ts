@@ -1,11 +1,11 @@
-import { type ChosenRole } from "~/screens/LoginRegisterFlow/hooks/useFirstDataStepSchema";
+import { type ChosenRole } from "~/pages/login/LoginRegisterFlow/hooks/useFirstDataStepSchema";
 import { formatPhone, lengthFormattedCPF } from "./formatters";
 import { type BusinessSector, type User } from "~/server/types/user.type";
 import { type FieldValues, type UseFormReturn } from "react-hook-form";
-import { type SecondDataStepBuyerFields } from "~/screens/LoginRegisterFlow/hooks/useSecondDataStepBuyerSchema";
+import { type SecondDataStepBuyerFields } from "~/pages/login/LoginRegisterFlow/hooks/useSecondDataStepBuyerSchema";
 import { BusinessSectorLabel } from "~/server/types/user.type";
 import { emptyString } from "./constants";
-import { type SecondDataStepSellerFields } from "~/screens/LoginRegisterFlow/hooks/useSecondDataStepSellerSchema";
+import { type SecondDataStepSellerFields } from "~/pages/login/LoginRegisterFlow/hooks/useSecondDataStepSellerSchema";
 
 export function cpfIsCNPJ({ cpf, role }: { cpf: string; role?: ChosenRole }) {
   if (role === "buyer") {
