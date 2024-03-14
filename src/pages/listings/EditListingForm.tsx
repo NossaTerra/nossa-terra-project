@@ -51,9 +51,9 @@ export function EditListingForm({
     resolver: zodResolver(schema),
     defaultValues: listing
       ? {
-        ...listing,
-        price: Number(listing.price),
-      }
+          ...listing,
+          price: Number(listing.price),
+        }
       : undefined,
   });
 
