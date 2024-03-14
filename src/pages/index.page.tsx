@@ -1,70 +1,47 @@
-import { ChooseRoleScreen } from "~/screens/LoginRegisterFlow/screens/ChooseRoleScreen";
-import { FirstDataStepScreen } from "~/screens/LoginRegisterFlow/screens/FirstDataStepScreen";
-import { GreetingScreen } from "~/screens/LoginRegisterFlow/screens/GreetingScreen";
-import { WelcomeBackScreen } from "~/screens/LoginRegisterFlow/screens/WelcomeBackScreen";
-import { SecondDataStepSellerScreen } from "~/screens/LoginRegisterFlow/screens/SecondDataStepSellerScreen";
-import { useLoginRegisterFlow } from "~/screens/LoginRegisterFlow/state/machine";
-import { SecondDataStepBuyerScreen } from "~/screens/LoginRegisterFlow/screens/SecondDataStepBuyerScreen";
-
-import { AnimatePresence, motion } from "framer-motion";
+import { type InferGetServerSidePropsType } from "next";
+import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
+import { AppHeader } from "~/components/common/headers";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
-import { useRouter } from "next/router";
-import { z } from "zod";
-import { useInvokeCallbackOnce } from "~/hooks/useInvokeCallbackOnce";
-import { useToastMustSignIn } from "~/screens/LoginRegisterFlow/useToastMustSignIn";
-import {
-  Direction,
-  variants,
-  transition,
-} from "~/animation/horizontalCrossfade";
-import useBeforeUnloadAndPopState from "~/screens/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
+import { cn } from "~/utils/ui";
+import Image from "next/image";
 
-export const getServerSideProps = redirectGetServerSideProps.Public;
+export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
+type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-function useToastWhenRedirected() {
-  const toastMustSignIn = useToastMustSignIn();
-
-  const router = useRouter();
-  const hasRedirectQueryParam = z
-    .string()
-    .safeParse(router.query.redirect).success;
-
-  useInvokeCallbackOnce({
-    callback: toastMustSignIn,
-    shouldInvoke: hasRedirectQueryParam,
-  });
-}
-
-export default function RootScreen() {
-  useToastWhenRedirected();
-  useBeforeUnloadAndPopState();
-
-  const stepKey = useLoginRegisterFlow((s) => s.state.stepKey);
-  const lastCommand = useLoginRegisterFlow((s) => s.lastCommand);
-
-  const direction = lastCommand === "goBack" ? Direction.Left : Direction.Right;
-
+export default function SearchScreen({ user }: Props) {
   return (
-    <div className="w-screen overflow-x-hidden">
-      <AnimatePresence initial={false} custom={direction} mode="popLayout">
-        <motion.div
-          key={stepKey}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          custom={direction}
-          variants={variants}
-          transition={transition}
-          className="w-screen"
-        >
-          {stepKey === "greeting" && <GreetingScreen />}
-          {stepKey === "welcomeBack" && <WelcomeBackScreen />}
-          {stepKey === "chooseRole" && <ChooseRoleScreen />}
-          {stepKey === "firstDataStep" && <FirstDataStepScreen />}
-          {stepKey === "secondDataStepSeller" && <SecondDataStepSellerScreen />}
-          {stepKey === "secondDataStepBuyer" && <SecondDataStepBuyerScreen />}
-        </motion.div>
-      </AnimatePresence>
-    </div>
+    <>
+      <AppHeader user={user} hideLogo />
+
+      <div className="p-10">
+        <div className="flex flex-col items-center gap-8 px-8 sm:flex-row sm:gap-16 sm:px-16">
+          <Image
+            src="/images/logo-no-background.png"
+            width={200}
+            height={114}
+            priority
+            alt="Nossa terra logo"
+          />
+          <h1
+            className={cn(
+              "font-poppins-700 text-headingPrimary",
+              "text-left",
+              "text-xl md:text-2xl lg:text-3xl",
+            )}
+          >
+            Seja bem vindo(a) à{" "}
+            <span
+              className={cn(
+                "font-poppins-700 text-headingSecondary",
+                "text-4xl md:text-5xl lg:text-6xl",
+                "block",
+              )}
+            >
+              Nossa Terra
+            </span>
+          </h1>
+        </div>
+      </div>
+    </>
   );
 }

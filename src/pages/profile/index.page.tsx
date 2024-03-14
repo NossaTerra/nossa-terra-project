@@ -14,8 +14,8 @@ import {
   transition,
   variants,
 } from "~/animation/horizontalCrossfade";
-import { BuyerForm } from "~/screens/LoginRegisterFlow/screens/SecondDataStepBuyerScreen";
-import { SellerForm } from "~/screens/LoginRegisterFlow/screens/SecondDataStepSellerScreen";
+import { BuyerForm } from "~/pages/login/LoginRegisterFlow/screens/SecondDataStepBuyerScreen";
+import { SellerForm } from "~/pages/login/LoginRegisterFlow/screens/SecondDataStepSellerScreen";
 import { generateAvatarColor } from "~/utils/formHelpers";
 
 import {

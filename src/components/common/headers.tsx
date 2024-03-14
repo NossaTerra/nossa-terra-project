@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   DollarSignIcon,
   FolderOpenIcon,
+  LogInIcon,
   MenuIcon,
   PhoneIcon,
   SearchIcon,
@@ -67,7 +68,26 @@ function NavBar({ children }: PropsWithChildren) {
   );
 }
 
-export function AppHeader({ user }: { user: User }) {
+export function AppHeader({
+  user,
+  hideLogo = false,
+}: {
+  user: User | null;
+  hideLogo?: boolean;
+}) {
+  if (!user) {
+    return (
+      <div className="flex w-full items-center justify-end px-10 pb-7 pt-10">
+        <Button variant="primary" size="lg" asChild>
+          <Link href="/login">
+            <UserIcon /> Entrar
+          </Link>
+        </Button>
+        {!hideLogo && <NossaTerraLogo />}
+      </div>
+    );
+  }
+
   return (
     <div className="flex w-full items-center justify-between px-10 pb-7 pt-10">
       <NavBar>
@@ -86,7 +106,8 @@ export function AppHeader({ user }: { user: User }) {
         <NavItem href="/profile" label="Perfil" icon={<UserIcon />} />
         <NavItem href="/contact" label="Fale Conosco" icon={<PhoneIcon />} />
       </NavBar>
-      <NossaTerraLogo />
+
+      {!hideLogo && <NossaTerraLogo />}
     </div>
   );
 }

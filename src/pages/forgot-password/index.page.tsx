@@ -20,7 +20,7 @@ import router, { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { z } from "zod";
-import useBeforeUnloadAndPopState from "~/screens/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
+import useBeforeUnloadAndPopState from "~/pages/login/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
 
 function useForgotPasswordSchema() {
   // It's best to use a hook to get the schema because

@@ -24,7 +24,7 @@ import { useAuth } from "~/hooks/useAuth";
 import { TRPCClientError } from "@trpc/client";
 import { type AppRouter } from "~/server/api/routers/_rootRouter";
 import Link from "next/link";
-import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
+import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
 
 function WelcomeBackContent({ className }: ClassNameProps) {
   const { state, resetState } = useLoginRegisterFlow();

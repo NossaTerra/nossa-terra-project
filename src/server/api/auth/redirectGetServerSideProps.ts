@@ -15,7 +15,7 @@ const getUser = async (context: GetServerSidePropsContext) => {
 const redirectSignIn = (async (context) => {
   return {
     redirect: {
-      destination: `/?redirect=${encodeURIComponent(context.resolvedUrl)}`,
+      destination: `/login?redirect=${encodeURIComponent(context.resolvedUrl)}`,
       permanent: false,
     },
   };
@@ -32,6 +32,11 @@ const Public = (async (context) => {
     };
   }
   return { props: {} };
+}) satisfies GetServerSideProps;
+
+const MaybeAuthed = (async (context) => {
+  const user = await getUser(context);
+  return { props: { user } };
 }) satisfies GetServerSideProps;
 
 const Authed = <TRoles extends [Role, ...Role[]]>(
@@ -63,6 +68,7 @@ const Authed = <TRoles extends [Role, ...Role[]]>(
 
 export const redirectGetServerSideProps = {
   Public,
+  MaybeAuthed,
   Common: Authed(RoleTypeSchema.Common),
   BuyerOnly: Authed(RoleTypeSchema.BuyerOnly),
   Backoffice: Authed(RoleTypeSchema.Backoffice),

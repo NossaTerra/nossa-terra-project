@@ -34,7 +34,7 @@ import Image from "next/image";
 import { useAutomaticAddressFill } from "../hooks/useAutomaticAddressFill";
 import { type User } from "lucia";
 import { ProfileButton } from "~/components/forms/profileButton";
-import useScrollToTop from "~/screens/LoginRegisterFlow/hooks/useScrolltoTop";
+import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
 import {
   TooltipProvider,
   Tooltip,
