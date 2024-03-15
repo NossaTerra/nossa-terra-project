@@ -9,7 +9,16 @@ import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType } from "@prisma/client";
 
-export function ProductSearchColumn({ className }: ClassNameProps) {
+interface Props extends ClassNameProps {
+  title?: string;
+  containerRef?: React.MutableRefObject<HTMLDivElement | null>;
+}
+
+export function ProductSearchColumn({
+  title = "Escolher Produto",
+  containerRef,
+  className,
+}: Props) {
   const router = useRouter();
   // TODO: maybe react to the loading state or make this query in server side rendering
   const { data: products } = api.product.getAll.useQuery();
@@ -46,11 +55,14 @@ export function ProductSearchColumn({ className }: ClassNameProps) {
   }, [noProductTypeFilterSelected, productTypeFilter, products, searchString]);
 
   return (
-    <div className={cn("flex flex-col items-center", className)}>
+    <div
+      className={cn("flex flex-col items-center", className)}
+      ref={containerRef}
+    >
       <div className="sticky top-0 z-10 w-full items-center">
         <div className="flex w-full justify-center bg-backgroundPrimary">
           <div className="w-full max-w-[36em] px-8 py-8">
-            <H3>Escolher Produto</H3>
+            {title && <H3>{title}</H3>}
             <div className="relative">
               <SearchIcon className="absolute left-3 top-2" />{" "}
               <Input
@@ -59,7 +71,7 @@ export function ProductSearchColumn({ className }: ClassNameProps) {
                 className="border-slate-400 pl-12 text-xl"
               />
             </div>
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex w-full gap-4">
               {Object.values(ProductType).map((productType) => (
                 <CheckboxProductType
                   key={productType}

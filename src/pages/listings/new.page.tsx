@@ -52,15 +52,9 @@ function ListingCreationFlow() {
           })}
         />
         <ListingDetailsColumn
-          className={cn(
-            "px-10",
-            {
-              "": selectedProductId,
-            },
-            {
-              "hidden lg:block": !selectedProductId,
-            },
-          )}
+          className={cn("px-10", {
+            "hidden lg:block": !selectedProductId,
+          })}
         />
       </div>
     </div>

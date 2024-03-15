@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
-import { adminProcedure, protectedProcedure } from "../trpc/procedures";
+import { adminProcedure, publicProcedure } from "../trpc/procedures";
 import { productSchema } from "~/server/types/product.type";
 
 export const productRouter = createTRPCRouter({
@@ -43,7 +43,7 @@ export const productRouter = createTRPCRouter({
       });
     }),
 
-  getAll: protectedProcedure.query(({ ctx: { db } }) => {
+  getAll: publicProcedure.query(({ ctx: { db } }) => {
     return db.product.findMany();
   }),
 });
