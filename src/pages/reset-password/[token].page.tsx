@@ -76,7 +76,7 @@ function ResetPasswordContent({
         toast.success("Senha redefinida com sucesso!", {
           duration: 1400,
         });
-        await router.replace("/search");
+        await router.replace("/");
       } catch (err) {
         toast.error("Erro ao redefinir a senha!");
       }
