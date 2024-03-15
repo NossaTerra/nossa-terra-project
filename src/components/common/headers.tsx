@@ -91,11 +91,7 @@ export function AppHeader({
   return (
     <div className="flex w-full items-center justify-between px-10 pb-7 pt-10">
       <NavBar>
-        <NavItem
-          href="/search"
-          label="Pesquisa de Anúncios"
-          icon={<SearchIcon />}
-        />
+        <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         {user.role === "buyer" && (
           <NavItem
             href="/listings"

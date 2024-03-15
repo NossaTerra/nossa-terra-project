@@ -131,7 +131,7 @@ export function SellerForm({
           password,
         });
 
-        await router.replace("/search");
+        await router.replace("/");
         toast.remove(toastRefId);
         resetState();
       },
