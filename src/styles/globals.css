@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
 
   .font-inter-400 {
@@ -63,5 +63,4 @@
     font-family: var(--font-poppins);
     font-weight: 900;
   }
-
 }

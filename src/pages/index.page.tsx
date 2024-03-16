@@ -7,10 +7,11 @@ import { ProductSearchColumn } from "~/components/common/ProductSearchColumn";
 import { useRouter } from "next/router";
 import { ArrowLeftIcon, XIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { H2 } from "~/components/ui/typography";
+import { H1, H2 } from "~/components/ui/typography";
 import { api } from "~/utils/api";
 import { Separator } from "~/components/ui/separator";
 import { ProductCard } from "~/components/common/ProductCard";
+import { motion } from "framer-motion";
 
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -21,57 +22,67 @@ export default function SearchScreen({ user }: Props) {
 
   return (
     <>
-      <AppHeader user={user} hideLogo />
+      <div className= {cn(
+                "flex flex-row-reverse",
+                 user?"mt-0":"mt-12"
+              )}>
+        <AppHeader user={user} hideLogo={!user} />
 
-      <div className="px-10">
-        <div className="flex flex-col items-center gap-8 px-8 sm:flex-row sm:gap-16 sm:px-16">
-          <Image
-            src="/images/logo-no-background.png"
-            width={200}
-            height={114}
-            priority
-            alt="Nossa terra logo"
-          />
-          <h1
-            className={cn(
-              "font-poppins-700 text-headingPrimary",
-              "text-left",
-              "text-xl md:text-2xl lg:text-3xl",
-            )}
-          >
-            Seja bem vindo(a) à{" "}
-            <span
+       {!user && <div className="w-full mt-2 px-10">
+          <div className="flex flex-col items-center gap-8 px-8 sm:flex-row sm:gap-16 sm:px-16">
+            <Image
+              src="/images/logo-no-background.png"
+              width={140}
+              height={134}
+              priority
+              alt="Nossa terra logo"
+            />
+            <h1
               className={cn(
-                "font-poppins-700 text-headingSecondary",
-                "text-4xl md:text-5xl lg:text-6xl",
-                "block",
+                "font-poppins-700 text-headingPrimary",
+                "text-left",
+                "text-xl md:text-2xl lg:text-3xl",
               )}
             >
-              Nossa Terra
-            </span>
-          </h1>
-        </div>
+              Seja bem vindo(a) à{" "}
+              <span
+                className={cn(
+                  "font-poppins-700 text-headingSecondary",
+                  "text-4xl md:text-5xl lg:text-6xl",
+                  "inline",
+                )}
+              >
+                Nossa Terra
+              </span>
+            </h1>
+          </div>
 
-        <Separator className="mt-20 h-1 bg-slate-400" />
+        </div>}
       </div>
-      <H2 className="px-8">Pesquisar Anúncios</H2>
+      <Separator className=  {cn(
+                "w-full  mb-2.5  h-0.5 bg-headingSecondary",
+                 user?"mt-0":"mt-20"
+              )} />
+
+      {/* <H2 className="px-8">Pesquisar Anúncios</H2> */}
 
       {/* WORKAROUND */}
-      {/* The 97svw is a hack because the width of the window scrollbar messes up the width */}
+      {/* The 99.5svw is a hack because the width of the window scrollbar messes up the width */}
       {/* The absolute somehow fixes the position sticky, that's why it exists */}
-      <div className="absolute flex w-[97svw] flex-row overflow-hidden">
+      <div className="relative bg-cardShade bg-opacity-60 flex w-[99.5svw] flex-row overflow-hidden lg:fixed">
+        
         <ProductSearchColumn
           title=""
           className={cn(
-            "sticky top-0 w-full lg:h-svh lg:w-[56em] lg:overflow-y-auto",
+            "sticky top-0 w-full pb-[170px] h-full lg:h-svh bg-white lg:w-[56em]  lg:overflow-y-auto",
+             user?"scrollbar-webkit":"pb-[270px] scrollbar-webkit-big-margin",
             {
               "hidden lg:block": selectedProductId,
             },
           )}
         />
-
         <SelectedProductListingsColumn
-          className={cn("px-10", {
+          className={cn("px-10 sticky top-0 pb-[170px] lg:h-svh scrollbar-webkit lg:overflow-y-auto", user ? "scrollbar-webkit":"scrollbar-webkit-big-margin pb-[270px] ", {
             "hidden lg:block": !selectedProductId,
           })}
         />
@@ -104,9 +115,7 @@ function SelectedProductListingsColumn({ className }: ClassNameProps) {
 
       {product && (
         <div className="mt-8">
-          teste
-          <div className="relative rounded-xl bg-cardShade p-8">
-            teste2
+          <div className="relative rounded-xl  p-8">
             <Button
               variant="ghost"
               size="icon"
@@ -125,9 +134,7 @@ function SelectedProductListingsColumn({ className }: ClassNameProps) {
               <XIcon />
             </Button>
             <div>
-              <ProductCard product={product} className="mb-8" />
-
-              {Array.from({ length: 3 }).map((_, index) => (
+              {Array.from({ length: 933 }).map((_, index) => (
                 <ProductCard product={product} className="mb-8" key={index} />
               ))}
             </div>
