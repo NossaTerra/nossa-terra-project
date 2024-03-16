@@ -7,11 +7,10 @@ import { ProductSearchColumn } from "~/components/common/ProductSearchColumn";
 import { useRouter } from "next/router";
 import { ArrowLeftIcon, XIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { H1, H2 } from "~/components/ui/typography";
 import { api } from "~/utils/api";
 import { Separator } from "~/components/ui/separator";
 import { ProductCard } from "~/components/common/ProductCard";
-import { motion } from "framer-motion";
+
 
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -24,16 +23,16 @@ export default function SearchScreen({ user }: Props) {
     <>
       <div className= {cn(
                 "flex flex-row-reverse",
-                 user?"mt-0":"mt-12"
+                 user?"mt-0":" overflow-hidden bg-cardHover border-b-2 bg-opacity-25 py-16 shadow"
               )}>
         <AppHeader user={user} hideLogo={!user} />
 
-       {!user && <div className="w-full mt-2 px-10">
+       {!user && <div className="w-full  px-10">
           <div className="flex flex-col items-center gap-8 px-8 sm:flex-row sm:gap-16 sm:px-16">
             <Image
               src="/images/logo-no-background.png"
-              width={140}
-              height={134}
+              width={124}
+              height={114}
               priority
               alt="Nossa terra logo"
             />
@@ -47,9 +46,9 @@ export default function SearchScreen({ user }: Props) {
               Seja bem vindo(a) à{" "}
               <span
                 className={cn(
-                  "font-poppins-700 text-headingSecondary",
+                  "font-poppins-700 w-full text-headingSecondary",
                   "text-4xl md:text-5xl lg:text-6xl",
-                  "inline",
+                  "block",
                 )}
               >
                 Nossa Terra
@@ -59,22 +58,18 @@ export default function SearchScreen({ user }: Props) {
 
         </div>}
       </div>
-      <Separator className=  {cn(
-                "w-full  mb-2.5  h-0.5 bg-headingSecondary",
-                 user?"mt-0":"mt-20"
-              )} />
 
       {/* <H2 className="px-8">Pesquisar Anúncios</H2> */}
 
       {/* WORKAROUND */}
       {/* The 99.5svw is a hack because the width of the window scrollbar messes up the width */}
       {/* The absolute somehow fixes the position sticky, that's why it exists */}
-      <div className="relative bg-cardShade bg-opacity-60 flex w-[99.5svw] flex-row overflow-hidden lg:fixed">
+      <div className={cn("relativebg-opacity-60 flex w-[99.5svw] flex-row overflow-hidden lg:fixed", user ? "mt-0":"mt-1.5")}>
         
         <ProductSearchColumn
           title=""
           className={cn(
-            "sticky top-0 w-full pb-[170px] h-full lg:h-svh bg-white lg:w-[56em]  lg:overflow-y-auto",
+            "sticky top-0 w-full pb-[170px] h-full lg:h-svh bg-white lg:w-[56em] lg:overflow-y-auto",
              user?"scrollbar-webkit":"pb-[270px] scrollbar-webkit-big-margin",
             {
               "hidden lg:block": selectedProductId,
@@ -134,7 +129,7 @@ function SelectedProductListingsColumn({ className }: ClassNameProps) {
               <XIcon />
             </Button>
             <div>
-              {Array.from({ length: 933 }).map((_, index) => (
+              {Array.from({ length: 33 }).map((_, index) => (
                 <ProductCard product={product} className="mb-8" key={index} />
               ))}
             </div>

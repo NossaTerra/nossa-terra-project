@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   DollarSignIcon,
   FolderOpenIcon,
-  LogInIcon,
   MenuIcon,
   PhoneIcon,
   SearchIcon,
@@ -26,16 +25,17 @@ interface NavItem {
 
 function NavItem({ href, label, icon }: NavItem) {
   const { pathname } = useRouter();
-  const isSelected = pathname.startsWith(href);
+  const isSelected = pathname === href
 
   return (
     <Link
       href={href}
       className={cn(
-        "flex flex-row gap-2",
+        "flex flex-row justify-center items-center gap-2",
+        "rounded-full",
         "font-poppins-600 border-textPrimary px-5 py-4 text-textPrimary",
-        "hover:bg-textSecondary hover:bg-opacity-70 hover:text-slate-100 hover:opacity-100 hover:shadow-md",
-        isSelected ? "border-b-2" : "opacity-60",
+        "hover:bg-slate-600 hover:bg-opacity-85 hover:text-slate-100 hover:opacity-100 hover:shadow-md",
+        isSelected ? "border-[3px] rounded-full hover:rounded-full" : "opacity-60",
       )}
     >
       {icon}
@@ -77,7 +77,7 @@ export function AppHeader({
 }) {
   if (!user) {
     return (
-      <div className="flex w-full items-center justify-end px-10 pb-7 pt-10">
+      <div className={cn("flex items-center justify-end px-10 pb-7 pt-10", !hideLogo && "w-full")}>
         <Button variant="primary" size="lg" asChild>
           <Link href="/login">
             <UserIcon /> Entrar
@@ -89,7 +89,7 @@ export function AppHeader({
   }
 
   return (
-    <div className="flex w-full items-center justify-between px-10 pb-7 pt-10">
+    <div className="flex  bg-cardHover bg-opacity-25 shadow mb-3 w-full items-center justify-between px-10 pb-7 pt-10">
       <NavBar>
         <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         {user.role === "buyer" && (

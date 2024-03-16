@@ -93,7 +93,7 @@ module.exports = {
         "&::-webkit-scrollbar-track": {
           backgroundColor: "#f1f1f1",
           paddingTop: "100px",
-          marginBottom: "262px"
+          marginBottom: "280px"
         },
         "&::-webkit-scrollbar-thumb": {
           background: "#2a1d10",

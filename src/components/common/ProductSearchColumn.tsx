@@ -50,7 +50,7 @@ export function ProductSearchColumn({ className }: ClassNameProps) {
       <div className="sticky top-0 z-10 w-full items-center">
         <div className="flex w-full justify-center  bg-backgroundPrimary">
           <div className="w-full max-w-[36em] md:pr-8  pb-8 pt-2">
-            <H3 className="ml-12">Escolher Produto</H3>
+           <h1 className="text-4xl ml-12 mb-12 mt-4 font-bold">Pesquisa de anúncios</h1>
             <div className="ml-12 relative">
               <SearchIcon className="absolute left-3 top-2" />{" "}
               <Input
