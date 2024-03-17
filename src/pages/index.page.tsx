@@ -195,7 +195,7 @@ function SelectedProductListingsColumn({
             <span className="pr-2 lg:hidden">VOLTAR</span>
           </Button>
           <div className="relative w-full rounded-xl md:p-8">
-            <div className="mb-6 ml-2 max-w-[890px] mr-2 mt-2 block rounded-lg bg-slate-100 p-4 lg:mr-8 ">
+            <div className="mb-6  max-w-[895px] mr-2 mt-2 block rounded-lg bg-slate-100 p-4 lg:mr-8 ">
               <span className="font-poppins-600 mb-2 ml-2 text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
                 {" "}
                 Resultados Para :
@@ -223,13 +223,13 @@ function SearchResultCard({ user, product }: Props & Product) {
   return (
     <div className="flex max-w-[900px] rounded-lg border-[2.3px] border-black md:justify-center md:px-0 ">
       <div className="relative w-full px-4 py-8">
-        <div className="font-poppins-500 absolute top-3 w-32 rounded-md bg-slate-200 p-3 text-xl lg:right-3 ">
+        <div className="font-poppins-500 absolute top-3 w-32 rounded-md bg-slate-200 p-3 text-xl right-3 ">
           R$ 109.09
         </div>
         <div className="mb-6 mt-12 flex w-full flex-col justify-between px-2 md:flex-row">
           <ProductCard
-            topRightElement={"R$:100,09"}
             small
+            footer={<div className="py-1.5 border-2 border-slate-500 rounded-md  mt-3 flex justify-center font-poppins-500 w-28">R$ 999,99</div>}
             product={product}
             className="xl:w-10em mb-8"
           />
@@ -397,13 +397,15 @@ export function UserAnnouncementInfo({ user }: Props) {
             )}
           </div>
           <Avatar className="mt-5 flex">
-            <AvatarImage
-              className="flex h-32 w-32 aspect-[1/1] items-center justify-center rounded-full border border-slate-200 object-cover"
-              src={user.avatarImage}
-            />
+          {user?.avatarImage && <div className="flex aspect-[1/1] h-24 w-24 items-center justify-center xl:h-28 xl:w-28  ">
+              <AvatarImage
+                className="rounded-full object-cover "
+                src={user?.avatarImage}
+              />
+            </div>}
             <AvatarFallback
               style={{ backgroundColor: `${generateAvatarColor(user.name)}` }}
-              className={`flex w-auto items-center justify-center rounded-full border border-slate-200 object-cover lg:h-auto lg:w-auto `}
+              className={`flex xl:h-28 xl:w-28 h-24 w-24 aspect-[1/1] items-center justify-center rounded-full border border-slate-200 object-cover `}
             >
               <span className={`font-poppins-700 text-2xl text-white`}>
                 {user.name?.substring(0, 2).toLocaleUpperCase()}
