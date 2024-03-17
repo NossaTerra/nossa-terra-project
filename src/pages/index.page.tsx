@@ -5,7 +5,7 @@ import { type ClassNameProps, cn } from "~/utils/ui";
 import Image from "next/image";
 import { ProductSearchColumn } from "~/components/common/ProductSearchColumn";
 import { useRouter } from "next/router";
-import { ArrowLeftIcon, XIcon, ArrowUpIcon, MapPinIcon } from "lucide-react";
+import { ArrowLeftIcon, XIcon, ArrowUpIcon, MapPinIcon, TimerIcon } from "lucide-react";
 import { api } from "~/utils/api";
 import { Card, CardContent } from "~/components/ui/card";
 import { type Product } from "@prisma/client";
@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { animateScrollToTop } from "~/utils/scroll";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { generateAvatarColor } from "~/utils/formHelpers";
+import { getDisplayTimeWithAgo } from "~/utils/time";
 
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -23,6 +24,8 @@ type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 export default function SearchScreen({ user }: Props) {
   const router = useRouter();
   const selectedProductId = router.query.product;
+
+  const { data: searchResults } = api.search.getProductListings.useQuery(Array.isArray(router.query.product) ? router.query.product[0] : router.query.product);
 
   useEffect(() => {
     // This resets scroll position on selectedProductId change,
@@ -133,6 +136,7 @@ export default function SearchScreen({ user }: Props) {
           />
         </>
         <SelectedProductListingsColumn
+          searchResults={searchResults}
           user={user}
           className={cn(
             "sticky top-0 px-3 pb-16 md:px-10 lg:h-svh lg:overflow-y-auto lg:pb-[170px] lg:scrollbar-webkit",
@@ -150,6 +154,7 @@ export default function SearchScreen({ user }: Props) {
 }
 
 function SelectedProductListingsColumn({
+  searchResults,
   className,
   user,
 }: ClassNameProps & Props) {
@@ -205,10 +210,10 @@ function SelectedProductListingsColumn({
               </span>
             </div>
             <div>
-              {Array.from({ length: 33 }).map((_, index) => (
+              {searchResults?.map((result, index) => (
                 // <SearchResultCard product={product} className="mb-8" key={index} />
                 <div className="mb-10 md:mr-7">
-                  <SearchResultCard product={product} user={user} key={index} />
+                  <SearchResultCard result={result} product={product} key={index} />
                 </div>
               ))}
             </div>
@@ -219,41 +224,50 @@ function SelectedProductListingsColumn({
   );
 }
 
-function SearchResultCard({ user, product }: Props & Product) {
+function SearchResultCard({ result, product }: Props & Product) {
+  const listingTime = new Date(result.listing.updatedAt);
+  const timeString = getDisplayTimeWithAgo(listingTime);
+
+  console.log(result)
+  const filteredUserListings = result?.userListings?.filter((listing)=> listing.productId !== product.id); 
+
   return (
-    <div className="flex max-w-[900px] rounded-lg border-[2.3px] border-black md:justify-center md:px-0 ">
-      <div className="relative w-full px-4 py-8">
-        <div className="font-poppins-500 absolute top-3 w-32 rounded-md bg-slate-200 p-3 text-xl right-3 ">
-          R$ 109.09
+    <div className="flex max-w-[880px] rounded-lg border-[2.3px] pb-3 xl:pb-0 border-black md:justify-center md:px-0 ">
+      <div className="relative w-full px-4 pt-7">
+        <div className="font-poppins-500 absolute top-3 flex rounded-md bg-slate-200 p-3 text-xl right-3 ">
+         {`R$ ${result.listing.price}`}
         </div>
-        <div className="mb-6 mt-12 flex w-full flex-col justify-between px-2 md:flex-row">
+        <div className="font-poppins-500 absolute top-4 w-64 rounded-md flex flex-row items-start p-3 text-sm left-3 ">
+          <TimerIcon className="mr-1 " size={18} /> {timeString} </div>
+        <div className="mt-12 flex w-full flex-col justify-between px-2 md:flex-row">
           <ProductCard
             small
-            footer={<div className="py-1.5 border-2 border-slate-500 rounded-md  mt-3 flex justify-center font-poppins-500 w-28">R$ 999,99</div>}
+            footer={<div className="py-1.5 border-2 border-slate-500 rounded-md  mt-3 flex justify-center font-poppins-500 w-28">{`R$ ${result.listing.price}`}</div>}
             product={product}
             className="xl:w-10em mb-8"
           />
-          {!!user && <UserAnnouncementInfo user={user} />}
+          {!!result.user && <UserAnnouncementInfo user={result.user} />}
         </div>
+        {filteredUserListings?.length > 0  &&
         <div className="space-y-4">
-          <Separator className="mb-4  w-full bg-black"></Separator>
-          <span className="font-inter-500">
+          <Separator className="mb-4 mt-3 md:mt-0 w-full bg-black"></Separator>
+          <span className="font-inter-600">
             Outros anúncios desse comprador...
           </span>
           <div className="items-around flex flex-row flex-wrap ">
-            {Array.from({ length: 3 }).map(() => (
-              <div className="mr-2 max-w-[140px] md:max-w-[170px] ">
-                <Card className="mb-3 mr-1 border-2 border-headingSecondary bg-slate-50 md:mr-3 md:border-4">
-                  <CardContent className="text-md font-inter-500 flex h-full flex-col justify-center py-2 text-headingSecondary">
-                    <p>R$ 910.00</p>
-                    <p>catação 25% 18/17</p>
+            {filteredUserListings.map((listing, index) => (
+              <div key={index} className="mr-2 max-w-[140px] md:max-w-[170px] ">
+                <Card className="mb-3 mr-1 border-2 border-headingSecondary bg-slate-50 md:mr-3 md:border-3">
+                  <CardContent className="text-xs xl:text-ms font-inter-500 flex flex-col justify-top pt-1 pb-2 px-2.5 text-headingSecondary">
+                    <p className="mb-1 mt-1 lg:text-lg  font-poppins-700 lg:font-poppins-600">R$ {listing.price}</p>
+                    <p>{listing.name}</p>
                     <p></p>
                   </CardContent>
-                </Card>{" "}
+                </Card>
               </div>
             ))}
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );

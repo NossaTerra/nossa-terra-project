@@ -80,7 +80,7 @@ export function ProductSearchColumn({ className }: ClassNameProps) {
         <div className="h-4 w-full bg-gradient-to-b from-backgroundPrimary to-transparent" />
       </div>
 
-      <div className="flex pl-12 pr-8  w-full flex-col items-center gap-4  pb-20">
+      <div className="flex pl-12 pr-8  w-full flex-col items-center gap-4 pb-20">
         {filteredProducts.map((product) => (
           <ProductCard
             key={product.id}
