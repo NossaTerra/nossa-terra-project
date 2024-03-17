@@ -11,11 +11,10 @@ import {
   ArrowUpIcon,
   MapPinIcon,
   TimerIcon,
-  Link,
 } from "lucide-react";
 import { api } from "~/utils/api";
 import { Card, CardContent } from "~/components/ui/card";
-import { type Product } from "@prisma/client";
+import { type User, type Product } from "@prisma/client";
 import { Button } from "~/components/ui/button";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Separator } from "~/components/ui/separator";
@@ -25,6 +24,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { generateAvatarColor } from "~/utils/formHelpers";
 import { getDisplayTimeWithAgo } from "~/utils/time";
 import { PriceTag } from "~/components/common/PriceTag";
+import { type SearchResult } from "./search/types";
 
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -37,7 +37,7 @@ export default function SearchScreen({ user }: Props) {
     Array.isArray(router.query.product)
       ? router.query.product[0]
       : router.query.product,
-  );
+  ) as { data: SearchResult[] };
 
   useEffect(() => {
     // This resets scroll position on selectedProductId change,
@@ -106,9 +106,6 @@ export default function SearchScreen({ user }: Props) {
           </div>
         )}
       </div>
-
-      {/* <H2 className="px-8">Pesquisar Anúnciomt-2s</H2> */}
-
       {/* WORKAROUND */}
       {/* The 99.5svw is a hack because the width of the window scrollbar messes up the width */}
       {/* The absolute somehow fixes the position sticky, that's why it exists */}
@@ -135,7 +132,7 @@ export default function SearchScreen({ user }: Props) {
           )}
 
           <ProductSearchColumn
-            title=""
+            title="Pesquisa de Anúnicios"
             className={cn(
               "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
               user
@@ -169,12 +166,17 @@ function SelectedProductListingsColumn({
   searchResults,
   className,
   user,
-}: ClassNameProps & Props) {
+}: {
+  searchResults: SearchResult[];
+  className?: ClassNameProps | string;
+} & Props) {
   const router = useRouter();
   const selectedProductId = router.query.product;
   const { data: products } = api.product.getAll.useQuery();
   const product = products?.find((product) => product.id === selectedProductId);
-  const showLinkForFirstListing = searchResults?.length ===0 && !!user && user.role ==='buyer'
+  const showLinkForFirstListing =
+    searchResults?.length === 0 && !!user && user.role === "buyer";
+
   return (
     <div
       className={cn("sticky top-0 w-full", className)}
@@ -213,24 +215,31 @@ function SelectedProductListingsColumn({
           </Button>
           <div className="relative w-full rounded-xl md:p-8">
             <div className="mb-6  mr-2 mt-2 block max-w-[895px] rounded-lg bg-slate-100 p-4 lg:mr-8 ">
-              <span className="font-poppins-600 block  mb-2 ml-2 text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
+              <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
                 {searchResults?.length > 0
-                  ? "Resultados Para:"
+                  ? "Resultados Para Saca (60kg) de:"
                   : "Ainda não há anúncios na distância pesquisada para:"}
               </span>
               <span className="font-poppins-400 ml-2 mt-2 block pb-4 text-lg lg:text-xl">
                 {product.name}
               </span>
-              {showLinkForFirstListing && <Button variant="link" asChild className="ml-2 text-accent block font-poppins-700 text-xl p-0">
-                <a href={`/listings/new?product=${product.id}`}>Seja o primeiro a Anunciar</a>
-               </Button>}
+              {showLinkForFirstListing && (
+                <Button
+                  variant="link"
+                  asChild
+                  className="font-poppins-700 ml-2 block p-0 text-xl text-accent"
+                >
+                  <a href={`/listings/new?product=${product.id}`}>
+                    Seja o primeiro a Anunciar
+                  </a>
+                </Button>
+              )}
             </div>
             <div>
-              {searchResults?.map((result, index) => (
-                // <SearchResultCard product={product} className="mb-8" key={index} />
+              {searchResults?.map((searchResult, index) => (
                 <div className="mb-10 md:mr-7">
                   <SearchResultCard
-                    result={result}
+                    searchResult={searchResult}
                     product={product}
                     key={index}
                   />
@@ -244,12 +253,17 @@ function SelectedProductListingsColumn({
   );
 }
 
-function SearchResultCard({ result, product }: Props & Product) {
-  const listingTime = new Date(result.listing.updatedAt);
+function SearchResultCard({
+  searchResult,
+  product,
+}: {
+  searchResult: SearchResult;
+  product: Product;
+}) {
+  const listingTime = new Date(searchResult.listing.updatedAt);
   const timeString = getDisplayTimeWithAgo(listingTime);
 
-  console.log(result);
-  const filteredUserListings = result?.userListings?.filter(
+  const filteredUserListings = searchResult?.userListings?.filter(
     (listing) => listing.productId !== product.id,
   );
 
@@ -257,7 +271,10 @@ function SearchResultCard({ result, product }: Props & Product) {
     <div className="flex max-w-[880px] rounded-lg border-[2.3px] border-black pb-3 md:justify-center md:px-0 xl:pb-0 ">
       <div className="relative w-full px-4 pt-7">
         <div className="font-poppins-500 absolute right-3 top-3 flex rounded-md text-xl ">
-        <PriceTag value={Number(result.listing.price)} className="mt-2" />
+          <PriceTag
+            value={Number(searchResult.listing.price)}
+            className="mt-2"
+          />
         </div>
         <div className="font-poppins-500 absolute left-3 top-4 flex w-64 flex-row items-start rounded-md p-3 text-sm ">
           <TimerIcon className="mr-1 " size={18} /> {timeString}{" "}
@@ -266,12 +283,17 @@ function SearchResultCard({ result, product }: Props & Product) {
           <ProductCard
             small
             footer={
-              <PriceTag value={Number(result.listing.price)} className="mt-2" />
+              <PriceTag
+                value={Number(searchResult.listing.price)}
+                className="mt-2"
+              />
             }
             product={product}
             className="xl:w-10em mb-8"
           />
-          {!!result.user && <UserAnnouncementInfo user={result.user} />}
+          {!!searchResult.user && (
+            <UserAnnouncementInfo user={searchResult.user} />
+          )}
         </div>
         {filteredUserListings?.length > 0 && (
           <div className="space-y-4">
@@ -287,7 +309,11 @@ function SearchResultCard({ result, product }: Props & Product) {
                 >
                   <Card className="md:border-3 mb-3 mr-1 border-2 border-headingSecondary bg-slate-50 md:mr-3">
                     <CardContent className="xl:text-ms font-inter-500 justify-top flex flex-col px-2.5 pb-2 pt-1 text-xs text-headingSecondary">
-                      <PriceTag small value={Number(listing.price)} className="mt-2 opacity-80 mb-2" />
+                      <PriceTag
+                        small
+                        value={Number(listing.price)}
+                        className="mb-2 mt-2 opacity-80"
+                      />
                       <p>{listing.name}</p>
                     </CardContent>
                   </Card>
@@ -301,7 +327,7 @@ function SearchResultCard({ result, product }: Props & Product) {
   );
 }
 
-export function UserAnnouncementInfo({ user }: Props) {
+export function UserAnnouncementInfo({ user }: { user: User }) {
   const commonPhones = useMemo(() => {
     const phones: string[] = [];
 
@@ -326,7 +352,7 @@ export function UserAnnouncementInfo({ user }: Props) {
     if (user?.phoneUsesWhatsapp) {
       phones.push(user?.phone);
     }
-    if (user.secondaryPhone && user?.secondaryPhoneUsesWhatsapp) {
+    if (user?.secondaryPhone && user?.secondaryPhoneUsesWhatsapp) {
       phones.push(user.secondaryPhone);
     }
 
@@ -357,7 +383,7 @@ export function UserAnnouncementInfo({ user }: Props) {
       <div className="rounded-lg ">
         <div className="flex space-x-4 ">
           <div className="flex flex-col gap-2  capitalize md:pl-10">
-            <span className=" text-lg font-bold">{user.name}</span>
+            <span className=" text-lg font-bold">{user?.name}</span>
             <div className="flex">
               <MapPinIcon className="ml-1 mr-1 h-5 w-5 text-current md:ml-0" />
               <span className="ml-1.5 w-36 text-sm text-gray-500">
@@ -448,11 +474,13 @@ export function UserAnnouncementInfo({ user }: Props) {
               </div>
             )}
             <AvatarFallback
-              style={{ backgroundColor: `${generateAvatarColor(user.name)}` }}
+              style={{
+                backgroundColor: `${generateAvatarColor(user?.name ?? "")}`,
+              }}
               className={`flex aspect-[1/1] h-24 w-24 items-center justify-center rounded-full border border-slate-200 object-cover xl:h-28 xl:w-28 `}
             >
               <span className={`font-poppins-700 text-2xl text-white`}>
-                {user.name?.substring(0, 2).toLocaleUpperCase()}
+                {user?.name?.substring(0, 2).toLocaleUpperCase()}
               </span>
             </AvatarFallback>
           </Avatar>

@@ -4,12 +4,11 @@ import { type ChangeEventHandler, useCallback, useMemo, useState } from "react";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Input } from "~/components/ui/input";
 import { CheckboxProductType } from "~/components/ui/checkbox";
-import { H3 } from "~/components/ui/typography";
 import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType } from "@prisma/client";
 
-export function ProductSearchColumn({ className }: ClassNameProps) {
+export function ProductSearchColumn({ className, title }: ClassNameProps & { title: string }) {
   const router = useRouter();
   // TODO: maybe react to the loading state or make this query in server side rendering
   const { data: products } = api.product.getAll.useQuery();
@@ -51,7 +50,7 @@ export function ProductSearchColumn({ className }: ClassNameProps) {
       <div className="sticky top-0 z-10 w-full items-center">
         <div className="flex w-full justify-center  bg-backgroundPrimary">
           <div className="w-full max-w-[36em] md:pr-8  pb-8 pt-2">
-           <h1 className="text-2xl md:text-4xl ml-12 mb-6 md:mb-12 mt-4 font-bold">Pesquisa de anúncios</h1>
+           <h1 className="text-2xl md:text-4xl ml-12 mb-6 md:mb-12 mt-4 font-bold">{title}</h1>
             <div className="ml-12 relative">
               <SearchIcon className="absolute left-3 top-2" />{" "}
               <Input

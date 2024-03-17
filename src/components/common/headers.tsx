@@ -73,7 +73,7 @@ export function AppHeader({
   user,
   hideLogo = false,
 }: {
-  className?:ClassNameProps,
+  className?:ClassNameProps | string,
   user: User | null;
   hideLogo?: boolean;
 }) {
