@@ -13,7 +13,8 @@ module.exports = {
       center: true,
       padding: "2rem",
       screens: {
-        "2xl": "1400px",
+        "3xl":"1560px",
+        "2xl":"1400px",
       },
     },
     extend: {
@@ -93,7 +94,7 @@ module.exports = {
         "&::-webkit-scrollbar-track": {
           backgroundColor: "#f1f1f1",
           paddingTop: "100px",
-          marginBottom: "280px"
+          marginBottom: "265px"
         },
         "&::-webkit-scrollbar-thumb": {
           background: "#2a1d10",

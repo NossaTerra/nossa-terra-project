@@ -10,7 +10,7 @@ export default function ContactScreen({ user }: Props) {
     <>
       <AppHeader user={user} />
       <div className="p-10">
-        <h1 className="text-4xl font-bold">Contato</h1>
+        <h1 className="text-2xl md:text-4xl font-bold">Contato</h1>
       </div>
     </>
   );

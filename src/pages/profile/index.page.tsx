@@ -97,7 +97,7 @@ export function CurrentProfileCardScreen({
 }: Props & { onEditing: () => void }) {
   return (
     <>
-      <h1 className="text-4xl mt-10 font-bold">Meu Perfil</h1>
+      <h1 className="mt-10 text-2xl md:text-4xl font-bold">Meu Perfil</h1>
       <p className="mb-4 mt-6 text-lg">Seus anúncios aparecem assim...</p>
       <UserAnnouncementCard user={user} />
       <Button

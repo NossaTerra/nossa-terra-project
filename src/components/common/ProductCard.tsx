@@ -4,6 +4,7 @@ import Image from "next/image";
 import { cn } from "~/utils/ui";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  small?:boolean;
   product: Product;
   footer?: React.ReactNode;
   topRightElement?: React.ReactNode;
@@ -13,13 +14,15 @@ export function ProductCard({
   product,
   footer,
   topRightElement,
+  small,
   className,
   ...rest
 }: Props) {
   return (
     <div
       className={cn(
-        "bg-background relative flex min-h-20 w-[23em] overflow-hidden rounded-lg border-[2.5px] border-gray-800 p-4",
+        "bg-background relative flex min-h-20 overflow-hidden rounded-lg border-[2.5px] border-gray-800 p-4",
+        small? "w-[22em]" : "w-[23em]",
         className,
       )}
       {...rest}
@@ -33,18 +36,18 @@ export function ProductCard({
       <Image
         priority
         src={getProductImageSrc(product.type)}
-        height={90}
-        width={90}
+        height={small? 62: 90}
+        width={small? 62 : 90}
         alt="marca dágua do produto"
         className="absolute -bottom-4 -right-3 opacity-60"
       />
-      <div className="pl-6 pr-16">
+      <div className={ small? "pl-5 pr-4 mb-2" : "pl-6 pr-16"}>
         <p className="text-lg">{product.name}</p>
         {footer}
       </div>
 
       {topRightElement && (
-        <div className="right-2 top-2">{topRightElement}</div>
+        <div className={cn("right-2 top-2", small && "top-0 bg-slate-200 h-8 ml-3 pt-1 pl-1 px-1 rounded-md font-inter-600 text-md" )}>{topRightElement}</div>
       )}
     </div>
   );

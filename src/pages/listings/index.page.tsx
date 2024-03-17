@@ -38,7 +38,7 @@ export default function MyListingsScreen({ user }: Props) {
     <div>
       <AppHeader user={user} />
       <div className="px-10 pb-16">
-        <h1 className="text-4xl my-12 font-bold">Meus Anúncios</h1>
+        <h1 className="text-2xl md:text-4xl my-12 font-bold">Meus Anúncios</h1>
         <MyListingsDashboard className="mt-5" />
       </div>
     </div>

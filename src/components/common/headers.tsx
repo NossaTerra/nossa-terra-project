@@ -1,6 +1,7 @@
 import { type User } from "lucia";
 import { NossaTerraLogo } from "./NossaTerraLogo";
 import { type PropsWithChildren } from "react";
+import { type ClassNameProps, cn } from "~/utils/ui";
 import Link from "next/link";
 import {
   DollarSignIcon,
@@ -13,7 +14,6 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import { cn } from "~/utils/ui";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 
@@ -31,7 +31,7 @@ function NavItem({ href, label, icon }: NavItem) {
     <Link
       href={href}
       className={cn(
-        "flex flex-row justify-center items-center gap-2",
+        "flex w-full lg:w-auto flex-row justify-start items-center gap-2",
         "rounded-full",
         "font-poppins-600 border-textPrimary px-5 py-4 text-textPrimary",
         "hover:bg-slate-600 hover:bg-opacity-85 hover:text-slate-100 hover:opacity-100 hover:shadow-md",
@@ -57,7 +57,7 @@ function NavBar({ children }: PropsWithChildren) {
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="flex flex-col gap-4 py-16"
+          className="flex flex-col items-start gap-4 py-16"
           hideClose
           overlayClassName="bg-black/30"
         >
@@ -69,15 +69,17 @@ function NavBar({ children }: PropsWithChildren) {
 }
 
 export function AppHeader({
+  className,
   user,
   hideLogo = false,
 }: {
+  className?:ClassNameProps,
   user: User | null;
   hideLogo?: boolean;
 }) {
   if (!user) {
     return (
-      <div className={cn("flex items-center justify-end px-10 pb-7 pt-10", !hideLogo && "w-full")}>
+      <div className={cn("flex items-center justify-end px-10 pb-7 pt-10", !hideLogo && "w-full" , className)}>
         <Button variant="primary" size="lg" asChild>
           <Link href="/login">
             <UserIcon /> Entrar
@@ -89,7 +91,7 @@ export function AppHeader({
   }
 
   return (
-    <div className="flex  bg-cardHover bg-opacity-25 shadow mb-3 w-full items-center justify-between px-10 pb-7 pt-10">
+    <div className="flex bg-cardHover bg-opacity-25 shadow mb-3 w-full items-center justify-between px-10 pb-7 pt-10">
       <NavBar>
         <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         {user.role === "buyer" && (
