@@ -33,11 +33,18 @@ export default function SearchScreen({ user }: Props) {
   const router = useRouter();
   const selectedProductId = router.query.product;
 
-  const { data: searchResults } = api.search.getProductListings.useQuery(
-    Array.isArray(router.query.product)
+  const [distanceFilter, setDistanceFilter] = useState<number | undefined>(
+    undefined,
+  );
+
+  const { data: searchResults, isLoading } = api.search.getProductListings.useQuery({
+    productId: Array.isArray(router.query.product)
       ? router.query.product[0]
       : router.query.product,
-  ) as { data: SearchResult[] };
+      searchingUserLatitude: user?.latitude,
+      searchingUserLongitude: user?.longitude,
+      distanceFilter: distanceFilter,
+  }) as { data: SearchResult[] };
 
   useEffect(() => {
     // This resets scroll position on selectedProductId change,
@@ -133,6 +140,8 @@ export default function SearchScreen({ user }: Props) {
 
           <ProductSearchColumn
             title="Pesquisa de Anúnicios"
+            showSlider={!!user}
+            onSliderValueChange={setDistanceFilter}
             className={cn(
               "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
               user

@@ -4,6 +4,10 @@ import * as React from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 
 import { cn } from "src/utils/ui";
+import { useCallback, useState } from "react";
+import { brazilBiggestTwoPointsKmDistance } from "~/utils/constants";
+import { debounce } from "~/utils/debounce";
+
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -25,4 +29,73 @@ const Slider = React.forwardRef<
 ));
 Slider.displayName = SliderPrimitive.Root.displayName;
 
-export { Slider };
+const SearchSlider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
+    onValueChange?: (value: number | number[]) => void;
+  }
+>(({ className, onValueChange, ...props }, ref) => {
+  const [thumbPosition, setThumbPosition] = useState<number>(props.max ?? 1);
+
+  const kmDistanceFromUser = useCallback(
+    (newValue?: number) => {
+      if (newValue) {
+        return (
+          (newValue * brazilBiggestTwoPointsKmDistance) / (props?.max ?? 1)
+        );
+      }
+      return (
+        (thumbPosition * brazilBiggestTwoPointsKmDistance) / (props?.max ?? 1)
+      );
+    },
+    [thumbPosition, props?.max],
+  );
+  
+  const debouncedHandleValueChange = useCallback(
+    debounce((newValue: number[]) => {
+      if (newValue?.[0]) {
+        setThumbPosition(newValue?.[0]);
+      }
+      if (onValueChange && newValue?.[0]) {
+        onValueChange(kmDistanceFromUser(newValue[0]));
+      }
+    }, 500),
+    [onValueChange, kmDistanceFromUser],
+  );
+
+  const handleValueChange = useCallback(
+    (newValue: number[]) => {
+      debouncedHandleValueChange(newValue);
+    },
+    [debouncedHandleValueChange],
+  );
+
+  return (
+    <div className="flex w-full flex-col pb-2 pt-4 ">
+      <SliderPrimitive.Root
+        onValueChange={handleValueChange}
+        ref={ref}
+        className={cn(
+          "relative flex  w-full touch-none select-none items-center rounded-md bg-slate-200 pb-2 pt-4",
+          className,
+        )}
+        {...props}
+      >
+        <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-green-200 dark:bg-green-200">
+          <SliderPrimitive.Range className="absolute h-full bg-accent dark:bg-accent" />
+        </SliderPrimitive.Track>
+        <SliderPrimitive.Thumb className="dark:headingSecondary block h-5 w-5 rounded-full border-2 border-green-900 bg-headingSecondary ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-900 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:bg-green-700 dark:ring-offset-green-700 dark:focus-visible:ring-green-300" />{" "}
+      </SliderPrimitive.Root>
+      <span className="ml-auto mt-3">
+        {" "}
+        {thumbPosition === props.max
+          ? "Mostrar Resultados para todo Brasil"
+          : `Mostrar Resultados até ${kmDistanceFromUser()} km de mim`}
+      </span>
+    </div>
+  );
+});
+
+Slider.displayName = SliderPrimitive.Root.displayName;
+
+export { Slider, SearchSlider };
