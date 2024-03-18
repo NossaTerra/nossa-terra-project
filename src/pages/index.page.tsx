@@ -37,14 +37,15 @@ export default function SearchScreen({ user }: Props) {
     undefined,
   );
 
-  const { data: searchResults, isLoading } = api.search.getProductListings.useQuery({
-    productId: Array.isArray(router.query.product)
-      ? router.query.product[0]
-      : router.query.product,
+  const { data: searchResults, isLoading } =
+    api.search.getProductListings.useQuery({
+      productId: Array.isArray(router.query.product)
+        ? router.query.product[0]
+        : router.query.product,
       searchingUserLatitude: user?.latitude,
       searchingUserLongitude: user?.longitude,
       distanceFilter: distanceFilter,
-  }) as { data: SearchResult[] };
+    }) as { data: SearchResult[], isLoading: boolean };
 
   useEffect(() => {
     // This resets scroll position on selectedProductId change,
@@ -55,6 +56,7 @@ export default function SearchScreen({ user }: Props) {
   const [showTopButton, setShowTopButton] = useState(false);
 
   useEffect(() => {
+    //logic to show the top button on small screens
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       setShowTopButton(scrollTop > 100);
@@ -155,6 +157,7 @@ export default function SearchScreen({ user }: Props) {
         </>
         <SelectedProductListingsColumn
           searchResults={searchResults}
+          isLoading={isLoading}
           user={user}
           className={cn(
             "sticky top-0 px-3 pb-16 md:px-10 lg:h-svh lg:overflow-y-auto lg:pb-[170px] lg:scrollbar-webkit",
@@ -175,9 +178,11 @@ function SelectedProductListingsColumn({
   searchResults,
   className,
   user,
+  isLoading,
 }: {
   searchResults: SearchResult[];
   className?: ClassNameProps | string;
+  isLoading?: boolean;
 } & Props) {
   const router = useRouter();
   const selectedProductId = router.query.product;
@@ -193,7 +198,8 @@ function SelectedProductListingsColumn({
       // cus key changes forces React to rerender the component
       key={product?.id}
     >
-      {!product && (
+
+      {!product && !isLoading &&(
         <div className="flex h-full w-full">
           <div className="flex flex-row items-center gap-8 text-3xl">
             <ArrowLeftIcon size={30} />
@@ -202,7 +208,7 @@ function SelectedProductListingsColumn({
         </div>
       )}
 
-      {product && (
+      {product && !isLoading &&(
         <div className="flex flex-col items-end">
           <Button
             variant="ghost"
@@ -249,6 +255,7 @@ function SelectedProductListingsColumn({
                 <div className="mb-10 md:mr-7">
                   <SearchResultCard
                     searchResult={searchResult}
+                    showBlured={!user}
                     product={product}
                     key={index}
                   />
@@ -265,9 +272,11 @@ function SelectedProductListingsColumn({
 function SearchResultCard({
   searchResult,
   product,
+  showBlured,
 }: {
   searchResult: SearchResult;
   product: Product;
+  showBlured: boolean;
 }) {
   const listingTime = new Date(searchResult.listing.updatedAt);
   const timeString = getDisplayTimeWithAgo(listingTime);
@@ -301,7 +310,10 @@ function SearchResultCard({
             className="xl:w-10em mb-8"
           />
           {!!searchResult.user && (
-            <UserAnnouncementInfo user={searchResult.user} />
+            <UserAnnouncementInfo
+              showBlured={showBlured}
+              user={searchResult.user}
+            />
           )}
         </div>
         {filteredUserListings?.length > 0 && (
@@ -336,7 +348,13 @@ function SearchResultCard({
   );
 }
 
-export function UserAnnouncementInfo({ user }: { user: User }) {
+export function UserAnnouncementInfo({
+  user,
+  showBlured,
+}: {
+  user: User;
+  showBlured: boolean;
+}) {
   const commonPhones = useMemo(() => {
     const phones: string[] = [];
 
@@ -388,9 +406,14 @@ export function UserAnnouncementInfo({ user }: { user: User }) {
   };
 
   return (
-    <div className="md:max-w-2xl">
-      <div className="rounded-lg ">
-        <div className="flex space-x-4 ">
+    <div className={cn("md:max-w-2xl")}>
+      <div className="relative rounded-lg ">
+        {showBlured && (
+          <span className="font-poppins-600 absolute left-16 top-14 z-10 text-xl">
+            Entre para ver detalhes
+          </span>
+        )}
+        <div className={cn("flex space-x-4", showBlured && "blur")}>
           <div className="flex flex-col gap-2  capitalize md:pl-10">
             <span className=" text-lg font-bold">{user?.name}</span>
             <div className="flex">
@@ -429,7 +452,7 @@ export function UserAnnouncementInfo({ user }: { user: User }) {
                   width={22}
                   alt="Phone Icon"
                 />
-                <div className="ml-2 flex flex-col">
+                <div className="ml-2.5 flex flex-col md:ml-4">
                   {whatsAppPhones.map((phone, index) => (
                     <button
                       onClick={() => {
@@ -473,12 +496,12 @@ export function UserAnnouncementInfo({ user }: { user: User }) {
               </div>
             )}
           </div>
-          <Avatar className="mt-5 flex">
+          <Avatar className="mt-5 flex aspect-[1/1] h-24 w-24 items-center justify-center xl:h-28 xl:w-28">
             {user?.avatarImage && (
-              <div className="flex aspect-[1/1] h-24 w-24 items-center justify-center xl:h-28 xl:w-28  ">
+              <div className="flex ">
                 <AvatarImage
                   className="rounded-full object-cover "
-                  src={user?.avatarImage}
+                  src={showBlured ? undefined : user?.avatarImage}
                 />
               </div>
             )}
@@ -486,7 +509,7 @@ export function UserAnnouncementInfo({ user }: { user: User }) {
               style={{
                 backgroundColor: `${generateAvatarColor(user?.name ?? "")}`,
               }}
-              className={`flex aspect-[1/1] h-24 w-24 items-center justify-center rounded-full border border-slate-200 object-cover xl:h-28 xl:w-28 `}
+              className={`flex h-24 w-24 items-center justify-center rounded-full border border-slate-200 object-cover xl:h-28 xl:w-28 `}
             >
               <span className={`font-poppins-700 text-2xl text-white`}>
                 {user?.name?.substring(0, 2).toLocaleUpperCase()}

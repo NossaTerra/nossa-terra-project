@@ -47,6 +47,8 @@ export const searchRouter = createTRPCRouter({
         searchingUserLatitude: z.number().optional(),
         searchingUserLongitude: z.number().optional(),
         distanceFilter: z.number().optional(),
+        pageNumber: z.number().optional(),
+        pageSize: z.number().optional(),
       }),
     )
     .query(
@@ -56,6 +58,8 @@ export const searchRouter = createTRPCRouter({
           searchingUserLatitude,
           searchingUserLongitude,
           distanceFilter,
+          pageNumber = 1,
+          pageSize = 205,
         },
         ctx: { db },
       }) => {
@@ -64,7 +68,13 @@ export const searchRouter = createTRPCRouter({
         }
         const product = await db.product.findUnique({
           where: { id: productId },
-          include: { listings: true }, // Include all listings directly
+          include: {
+            listings: {
+              take: pageSize,
+              skip: (pageNumber - 1) * pageSize,
+              orderBy: { price: 'desc' }
+            },
+          },
         });
 
         if (!product) {
@@ -87,7 +97,7 @@ export const searchRouter = createTRPCRouter({
           // Fetch all listings of the user associated with the current listing
           const userListings = await db.user.findUnique({
             where: { id: listing.userId },
-            include: { listings: { include: { product: true } } }, // Include product information for each listing
+            include: { listings: { include: { product: true }} }, 
           });
 
           const shouldFilterByDistance =
@@ -96,8 +106,8 @@ export const searchRouter = createTRPCRouter({
           !!distanceFilter &&
           !!user.latitude &&
           !!user.longitude;
-          
           let withinDistance = true;
+
           if (shouldFilterByDistance) {
             withinDistance = isWithinDistance(
               searchingUserLatitude,
@@ -121,12 +131,6 @@ export const searchRouter = createTRPCRouter({
             });
           }
         }
-        // Sort the result array by descending listing prices
-        result.sort((a, b) => {
-          const priceA = parseFloat(a.listing.price.toString());
-          const priceB = parseFloat(b.listing.price.toString());
-          return priceB - priceA;
-        });
 
         return result;
       },
