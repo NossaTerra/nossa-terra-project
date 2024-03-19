@@ -14,7 +14,7 @@ export function ProductSearchColumn({
   title,
   showSlider = false,
   onSliderValueChange
-}: ClassNameProps & { title: string; showSlider?: boolean, onSliderValueChange?: (value: number | number[]) => void; }) {
+}: ClassNameProps & { title: string; showSlider?: boolean, onSliderValueChange?: (((value: number[]) => void) & ((value: number) => void)) | undefined; }) {
   const router = useRouter();
   // TODO: maybe react to the loading state or make this query in server side rendering
   const { data: products } = api.product.getAll.useQuery();
@@ -82,7 +82,7 @@ export function ProductSearchColumn({
             </div>
             {showSlider && (
               <div className="ml-12 mt-4 flex items-center justify-center rounded-md px-2 pt-6">
-                <SearchSlider
+              <SearchSlider
                   onValueChange={onSliderValueChange}
                   className="m-0 p-0"
                   defaultValue={[200]}

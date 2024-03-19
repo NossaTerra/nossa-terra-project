@@ -32,7 +32,7 @@ Slider.displayName = SliderPrimitive.Root.displayName;
 const SearchSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
-    onValueChange?: (value: number | number[]) => void;
+    onValueChange?: (value: number ) => void;
   }
 >(({ className, onValueChange, ...props }, ref) => {
   const [thumbPosition, setThumbPosition] = useState<number>(props.max ?? 1);

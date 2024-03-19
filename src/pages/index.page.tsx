@@ -18,13 +18,16 @@ import { type User, type Product } from "@prisma/client";
 import { Button } from "~/components/ui/button";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Separator } from "~/components/ui/separator";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { animateScrollToTop } from "~/utils/scroll";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { generateAvatarColor } from "~/utils/formHelpers";
 import { getDisplayTimeWithAgo } from "~/utils/time";
 import { PriceTag } from "~/components/common/PriceTag";
 import { type SearchResult } from "./search/types";
+import BounceLoader from "react-spinners/BounceLoader";
+import { type InfiniteQueryObserverResult } from '@tanstack/react-query'
+
 
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -37,15 +40,30 @@ export default function SearchScreen({ user }: Props) {
     undefined,
   );
 
-  const { data: searchResults, isLoading } =
-    api.search.getProductListings.useQuery({
-      productId: Array.isArray(router.query.product)
-        ? router.query.product[0]
-        : router.query.product,
-      searchingUserLatitude: user?.latitude,
-      searchingUserLongitude: user?.longitude,
-      distanceFilter: distanceFilter,
-    }) as { data: SearchResult[], isLoading: boolean };
+  const { data, fetchNextPage, isFetching, hasNextPage, isLoading } =
+    api.search.getProductListings.useInfiniteQuery(
+      {
+        productId: Array.isArray(router.query.product)
+          ? router.query.product[0]
+          : router.query.product,
+        searchingUserLatitude: user?.latitude,
+        searchingUserLongitude: user?.longitude,
+        distanceFilter: distanceFilter,
+        limit: 5,
+      },
+      {
+        getNextPageParam: (lastPage) => {
+          if (lastPage?.nextCursor) {
+            return lastPage.nextCursor;
+          } else {
+            return undefined;
+          }
+        },
+        refetchOnMount: false,
+      },
+    );
+
+  const searchResults = data?.pages.flatMap((page) => page?.searchResults ?? []).filter((result) => result !== undefined) ?? [];
 
   useEffect(() => {
     // This resets scroll position on selectedProductId change,
@@ -54,18 +72,37 @@ export default function SearchScreen({ user }: Props) {
   }, [selectedProductId]);
 
   const [showTopButton, setShowTopButton] = useState(false);
+  const shouldFetchNextPage = hasNextPage && !isFetching;
+
+  const handleSliderValueChange = useCallback((value: number[] | number | undefined) => {
+    if (Array.isArray(value)) {
+      setDistanceFilter(value[0]);
+    } else {
+      setDistanceFilter(value);
+    }
+  }, []);
 
   useEffect(() => {
     //logic to show the top button on small screens
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       setShowTopButton(scrollTop > 100);
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+
+      const scrolled = (winScroll / height) * 100;
+      if (scrolled > 80 && hasNextPage && !isFetching) {
+        void fetchNextPage();
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [fetchNextPage, hasNextPage, isFetching]);
 
   return (
     <>
@@ -143,7 +180,7 @@ export default function SearchScreen({ user }: Props) {
           <ProductSearchColumn
             title="Pesquisa de Anúnicios"
             showSlider={!!user}
-            onSliderValueChange={setDistanceFilter}
+            onSliderValueChange={((value)=>handleSliderValueChange(value))}
             className={cn(
               "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
               user
@@ -157,6 +194,9 @@ export default function SearchScreen({ user }: Props) {
         </>
         <SelectedProductListingsColumn
           searchResults={searchResults}
+          shouldFetchNextPage={shouldFetchNextPage}
+          fetchNextPage={fetchNextPage}
+          hasNextPage={hasNextPage}
           isLoading={isLoading}
           user={user}
           className={cn(
@@ -179,10 +219,17 @@ function SelectedProductListingsColumn({
   className,
   user,
   isLoading,
+  fetchNextPage,
+  shouldFetchNextPage,
+  hasNextPage,
 }: {
-  searchResults: SearchResult[];
+  searchResults?: SearchResult[];
   className?: ClassNameProps | string;
   isLoading?: boolean;
+  shouldFetchNextPage?: boolean;
+  fetchNextPage?: () => Promise<unknown>;
+
+  hasNextPage?: boolean;
 } & Props) {
   const router = useRouter();
   const selectedProductId = router.query.product;
@@ -191,15 +238,28 @@ function SelectedProductListingsColumn({
   const showLinkForFirstListing =
     searchResults?.length === 0 && !!user && user.role === "buyer";
 
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLElement>) => {
+      const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+      if (
+        scrollHeight - scrollTop <= 1.3 * clientHeight &&
+        shouldFetchNextPage && fetchNextPage
+      ) {
+        void fetchNextPage();
+      }
+    },
+    [fetchNextPage, shouldFetchNextPage],
+  );
+
   return (
     <div
+      onScroll={handleScroll}
       className={cn("sticky top-0 w-full", className)}
       // This resets scroll position on key change,
       // cus key changes forces React to rerender the component
       key={product?.id}
     >
-
-      {!product && !isLoading &&(
+      {!product && (
         <div className="flex h-full w-full">
           <div className="flex flex-row items-center gap-8 text-3xl">
             <ArrowLeftIcon size={30} />
@@ -208,7 +268,7 @@ function SelectedProductListingsColumn({
         </div>
       )}
 
-      {product && !isLoading &&(
+      {product && !isLoading && (
         <div className="flex flex-col items-end">
           <Button
             variant="ghost"
@@ -226,14 +286,14 @@ function SelectedProductListingsColumn({
           >
             <XIcon className="hidden lg:block" />
             <ArrowLeftIcon className="lg:hidden" size={22} />
-            <span className="pr-2 lg:hidden">VOLTAR</span>
+            <span className="pr-2 lg:hidden">LISTA DE PRODUTOS</span>
           </Button>
           <div className="relative w-full rounded-xl md:p-8">
             <div className="mb-6  mr-2 mt-2 block max-w-[895px] rounded-lg bg-slate-100 p-4 lg:mr-8 ">
               <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
-                {searchResults?.length > 0
+                {!!searchResults && searchResults?.length > 0
                   ? "Resultados Para Saca (60kg) de:"
-                  : "Ainda não há anúncios na distância pesquisada para:"}
+                  : "Ainda não há anúncios para distância pesquisada para:"}
               </span>
               <span className="font-poppins-400 ml-2 mt-2 block pb-4 text-lg lg:text-xl">
                 {product.name}
@@ -261,6 +321,20 @@ function SelectedProductListingsColumn({
                   />
                 </div>
               ))}
+              {!!searchResults && searchResults?.length > 0 && hasNextPage && (
+                <div className="mt-4 flex items-center w-full justify-center ">
+                  <span className="font-poppins-800 mr-2 text-accent  lg:mr-6">
+                    {" "}
+                    Carregando mais resultados ...{" "}
+                  </span>
+                  <BounceLoader
+                    color={"#3cb37e"}
+                    loading={true}
+                    size={50}
+                    aria-label="Carregando"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -278,7 +352,7 @@ function SearchResultCard({
   product: Product;
   showBlured: boolean;
 }) {
-  const listingTime = new Date(searchResult.listing.updatedAt);
+  const listingTime = new Date(searchResult?.listing?.updatedAt ?? '');
   const timeString = getDisplayTimeWithAgo(listingTime);
 
   const filteredUserListings = searchResult?.userListings?.filter(
@@ -290,7 +364,7 @@ function SearchResultCard({
       <div className="relative w-full px-4 pt-7">
         <div className="font-poppins-500 absolute right-3 top-3 flex rounded-md text-xl ">
           <PriceTag
-            value={Number(searchResult.listing.price)}
+            value={Number(searchResult?.listing?.price)}
             className="mt-2"
           />
         </div>
@@ -302,7 +376,7 @@ function SearchResultCard({
             small
             footer={
               <PriceTag
-                value={Number(searchResult.listing.price)}
+                value={Number(searchResult?.listing?.price)}
                 className="mt-2"
               />
             }
@@ -316,14 +390,14 @@ function SearchResultCard({
             />
           )}
         </div>
-        {filteredUserListings?.length > 0 && (
+        {!!filteredUserListings && filteredUserListings?.length > 0 && (
           <div className="space-y-4">
             <Separator className="mb-4 mt-3 w-full bg-black md:mt-0"></Separator>
             <span className="font-inter-600">
               Outros anúncios desse comprador...
             </span>
             <div className="items-around flex flex-row flex-wrap ">
-              {filteredUserListings.map((listing, index) => (
+              {filteredUserListings?.map((listing, index) => (
                 <div
                   key={index}
                   className="mr-2 max-w-[140px] md:max-w-[170px] "
@@ -392,8 +466,8 @@ export function UserAnnouncementInfo({
   ]);
 
   const openWhatsApp = (phoneNumber: string | undefined) => {
-    const url = `https://wa.me/55${+phoneNumber.replace(/[\s()-]/g, "")}`;
     if (!!phoneNumber) {
+      const url = `https://wa.me/55${+phoneNumber.replace(/[\s()-]/g, "")}`;
       window.open(url, "_blank");
     }
   };

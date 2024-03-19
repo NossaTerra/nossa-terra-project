@@ -47,8 +47,8 @@ export const searchRouter = createTRPCRouter({
         searchingUserLatitude: z.number().optional(),
         searchingUserLongitude: z.number().optional(),
         distanceFilter: z.number().optional(),
-        pageNumber: z.number().optional(),
-        pageSize: z.number().optional(),
+        cursor: z.string().nullish(),
+        limit: z.number().min(1).max(100).default(10),
       }),
     )
     .query(
@@ -58,20 +58,21 @@ export const searchRouter = createTRPCRouter({
           searchingUserLatitude,
           searchingUserLongitude,
           distanceFilter,
-          pageNumber = 1,
-          pageSize = 205,
+          cursor,
+          limit,
         },
         ctx: { db },
       }) => {
         if (!productId) {
           return null;
         }
+
         const product = await db.product.findUnique({
           where: { id: productId },
           include: {
             listings: {
-              take: pageSize,
-              skip: (pageNumber - 1) * pageSize,
+              take: limit + 1,
+              cursor: cursor ? { id: cursor } : undefined,
               orderBy: { price: 'desc' }
             },
           },
@@ -82,7 +83,15 @@ export const searchRouter = createTRPCRouter({
         }
 
         // Custom object to store the result
-        const result = [];
+        const searchResults = [];
+        
+        let nextCursor: typeof cursor | undefined = undefined;
+
+        if (product.listings.length>0 && product.listings.length > limit) {
+          //CHeck this later
+          const nextItem = product.listings.pop()!;
+          nextCursor = nextItem.id;
+        }
 
         for (const listing of product.listings) {
           // Fetch the user associated with the current listing
@@ -120,7 +129,7 @@ export const searchRouter = createTRPCRouter({
 
           // Add the current listing, user, and all the other listings of the user
           if (withinDistance) {
-            result.push({
+            searchResults.push({
               listing: listing,
               user: user,
               userListings: userListings?.listings.map((userListing) => ({
@@ -132,7 +141,28 @@ export const searchRouter = createTRPCRouter({
           }
         }
 
-        return result;
+        return {searchResults, nextCursor };
       },
     ),
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
