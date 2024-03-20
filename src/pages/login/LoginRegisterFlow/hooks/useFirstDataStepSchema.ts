@@ -16,7 +16,8 @@ export function useFirstDataStepSchema(role?: ChosenRole) {
         .object({
           name: z
             .string({ required_error: "Você deve inserir o nome" })
-            .min(3, { message: "Nome com ao menos 3 caracte" }),
+            .min(3, { message: "Nome com ao menos 3 caracteres" })
+            .max(120, { message: "Nome deve ter no máximo 120 caracteres" }),
           cpf: z
             .string({
               required_error: "Você deve inserir um CPF ou CNPJ válido",
