@@ -275,9 +275,6 @@ function SelectedProductListingsColumn({
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLElement>) => {
       const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-      console.log("scrollTop", scrollTop);
-      console.log("clientHeight", clientHeight);
-      console.log("scrollHeight", scrollHeight);
       if (
         scrollHeight - scrollTop <= 1.3 * clientHeight &&
         shouldFetchNextPage
