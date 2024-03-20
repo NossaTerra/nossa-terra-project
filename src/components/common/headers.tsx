@@ -25,7 +25,8 @@ interface NavItem {
 
 function NavItem({ href, label, icon }: NavItem) {
   const { pathname } = useRouter();
-  const isSelected = pathname === href;
+  const isSelected =
+    href === "/" ? pathname === href : pathname.startsWith(href);
 
   return (
     <Link
