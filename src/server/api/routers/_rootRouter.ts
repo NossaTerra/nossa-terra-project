@@ -5,6 +5,7 @@ import { forgetPasswordRouter } from "./forgetPasswordRouter";
 import { backofficeRouter } from "./backofficeRouter";
 import { productRouter } from "./productRouter";
 import { listingRouter } from "./listingRouter";
+import { searchRouter } from "./searchRouter";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -12,6 +13,7 @@ export const appRouter = createTRPCRouter({
   forgetPassword: forgetPasswordRouter,
   backoffice: backofficeRouter,
   product: productRouter,
+  search: searchRouter,
   listing: listingRouter,
 });
 
