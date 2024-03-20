@@ -38,7 +38,7 @@ export default function MyListingsScreen({ user }: Props) {
     <div>
       <AppHeader user={user} />
       <div className="px-10 pb-16">
-        <H1>Meus Anúncios</H1>
+        <h1 className="my-12 text-2xl font-bold md:text-4xl">Meus Anúncios</h1>
         <MyListingsDashboard className="mt-5" />
       </div>
     </div>
@@ -190,14 +190,14 @@ function EmptyStateNoListings({ className }: ClassNameProps) {
         })}
       </div>
 
-      <div className="flex flex-1 flex-col justify-between pl-20">
-        <H2 className="py-4 font-medium">Crie aqui seu primeiro anúncio</H2>
+      <div className="flex flex-1 flex-col justify-between pl-16 md:pl-20">
+        <H2 className="py-4 font-medium ">Crie aqui seu primeiro anúncio</H2>
 
         <Button
           asChild
           variant="primary"
           size="lg"
-          className="mb-4 mt-4 text-xl"
+          className=" text-md mb-4 mt-4 px-4 md:px-6 md:text-xl"
         >
           <Link href="/listings/new" className="flex w-fit items-center gap-2">
             <PlusIcon size={20} /> Novo Anúncio
