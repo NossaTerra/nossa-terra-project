@@ -34,9 +34,11 @@ type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 export default function SearchScreen({ user }: Props) {
   const router = useRouter();
   const selectedProductId = router.query.product;
-  const [distanceFilter, setDistanceFilter] = useState<number | undefined>(
-    undefined,
-  );
+  const distanceQuery = Array.isArray(router.query.distance)
+    ? router.query.distance[0]
+    : router.query.distance;
+  const distanceFilter =
+    distanceQuery !== undefined ? parseFloat(distanceQuery) : undefined;
 
   const { data, fetchNextPage, isFetching, hasNextPage, isLoading } =
     api.search.getProductListings.useInfiniteQuery(
@@ -100,12 +102,26 @@ export default function SearchScreen({ user }: Props) {
   const handleSliderValueChange = useCallback(
     (value: number[] | number | undefined) => {
       if (Array.isArray(value)) {
-        setDistanceFilter(value[0]);
+        void router.push(
+          {
+            pathname: router.pathname,
+            query: { product: selectedProductId, distance: value[0] },
+          },
+          undefined,
+          { shallow: true },
+        );
       } else {
-        setDistanceFilter(value);
+        void router.push(
+          {
+            pathname: router.pathname,
+            query: { product: selectedProductId, distance: value },
+          },
+          undefined,
+          { shallow: true },
+        );
       }
     },
-    [],
+    [router, selectedProductId],
   );
 
   /*Small screens just use the default scroll mechanism this useEffect adds
@@ -212,6 +228,7 @@ export default function SearchScreen({ user }: Props) {
             title="Pesquisa de Anúnicios"
             showSlider={!!user}
             onSliderValueChange={(value) => handleSliderValueChange(value)}
+            sliderInitialValue={distanceFilter}
             className={cn(
               "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
               user

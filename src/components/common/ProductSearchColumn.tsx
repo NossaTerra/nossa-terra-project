@@ -8,15 +8,20 @@ import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType } from "@prisma/client";
 import { SearchSlider } from "../ui/slider";
+import { biggestTwoPointsKmDistanceInBrazil } from "~/utils/constants";
+
+const maxSliderValue = 200
 
 export function ProductSearchColumn({
   className,
   title,
   showSlider = false,
+  sliderInitialValue,
   onSliderValueChange,
 }: ClassNameProps & {
   title: string;
   showSlider?: boolean;
+  sliderInitialValue?: number;
   onSliderValueChange?:
     | (((value: number[]) => void) & ((value: number) => void))
     | undefined;
@@ -55,6 +60,10 @@ export function ProductSearchColumn({
       );
   }, [noProductTypeFilterSelected, productTypeFilter, products, searchString]);
 
+  const sliderDefaultValue = sliderInitialValue
+    ? (sliderInitialValue / biggestTwoPointsKmDistanceInBrazil) * maxSliderValue
+    : maxSliderValue;
+
   return (
     <div className={cn("flex flex-col items-center  pr-8", className)}>
       <div className="sticky top-0 z-10 w-full items-center">
@@ -91,8 +100,8 @@ export function ProductSearchColumn({
                 <SearchSlider
                   onValueChange={onSliderValueChange}
                   className="m-0 p-0"
-                  defaultValue={[200]}
-                  max={200}
+                  defaultValue={[sliderDefaultValue]}
+                  max={maxSliderValue}
                   step={1}
                 />
               </div>

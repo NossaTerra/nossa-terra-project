@@ -34,7 +34,7 @@ const SearchSlider = React.forwardRef<
     onValueChange?: (value: number) => void;
   }
 >(({ className, onValueChange, ...props }, ref) => {
-  const [thumbPosition, setThumbPosition] = useState<number>(props.max ?? 1);
+  const [thumbPosition, setThumbPosition] = useState<number>(props?.defaultValue?.[0] ?? props.max ?? 1);
 
   const kmDistanceFromUser = useCallback(
     (newValue?: number) => {
