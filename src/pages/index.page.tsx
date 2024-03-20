@@ -26,6 +26,7 @@ import { getDisplayTimeWithAgo } from "~/utils/time";
 import { PriceTag } from "~/components/common/PriceTag";
 import { type SearchResult } from "./search/types";
 import BounceLoader from "react-spinners/BounceLoader";
+import SearchCardShimmer from "./search/SearchCardShimmer";
 
 const pageLimit = 10;
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
@@ -317,7 +318,11 @@ function SelectedProductListingsColumn({
       // cus key changes forces React to rerender the component
       key={product?.id}
     >
-      {!product && (
+      {isLoading &&
+        Array.from({ length: 4 }).map((_, index) => (
+          <SearchCardShimmer key={index} />
+        ))}
+      {!product && !isLoading && (
         <div className="flex h-full w-full">
           <div className="flex flex-row items-center gap-8 text-3xl">
             <ArrowLeftIcon size={30} />
