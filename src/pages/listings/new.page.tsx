@@ -47,6 +47,7 @@ function ListingCreationFlow() {
 
       <div className="flex flex-row">
         <ProductSearchColumn
+          title="Pesquisa de Produtos"
           className={cn("w-full lg:w-[56em]", {
             "hidden lg:block": selectedProductId,
           })}
