@@ -38,10 +38,12 @@ function useEditListingSchema() {
 export type ListingFormData = z.infer<ReturnType<typeof useEditListingSchema>>;
 
 export function EditListingForm({
+  isLoading,
   listing,
   product,
   onSuccess,
 }: {
+  isLoading: boolean;
   listing?: MyListing;
   product: Product;
   onSuccess?: (data: ListingFormData) => void;
@@ -112,7 +114,12 @@ export function EditListingForm({
             )}
           />
 
-          <Button variant="primary" className="mt-8 w-full" type="submit">
+          <Button
+            isLoading={isLoading}
+            variant="primary"
+            className="mt-8 w-full"
+            type="submit"
+          >
             Confirmar
           </Button>
         </div>

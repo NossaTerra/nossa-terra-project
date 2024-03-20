@@ -11,6 +11,7 @@ import { PlusIcon } from "lucide-react";
 import { getProductImageSrc } from "~/server/types/product.type";
 import { ListingCard } from "./ListingCard";
 import { ProductType } from "@prisma/client";
+import MyListingsCardShimmer from "./MyListingsCardShimmer";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -126,12 +127,20 @@ function MyListingsDashboard({ className }: ClassNameProps) {
           <PlusIcon size={20} /> Novo Anúncio
         </Link>
       </Button>
-
-      <div className="mt-8 flex flex-wrap gap-8">
-        {myListings?.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
-        ))}
-      </div>
+      {!isLoading && (
+        <div className="mt-8 flex flex-wrap gap-8">
+          {myListings?.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
+      )}
+      {isLoading && (
+        <div className="mt-4 flex w-full flex-row flex-wrap gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <MyListingsCardShimmer key={index} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

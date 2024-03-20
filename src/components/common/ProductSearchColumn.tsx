@@ -9,8 +9,10 @@ import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType } from "@prisma/client";
 import { SearchSlider } from "../ui/slider";
 import { biggestTwoPointsKmDistanceInBrazil } from "~/utils/constants";
+import SearchCardShimmer from "~/components/common/ProductSearchShimmer";
+import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
 
-const maxSliderValue = 200
+const maxSliderValue = 200;
 
 export function ProductSearchColumn({
   className,
@@ -28,7 +30,7 @@ export function ProductSearchColumn({
 }) {
   const router = useRouter();
   // TODO: maybe react to the loading state or make this query in server side rendering
-  const { data: products } = api.product.getAll.useQuery();
+  const { data: products, isLoading } = api.product.getAll.useQuery();
   const [searchString, setSearchString] = useState("");
   const onInputChange: ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
@@ -111,6 +113,10 @@ export function ProductSearchColumn({
         <div className="h-4 w-full bg-gradient-to-b from-backgroundPrimary to-transparent" />
       </div>
       <div className="flex w-full flex-col  items-center gap-4 pb-20 pl-12 pr-8">
+        {isLoading &&
+          Array.from({ length: 4 }).map((_, index) => (
+            <ProductSearchShimmer key={index} />
+          ))}
         {filteredProducts.map((product) => (
           <ProductCard
             key={product.id}
