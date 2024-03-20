@@ -69,7 +69,7 @@ model User {
     city          String
     province      String
     street        String?
-    district  String?
+    district      String?
     streetNumber  String?
     complementary String?
     latitude      Float?
@@ -136,6 +136,7 @@ model Listing {
 
     updatedAt DateTime @updatedAt
 
+    @@unique([userId, productId])
     @@index([userId])
     @@index([productId])
 }

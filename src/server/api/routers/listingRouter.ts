@@ -14,8 +14,17 @@ export const listingRouter = createTRPCRouter({
   createListing: buyerOnlyProcedure
     .input(z.object({ price: z.number(), productId: z.string() }))
     .mutation(({ input: { price, productId }, ctx: { db, user } }) => {
-      return db.listing.create({
-        data: {
+      return db.listing.upsert({
+        where: {
+          userId_productId: {
+            userId: user.id,
+            productId,
+          },
+        },
+        update: {
+          price,
+        },
+        create: {
           price,
           productId,
           userId: user.id,
@@ -40,8 +49,8 @@ export const listingRouter = createTRPCRouter({
       });
     }),
 
-  getMyListings: buyerOnlyProcedure.query(async ({ ctx: { db, user } }) => {
-    const myListings = await db.listing.findMany({
+  getMyListings: buyerOnlyProcedure.query(({ ctx: { db, user } }) => {
+    return db.listing.findMany({
       where: {
         userId: user.id,
       },
@@ -49,31 +58,5 @@ export const listingRouter = createTRPCRouter({
         product: true,
       },
     });
-
-    type MyListing = (typeof myListings)[number];
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-    const mostRecentListingPerProduct: { [productId: string]: MyListing } = {};
-    const pausedListings: MyListing[] = [];
-
-    for (const listing of myListings) {
-      const existingListing = mostRecentListingPerProduct[listing.product.id];
-      if (!existingListing) {
-        mostRecentListingPerProduct[listing.product.id] = listing;
-      } else if (
-        new Date(listing.updatedAt) > new Date(existingListing.updatedAt)
-      ) {
-        pausedListings.push(existingListing);
-        mostRecentListingPerProduct[listing.product.id] = listing;
-      } else {
-        pausedListings.push(listing);
-      }
-    }
-
-    const activeListings = Object.values(mostRecentListingPerProduct).sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    );
-
-    return { activeListings, pausedListings };
   }),
 });
