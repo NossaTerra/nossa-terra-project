@@ -7,7 +7,7 @@ import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerS
 import { Button, linkClassNames } from "~/components/ui/button";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { api } from "~/utils/api";
-import { HourglassIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { getProductImageSrc } from "~/server/types/product.type";
 import { ListingCard } from "./ListingCard";
 import { ProductType } from "@prisma/client";
@@ -115,7 +115,7 @@ function InactivePaymentMessage({ className }: ClassNameProps) {
 function MyListingsDashboard({ className }: ClassNameProps) {
   const { data: myListings, isLoading } = api.listing.getMyListings.useQuery();
 
-  if (!isLoading && !myListings?.activeListings?.length) {
+  if (!isLoading && !myListings?.length) {
     return <EmptyStateNoListings className={className} />;
   }
 
@@ -128,35 +128,10 @@ function MyListingsDashboard({ className }: ClassNameProps) {
       </Button>
 
       <div className="mt-8 flex flex-wrap gap-8">
-        {myListings?.activeListings.map((listing) => (
+        {myListings?.map((listing) => (
           <ListingCard key={listing.id} listing={listing} />
         ))}
       </div>
-
-      {!!myListings?.pausedListings?.length && (
-        <>
-          <H2 className="mt-16 flex items-center gap-4">
-            <HourglassIcon size={24} />
-            Anúncios Pausados
-          </H2>
-          <p className="text-lg">
-            Só é possível ter um anúncio de cada vez para cada produto...{" "}
-          </p>
-          <p className="text-lg">
-            Já que você fez um anúncio mais recente para esses produtos, os
-            anúncios a seguir foram desativados.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-8">
-            {myListings.pausedListings.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-                className="opacity-70"
-              />
-            ))}
-          </div>
-        </>
-      )}
     </div>
   );
 }

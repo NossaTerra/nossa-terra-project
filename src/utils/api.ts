@@ -67,5 +67,4 @@ export type RouterInputs = inferRouterInputs<AppRouter>;
  */
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
-export type MyListing =
-  RouterOutputs["listing"]["getMyListings"]["activeListings"][number];
+export type MyListing = RouterOutputs["listing"]["getMyListings"][number];
