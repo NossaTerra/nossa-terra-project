@@ -10,7 +10,8 @@ export function useGreetingSchema() {
       z.object({
         email: z
           .string({ required_error: "Você deve inserir um email válido" })
-          .email({ message: "Email inválido" }),
+          .email({ message: "Email inválido" })
+          .max(60, { message: "Email deve ter no máximo 60 caracteres" }),
       }),
     [],
   );
