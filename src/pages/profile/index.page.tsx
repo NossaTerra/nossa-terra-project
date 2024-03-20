@@ -97,7 +97,7 @@ export function CurrentProfileCardScreen({
 }: Props & { onEditing: () => void }) {
   return (
     <>
-      <h1 className="text-4xl font-bold">Meu Perfil</h1>
+      <h1 className="mt-10 text-2xl font-bold md:text-4xl">Meu Perfil</h1>
       <p className="mb-4 mt-6 text-lg">Seus anúncios aparecem assim...</p>
       <UserAnnouncementCard user={user} />
       <Button
@@ -205,7 +205,13 @@ export function UserAnnouncementCard({ user }: Props) {
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-3 pl-3 capitalize md:pl-10">
-            <span className="text-lg font-bold">{user.name}</span>
+            <div className="ml-0.5 mt-0.5 flex items-start justify-start md:ml-0 ">
+              <div className="flex flex-col items-start">
+                <span className=" mb-1 w-40 break-all text-lg font-bold lg:w-96">
+                  {user?.name}
+                </span>
+              </div>
+            </div>
             <div className="flex-col md:flex md:flex-row">
               <div className="flex">
                 <MapPinIcon className="h-5 w-5 text-current" />
