@@ -28,4 +28,3 @@ const SearchCardShimmer = () => {
 };
 
 export default SearchCardShimmer;
-3;
