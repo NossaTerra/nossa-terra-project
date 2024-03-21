@@ -31,8 +31,8 @@ export const searchRouter = createTRPCRouter({
     .input(
       z.object({
         productId: z.string().optional(),
-        searchingUserLatitude: z.number().optional(),
-        searchingUserLongitude: z.number().optional(),
+        searchingUserLatitude: z.number().nullable(),
+        searchingUserLongitude: z.number().nullable(),
         distanceFilter: z.number().optional(),
         cursor: z.string().nullish(),
         limit: z.number().min(1).max(100).default(10),
