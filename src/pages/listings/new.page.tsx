@@ -10,7 +10,6 @@ import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { EditListingForm, type ListingFormData } from "./EditListingForm";
 import { ProductSearchColumn } from "~/components/common/ProductSearchColumn";
-import { useState } from "react";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -67,7 +66,6 @@ function ListingDetailsColumn({ className }: ClassNameProps) {
   const router = useRouter();
   const selectedProductId = router.query.product;
   const { data: products } = api.product.getAll.useQuery();
-  const [isLoading, setIsLoading] = useState(false);
   const product = products?.find((product) => product.id === selectedProductId);
 
   const apiUtils = api.useUtils();
@@ -82,16 +80,11 @@ function ListingDetailsColumn({ className }: ClassNameProps) {
       if (!product) {
         return;
       }
-      setIsLoading(true);
-      try {
-        await createListing.mutateAsync({
-          price: data.price,
-          productId: product.id,
-        });
-        await router.push("/listings");
-      } finally {
-        setIsLoading(false);
-      }
+      await createListing.mutateAsync({
+        price: data.price,
+        productId: product.id,
+      });
+      await router.push("/listings");
     },
     [createListing, product, router],
   );
@@ -122,7 +115,7 @@ function ListingDetailsColumn({ className }: ClassNameProps) {
               </Link>
             </Button>
             <EditListingForm
-              isLoading={isLoading}
+              isLoading={createListing.isLoading}
               product={product}
               onSuccess={onNewListingFormSubmit}
             />
