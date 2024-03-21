@@ -28,6 +28,7 @@ import { type SearchResult } from "./search/types";
 import BounceLoader from "react-spinners/BounceLoader";
 import SearchCardShimmer from "./search/SearchCardShimmer";
 import { useDebouncedValue } from "~/hooks/useDebouncedValue";
+import Link from "next/link";
 
 const pageLimit = 10;
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
@@ -542,11 +543,18 @@ export function UserAnnouncementInfo({
     <div className={cn("md:max-w-2xl")}>
       <div className="relative rounded-lg ">
         {showBlured && (
-          <span className="font-poppins-600 absolute left-16 top-14 z-10 text-xl">
-            Entre para ver detalhes
-          </span>
+          <Link
+            href="/login"
+            className="font-poppins-600 absolute left-16 top-14 z-10 text-xl underline"
+          >
+            <span className="text-accent">Entre</span> para ver detalhes
+          </Link>
         )}
-        <div className={cn("mb-2 flex space-x-4", showBlured && "blur")}>
+        <div
+          className={cn("mb-2 flex space-x-4", {
+            "select-none blur": showBlured,
+          })}
+        >
           <div className="flex flex-col gap-2  capitalize md:pl-10">
             <div className="ml-0.5 mt-0.5 flex items-start justify-start md:ml-0 ">
               <div className="flex flex-col items-start">
