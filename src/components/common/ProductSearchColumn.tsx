@@ -10,8 +10,6 @@ import { ProductType } from "@prisma/client";
 import { SearchSlider } from "../ui/slider";
 import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
 
-const maxSliderValue = 200;
-
 export function ProductSearchColumn({
   className,
   title,
@@ -87,11 +85,7 @@ export function ProductSearchColumn({
             </div>
             {showSlider && (
               <div className="ml-12 mt-4 flex items-center justify-center rounded-md px-2 pt-6">
-                <SearchSlider
-                  className="m-0 p-0"
-                  max={maxSliderValue}
-                  step={1}
-                />
+                <SearchSlider className="m-0 p-0" step={1} />
               </div>
             )}
           </div>
