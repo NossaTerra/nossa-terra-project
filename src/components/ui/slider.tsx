@@ -6,7 +6,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "src/utils/ui";
 import { useCallback, useState } from "react";
 import { biggestTwoPointsKmDistanceInBrazil } from "~/utils/constants";
-import { debounce } from "~/utils/debounce";
+import { useRouter } from "next/router";
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -30,49 +30,48 @@ Slider.displayName = SliderPrimitive.Root.displayName;
 
 const SearchSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
-    onValueChange?: (value: number) => void;
-  }
->(({ className, onValueChange, ...props }, ref) => {
-  const [thumbPosition, setThumbPosition] = useState<number>(props?.defaultValue?.[0] ?? props.max ?? 1);
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+>(({ className, max: maxSliderValue = 1, ...props }, ref) => {
+  const [thumbPosition, setThumbPosition] = useState<number>(
+    props?.defaultValue?.at(0) ?? maxSliderValue,
+  );
 
   const kmDistanceFromUser = useCallback(
-    (newValue?: number) => {
-      if (newValue) {
-        return (
-          (newValue * biggestTwoPointsKmDistanceInBrazil) / (props?.max ?? 1)
-        );
-      }
+    (value: number) => {
       return (
-        (thumbPosition * biggestTwoPointsKmDistanceInBrazil) / (props?.max ?? 1)
+        biggestTwoPointsKmDistanceInBrazil *
+        (value / maxSliderValue)
+      ).toFixed(0);
+    },
+    [maxSliderValue],
+  );
+
+  const router = useRouter();
+  const handleValueChange = useCallback(
+    (valuesArray: number[]) => {
+      const newValue = valuesArray.at(0);
+      if (newValue === undefined) {
+        return;
+      }
+      setThumbPosition(newValue);
+
+      const distance = kmDistanceFromUser(newValue);
+      void router.replace(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, distance },
+        },
+        undefined,
+        { shallow: true },
       );
     },
-    [thumbPosition, props?.max],
-  );
-
-  // avoid onValueChange being called too frequently via debounce
-  const debouncedHandleValueChange = useCallback(
-    debounce((newValue: number[]) => {
-      if (newValue?.[0]) {
-        setThumbPosition(newValue?.[0]);
-      }
-      if (onValueChange && newValue?.[0]) {
-        onValueChange(kmDistanceFromUser(newValue[0]));
-      }
-    }, 500),
-    [onValueChange, kmDistanceFromUser],
-  );
-
-  const handleValueChange = useCallback(
-    (newValue: number[]) => {
-      debouncedHandleValueChange(newValue);
-    },
-    [debouncedHandleValueChange],
+    [kmDistanceFromUser, router],
   );
 
   return (
     <div className="flex w-full flex-col pb-2 pt-4 ">
       <SliderPrimitive.Root
+        value={[thumbPosition]}
         onValueChange={handleValueChange}
         ref={ref}
         className={cn(
@@ -88,14 +87,12 @@ const SearchSlider = React.forwardRef<
       </SliderPrimitive.Root>
       <span className="ml-auto mt-3">
         {" "}
-        {thumbPosition === props.max
+        {thumbPosition === maxSliderValue
           ? "Mostrar Resultados para todo Brasil"
-          : `Mostrar Resultados até ${kmDistanceFromUser()} km de mim`}
+          : `Mostrar Resultados até ${kmDistanceFromUser(thumbPosition)} km`}
       </span>
     </div>
   );
 });
-
-Slider.displayName = SliderPrimitive.Root.displayName;
 
 export { Slider, SearchSlider };
