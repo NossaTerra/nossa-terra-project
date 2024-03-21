@@ -18,7 +18,7 @@ import { type User, type Product } from "@prisma/client";
 import { Button } from "~/components/ui/button";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Separator } from "~/components/ui/separator";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { animateScrollToTop } from "~/utils/scroll";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { generateAvatarColor } from "~/utils/formHelpers";
@@ -33,7 +33,7 @@ const pageLimit = 10;
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-export default function SearchScreen({ user }: Props) {
+function useSearchScreenParams() {
   const router = useRouter();
   const selectedProductId = Array.isArray(router.query.product)
     ? router.query.product[0]
@@ -41,6 +41,15 @@ export default function SearchScreen({ user }: Props) {
   const distanceQueryParam = Array.isArray(router.query.distance)
     ? router.query.distance[0]
     : router.query.distance;
+
+  return {
+    selectedProductId,
+    distanceQueryParam,
+  };
+}
+
+export default function SearchScreen({ user }: Props) {
+  const { selectedProductId, distanceQueryParam } = useSearchScreenParams();
 
   // NOTE: Query params already have a natural debounce / delay to rerender
   // the route components
@@ -197,8 +206,10 @@ export default function SearchScreen({ user }: Props) {
           {!selectedProductId && (
             <Button
               variant="ghost"
-              className={`fixed bottom-4 right-2 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2 ${showTopButton ? "opacity-100" : "opacity-0"
-                }`}
+              className={cn(
+                "fixed bottom-4 right-2 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2 ",
+                showTopButton ? "opacity-100" : "opacity-0",
+              )}
               onClick={() => {
                 animateScrollToTop();
               }}
@@ -261,11 +272,10 @@ function SelectedProductListingsColumn({
   hasNextPage?: boolean;
 } & Props) {
   const router = useRouter();
-  const selectedProductId = router.query.product;
+  const { selectedProductId } = useSearchScreenParams();
   const { data: products } = api.product.getAll.useQuery();
   const product = products?.find((product) => product.id === selectedProductId);
-  const divRef = useRef<HTMLDivElement>(null);
-  const shouldFetchNextPage = hasNextPage && !isFetching && fetchNextPage;
+
   /*Big screens have custom scroll defined by tailwind scrollbar-webkit
     having that window scroll events are not captured, so it is needed to add this 
     other listener that is latter attached to the parent div of the component
@@ -274,14 +284,16 @@ function SelectedProductListingsColumn({
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLElement>) => {
       const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+      const shouldFetchNextPage = hasNextPage && !isFetching;
+
       if (
         scrollHeight - scrollTop <= 1.3 * clientHeight &&
         shouldFetchNextPage
       ) {
-        void fetchNextPage();
+        void fetchNextPage?.();
       }
     },
-    [fetchNextPage, shouldFetchNextPage],
+    [fetchNextPage, hasNextPage, isFetching],
   );
 
   const shouldShowLoader =
@@ -292,7 +304,6 @@ function SelectedProductListingsColumn({
 
   return (
     <div
-      ref={divRef}
       onScroll={handleScroll}
       className={cn("sticky top-0 w-full", className)}
       // This resets scroll position on key change,
@@ -321,7 +332,7 @@ function SelectedProductListingsColumn({
               router.replace(
                 {
                   pathname: router.pathname,
-                  query: null,
+                  query: { ...router.query, product: undefined },
                 },
                 undefined,
                 { shallow: true },
