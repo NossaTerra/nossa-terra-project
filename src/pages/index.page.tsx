@@ -186,8 +186,7 @@ export default function SearchScreen({ user }: Props) {
         )}
       </div>
       {/* WORKAROUND */}
-      {/* The 99.5svw is a hack because the width of the window scrollbar messes up the width */}
-      {/* The absolute somehow fixes the position sticky, that's why it exists */}
+      {/* The 99.5svw is a hack to show the scrollbar a little better */}
       <div
         className={cn(
           "flex w-[99.5svw] flex-row overflow-hidden bg-opacity-60 lg:fixed",
