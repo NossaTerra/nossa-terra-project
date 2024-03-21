@@ -103,15 +103,9 @@ function DeleteListingDialog({
     },
   });
 
-  const [isLoading, setIsLoading] = useState(false);
   const onDelete = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await deleteListing.mutateAsync({ id: listing.id });
-    } finally {
-      setIsLoading(false);
-      onOpenChange(false);
-    }
+    await deleteListing.mutateAsync({ id: listing.id });
+    onOpenChange(false);
   }, [deleteListing, listing.id, onOpenChange]);
 
   return (
@@ -130,7 +124,7 @@ function DeleteListingDialog({
             Cancelar
           </Button>
           <Button
-            isLoading={isLoading}
+            isLoading={deleteListing.isLoading}
             className="w-24"
             variant="destructive"
             onClick={onDelete}
@@ -158,16 +152,10 @@ function EditListingModal({
       void apiUtils.listing.getMyListings.invalidate();
     },
   });
-  const [isLoading, setIsLoading] = useState(false);
   const onSuccess = useCallback(
     async (data: ListingFormData) => {
-      setIsLoading(true);
-      try {
-        await editListing.mutateAsync({ ...listing, ...data });
-      } finally {
-        setIsLoading(false);
-        onOpenChange(false);
-      }
+      await editListing.mutateAsync({ ...listing, ...data });
+      onOpenChange(false);
     },
     [editListing, listing, onOpenChange],
   );
@@ -180,7 +168,7 @@ function EditListingModal({
         </DialogTitle>
 
         <EditListingForm
-          isLoading={isLoading}
+          isLoading={editListing.isLoading}
           product={listing.product}
           listing={listing}
           onSuccess={onSuccess}
