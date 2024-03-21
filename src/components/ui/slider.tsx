@@ -37,7 +37,7 @@ interface SearchSliderProps
 function SearchSlider({
   className,
   max: maxSliderValue = 100,
-  minDistanceKm = 100,
+  minDistanceKm = 5,
   ...rest
 }: SearchSliderProps) {
   const minSliderValue =
