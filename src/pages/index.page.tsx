@@ -222,7 +222,7 @@ export default function SearchScreen({ user }: Props) {
 
           <ProductSearchColumn
             title="Pesquisa de Anúnicios"
-            showSlider={!!user}
+            showSlider={!!user && user.latitude && user.longitude}
             className={cn(
               "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
               user
