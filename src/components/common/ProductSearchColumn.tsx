@@ -8,8 +8,6 @@ import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType } from "@prisma/client";
 import { SearchSlider } from "../ui/slider";
-import { biggestTwoPointsKmDistanceInBrazil } from "~/utils/constants";
-import SearchCardShimmer from "~/components/common/ProductSearchShimmer";
 import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
 
 const maxSliderValue = 200;
@@ -18,15 +16,9 @@ export function ProductSearchColumn({
   className,
   title,
   showSlider = false,
-  sliderInitialValue,
-  onSliderValueChange,
 }: ClassNameProps & {
   title: string;
   showSlider?: boolean;
-  sliderInitialValue?: number;
-  onSliderValueChange?:
-    | (((value: number[]) => void) & ((value: number) => void))
-    | undefined;
 }) {
   const router = useRouter();
   // TODO: maybe react to the loading state or make this query in server side rendering
@@ -62,10 +54,6 @@ export function ProductSearchColumn({
       );
   }, [noProductTypeFilterSelected, productTypeFilter, products, searchString]);
 
-  const sliderDefaultValue = sliderInitialValue
-    ? (sliderInitialValue / biggestTwoPointsKmDistanceInBrazil) * maxSliderValue
-    : maxSliderValue;
-
   return (
     <div className={cn("flex flex-col items-center  pr-8", className)}>
       <div className="sticky top-0 z-10 w-full items-center">
@@ -100,9 +88,7 @@ export function ProductSearchColumn({
             {showSlider && (
               <div className="ml-12 mt-4 flex items-center justify-center rounded-md px-2 pt-6">
                 <SearchSlider
-                  onValueChange={onSliderValueChange}
                   className="m-0 p-0"
-                  defaultValue={[sliderDefaultValue]}
                   max={maxSliderValue}
                   step={1}
                 />

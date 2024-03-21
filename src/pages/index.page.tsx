@@ -27,6 +27,7 @@ import { PriceTag } from "~/components/common/PriceTag";
 import { type SearchResult } from "./search/types";
 import BounceLoader from "react-spinners/BounceLoader";
 import SearchCardShimmer from "./search/SearchCardShimmer";
+import { useDebouncedValue } from "~/hooks/useDebouncedValue";
 
 const pageLimit = 10;
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
@@ -34,25 +35,35 @@ type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export default function SearchScreen({ user }: Props) {
   const router = useRouter();
-  const selectedProductId = router.query.product;
-  const distanceQuery = Array.isArray(router.query.distance)
+  const selectedProductId = Array.isArray(router.query.product)
+    ? router.query.product[0]
+    : router.query.product;
+  const distanceQueryParam = Array.isArray(router.query.distance)
     ? router.query.distance[0]
     : router.query.distance;
-  const distanceFilter =
-    distanceQuery !== undefined ? parseFloat(distanceQuery) : undefined;
+
+  // NOTE: Query params already have a natural debounce / delay to rerender
+  // the route components
+  //
+  // if you useEffect and console log a query param you'll notice that
+  const debouncedDistanceFilter = useDebouncedValue({
+    value:
+      distanceQueryParam !== undefined
+        ? parseFloat(distanceQueryParam)
+        : undefined,
+  });
 
   const { data, fetchNextPage, isFetching, hasNextPage, isLoading } =
     api.search.getProductListings.useInfiniteQuery(
       {
-        productId: Array.isArray(router.query.product)
-          ? router.query.product[0]
-          : router.query.product,
+        productId: selectedProductId,
         searchingUserLatitude: user?.latitude,
         searchingUserLongitude: user?.longitude,
-        distanceFilter: distanceFilter,
+        distanceFilter: debouncedDistanceFilter,
         limit: pageLimit,
       },
       {
+        refetchOnMount: false,
         getNextPageParam: (lastPage) => {
           if (lastPage?.nextCursor) {
             return lastPage.nextCursor;
@@ -60,7 +71,6 @@ export default function SearchScreen({ user }: Props) {
             return undefined;
           }
         },
-        refetchOnMount: false,
         onSuccess: (data) => {
           /* if there is a distance filter applied
               it should always try to show the limit value per batch   
@@ -99,31 +109,6 @@ export default function SearchScreen({ user }: Props) {
   }, [selectedProductId]);
 
   const [showTopButton, setShowTopButton] = useState(false);
-
-  const handleSliderValueChange = useCallback(
-    (value: number[] | number | undefined) => {
-      if (Array.isArray(value)) {
-        void router.push(
-          {
-            pathname: router.pathname,
-            query: { product: selectedProductId, distance: value[0] },
-          },
-          undefined,
-          { shallow: true },
-        );
-      } else {
-        void router.push(
-          {
-            pathname: router.pathname,
-            query: { product: selectedProductId, distance: value },
-          },
-          undefined,
-          { shallow: true },
-        );
-      }
-    },
-    [router, selectedProductId],
-  );
 
   /*Small screens just use the default scroll mechanism this useEffect adds
     scroll event listener for those screens to either show the top button so
@@ -213,9 +198,8 @@ export default function SearchScreen({ user }: Props) {
           {!selectedProductId && (
             <Button
               variant="ghost"
-              className={`fixed bottom-4 right-2 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2 ${
-                showTopButton ? "opacity-100" : "opacity-0"
-              }`}
+              className={`fixed bottom-4 right-2 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2 ${showTopButton ? "opacity-100" : "opacity-0"
+                }`}
               onClick={() => {
                 animateScrollToTop();
               }}
@@ -228,8 +212,6 @@ export default function SearchScreen({ user }: Props) {
           <ProductSearchColumn
             title="Pesquisa de Anúnicios"
             showSlider={!!user}
-            onSliderValueChange={(value) => handleSliderValueChange(value)}
-            sliderInitialValue={distanceFilter}
             className={cn(
               "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
               user
