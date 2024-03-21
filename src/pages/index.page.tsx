@@ -12,7 +12,7 @@ import {
   MapPinIcon,
   TimerIcon,
 } from "lucide-react";
-import { api } from "~/utils/api";
+import { type SearchResult, api } from "~/utils/api";
 import { Card, CardContent } from "~/components/ui/card";
 import { type User, type Product } from "@prisma/client";
 import { Button } from "~/components/ui/button";
@@ -24,13 +24,13 @@ import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { generateAvatarColor } from "~/utils/formHelpers";
 import { getDisplayTimeWithAgo } from "~/utils/time";
 import { PriceTag } from "~/components/common/PriceTag";
-import { type SearchResult } from "./search/types";
 import BounceLoader from "react-spinners/BounceLoader";
 import SearchCardShimmer from "./search/SearchCardShimmer";
 import { useDebouncedValue } from "~/hooks/useDebouncedValue";
 import Link from "next/link";
 
 const pageLimit = 10;
+
 export const getServerSideProps = redirectGetServerSideProps.MaybeAuthed;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -407,11 +407,11 @@ function SearchResultCard({
   product: Product;
   showBlured: boolean;
 }) {
-  const listingTime = new Date(searchResult?.listing?.updatedAt ?? "");
+  const listingTime = new Date(searchResult?.updatedAt ?? "");
   const timeString = getDisplayTimeWithAgo(listingTime);
 
   // Show other products listings but filter out the current product listing
-  const otherProductsListingsFromUser = searchResult?.userListings?.filter(
+  const otherProductsListingsFromUser = searchResult?.user?.listings?.filter(
     (listing) => listing.productId !== product.id,
   );
 
@@ -423,10 +423,7 @@ function SearchResultCard({
     <div className="flex max-w-[880px] rounded-lg border-[2.3px] border-black pb-3 md:justify-center md:px-0 xl:pb-0 ">
       <div className="relative w-full px-4 pt-7">
         <div className="font-poppins-500 absolute right-3 top-3 flex rounded-md text-xl ">
-          <PriceTag
-            value={Number(searchResult?.listing?.price)}
-            className="mt-2"
-          />
+          <PriceTag value={Number(searchResult?.price)} className="mt-2" />
         </div>
         <div className="font-poppins-500 absolute left-3 top-4 flex w-64 flex-row items-start rounded-md p-3 text-sm ">
           <TimerIcon className="mr-1 " size={18} /> {timeString}{" "}
@@ -435,10 +432,7 @@ function SearchResultCard({
           <ProductCard
             small
             footer={
-              <PriceTag
-                value={Number(searchResult?.listing?.price)}
-                className="mt-2"
-              />
+              <PriceTag value={Number(searchResult?.price)} className="mt-2" />
             }
             product={product}
             className="xl:w-10em mb-8"
@@ -469,7 +463,7 @@ function SearchResultCard({
                         value={Number(listing.price)}
                         className="mb-2 mt-2 opacity-80"
                       />
-                      <p>{listing.name}</p>
+                      <p>{listing.product.name}</p>
                     </CardContent>
                   </Card>
                 </div>

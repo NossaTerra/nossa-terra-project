@@ -68,3 +68,6 @@ export type RouterInputs = inferRouterInputs<AppRouter>;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export type MyListing = RouterOutputs["listing"]["getMyListings"][number];
+
+export type SearchResult =
+  RouterOutputs["search"]["getProductListings"]["searchResults"][number];
