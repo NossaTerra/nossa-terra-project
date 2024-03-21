@@ -67,8 +67,8 @@ export default function SearchScreen({ user }: Props) {
     api.search.getProductListings.useInfiniteQuery(
       {
         productId: selectedProductId,
-        searchingUserLatitude: user?.latitude,
-        searchingUserLongitude: user?.longitude,
+        searchingUserLatitude: user?.latitude ?? null,
+        searchingUserLongitude: user?.longitude ?? null,
         distanceFilter: debouncedDistanceFilter,
         limit: pageLimit,
       },
@@ -222,7 +222,7 @@ export default function SearchScreen({ user }: Props) {
 
           <ProductSearchColumn
             title="Pesquisa de Anúnicios"
-            showSlider={!!user && user.latitude && user.longitude}
+            showSlider={!!user && !!user?.latitude && !!user?.longitude}
             className={cn(
               "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
               user
