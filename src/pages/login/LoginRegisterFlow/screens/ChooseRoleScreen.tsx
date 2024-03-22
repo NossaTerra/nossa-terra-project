@@ -15,17 +15,24 @@ import {
   type ChooseRoleFields,
   useChooseRoleSchema,
 } from "../hooks/useChooseRoleSchema";
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { RadioGroup } from "~/components/ui/radio-group";
+import { RadioGroupItem as RadixRadioGroupItem } from "@radix-ui/react-radio-group";
 import { useLoginRegisterFlow } from "../state/machine";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
+import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
+import { H2 } from "~/components/ui/typography";
+import { type Role } from "@prisma/client";
 
 function ChooseRoleContent({ className }: ClassNameProps) {
   const { state, chooseRoleAction } = useLoginRegisterFlow();
 
   const schema = useChooseRoleSchema();
   const form = useForm<ChooseRoleFields>({
+    defaultValues: {
+      role: "seller",
+    },
     resolver: zodResolver(schema),
   });
 
@@ -71,50 +78,91 @@ function ChooseRoleContent({ className }: ClassNameProps) {
       </div>
 
       <Form {...form}>
-        <form
-          className="w-full md:max-w-xs lg:max-w-sm"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+        <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
             control={form.control}
             name="role"
             render={({ field }) => (
-              // TODO: Style radio buttons like cards
-              // Look at this example which styles the "Theme" radio buttons like so
-              // @link https://ui.shadcn.com/examples/forms/appearance
-              // @link https://github.com/shadcn-ui/ui/blob/main/apps/www/app/examples/forms/appearance/appearance-form.tsx
-              <FormItem className="mb-4 space-y-6">
-                <h2 className="text-2xl font-bold">Qual a sua modalidade?</h2>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="buyer" />
-                      </FormControl>
-                      <FormLabel>Comprador</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="seller" />
-                      </FormControl>
-                      <FormLabel>Produtor</FormLabel>
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
+              <FormItem className={className}>
+                <FormLabel>
+                  <H2 className="py-2">Qual a sua modalidade?</H2>
+                </FormLabel>
                 <FormMessage />
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex w-full flex-row flex-wrap gap-8 pb-16 pt-2"
+                >
+                  <RoleRadioGroupItem
+                    title="Produtor"
+                    role="seller"
+                    description="Ver as ofertas de compras do seu produto e entrar em contato com os compradores!"
+                    isSelected={field.value === "seller"}
+                  />
+                  <RoleRadioGroupItem
+                    title="Comprador"
+                    role="buyer"
+                    description="Faça suas ofertas de compra!"
+                    isSelected={field.value === "buyer"}
+                  />
+                </RadioGroup>
               </FormItem>
             )}
           />
-          <Button variant="primary" className="w-full" type="submit">
+          <Button
+            variant="primary"
+            className="w-full md:max-w-xs lg:max-w-sm"
+            type="submit"
+          >
             Continuar
           </Button>
         </form>
       </Form>
     </main>
+  );
+}
+
+function RoleRadioGroupItem({
+  isSelected,
+  role,
+  title,
+  description,
+}: {
+  isSelected?: boolean;
+  role: Role;
+  title: string;
+  description: string;
+}) {
+  return (
+    <FormItem>
+      <FormControl>
+        <RadixRadioGroupItem
+          value={role}
+          className={cn("h-full rounded-lg border-4 border-transparent", {
+            "border-basedDark": isSelected,
+          })}
+        >
+          <Card className="relative h-full min-h-36 w-80 bg-cardShade p-4 text-left shadow-lg">
+            <div
+              className={cn(
+                "absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-basedDark p-1 text-cardShade",
+                {
+                  hidden: !isSelected,
+                },
+              )}
+            >
+              <CheckIcon />
+            </div>
+            <CardHeader className="p-0">
+              <CardTitle className="pb-2 text-lg">{title}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <p className="text-md">{description}</p>
+            </CardContent>
+          </Card>
+        </RadixRadioGroupItem>
+      </FormControl>
+    </FormItem>
   );
 }
 
