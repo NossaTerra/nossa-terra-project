@@ -48,7 +48,7 @@ export function ProductCard({
       </div>
 
       {topRightElement && (
-        <div className={cn("right-2 top-2")}>{topRightElement}</div>
+        <div className={cn("absolute right-2 top-2")}>{topRightElement}</div>
       )}
     </div>
   );
