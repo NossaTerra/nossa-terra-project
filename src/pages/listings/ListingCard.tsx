@@ -125,7 +125,6 @@ function DeleteListingDialog({
           </Button>
           <Button
             isLoading={deleteListing.isLoading}
-            className="w-24"
             variant="destructive"
             onClick={onDelete}
           >
