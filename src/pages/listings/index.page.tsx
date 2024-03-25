@@ -117,11 +117,17 @@ function MyListingsDashboard({ className }: ClassNameProps) {
   const { data: myListings, isLoading } = api.listing.getMyListings.useQuery();
 
   if (!isLoading && !myListings?.length) {
-    return <EmptyStateNoListings className={className} />;
+    return (
+      <>
+        <FreeListingsBanner />
+        <EmptyStateNoListings className={className} />
+      </>
+    );
   }
 
   return (
     <div className={className}>
+      <FreeListingsBanner />
       <Button asChild variant="primary">
         <Link href="/listings/new" className="flex items-center gap-2">
           <PlusIcon size={20} /> Novo Anúncio
@@ -187,6 +193,19 @@ function EmptyStateNoListings({ className }: ClassNameProps) {
             <PlusIcon size={20} /> Novo Anúncio
           </Link>
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function FreeListingsBanner() {
+  return (
+    <div>
+      <div className="font-poppins-400 mb-4 inline-block rounded-md bg-slate-100 px-4 py-4 md:mb-6">
+        <span className="mb-2 block font-semibold">
+          Aproveite seus anúncios são gratuitos durante os primeiros meses!
+        </span>
+        <span>Em breve, uma pequena taxa mensal será aplicada.</span>
       </div>
     </div>
   );
