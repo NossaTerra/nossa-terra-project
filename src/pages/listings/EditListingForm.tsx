@@ -115,6 +115,7 @@ export function EditListingForm({
           />
 
           <Button
+            disabled={!form.formState.isDirty}
             isLoading={isLoading}
             variant="primary"
             className="mt-8 w-full"
