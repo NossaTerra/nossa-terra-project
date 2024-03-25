@@ -27,7 +27,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { cn } from "~/utils/ui";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -40,18 +39,18 @@ export default function ProfileScreen({ user }: Props) {
   return (
     <>
       <AppHeader user={user} />
-      <div className="relative px-6 md:px-14 ">
-        <AnimatePresence initial={false} custom={direction} mode="popLayout">
-          <motion.div
-            key={isEditingProfile.toString()}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            custom={direction}
-            variants={variants}
-            transition={transition}
-            className="md:w-screen"
-          >
+      <AnimatePresence initial={false} custom={direction} mode="popLayout">
+        <motion.div
+          key={isEditingProfile.toString()}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          custom={direction}
+          variants={variants}
+          transition={transition}
+          className="flex grow flex-col justify-between px-6 md:px-14"
+        >
+          <div>
             {user.role === "seller" && (
               <SellerForm
                 isEditingProfile
@@ -83,10 +82,15 @@ export default function ProfileScreen({ user }: Props) {
                 onEditing={() => setIsEditingProfile(true)}
               />
             )}
-          </motion.div>
-        </AnimatePresence>
-        {showLogoutButton && <LogOutButton isSeller={user.role === "seller"} />}
-      </div>
+          </div>
+
+          {showLogoutButton && (
+            <footer className="flex justify-center py-10 lg:justify-end">
+              <LogOutButton />
+            </footer>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 }
@@ -112,22 +116,13 @@ export function CurrentProfileCardScreen({
   );
 }
 
-export function LogOutButton({ isSeller }: { isSeller: boolean }) {
+export function LogOutButton() {
   const { logout, logoutLoading } = useAuth();
 
   return (
     <Dialog modal>
       <DialogTrigger asChild>
-        <Button
-          isLoading={logoutLoading}
-          variant={"ghost"}
-          className={cn(
-            isSeller
-              ? "mb-4 mt-12 w-full md:mt-16 md:w-52 lg:fixed lg:bottom-8 lg:right-12"
-              : " fixed bottom-2 right-2 ",
-            "text-md md:bottom-14 md:right-14",
-          )}
-        >
+        <Button isLoading={logoutLoading} variant="ghost" className="text-md">
           <LogOut color="black" className="mr-2 inline h-6 w-6" />
           Sair do Nossa Terra
         </Button>
