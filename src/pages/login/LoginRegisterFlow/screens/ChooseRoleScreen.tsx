@@ -24,6 +24,7 @@ import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { H3 } from "~/components/ui/typography";
 import { type Role } from "@prisma/client";
+import { AdsCarouselFooter } from "~/components/common/AdsCarrousel";
 
 function ChooseRoleContent({ className }: ClassNameProps) {
   const { state, chooseRoleAction } = useLoginRegisterFlow();
@@ -181,10 +182,10 @@ export function ChooseRoleScreen() {
   );
 
   return (
-    <div className="flex min-h-screen flex-grow flex-col">
+    <div className="flex h-screen flex-grow flex-col">
       <header className="items-between flex justify-between pt-12">
         <Button
-          className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
+          className="ml-8 gap-3 p-6 text-lg md:mt-8 lg:ml-14"
           variant="outline"
           onClick={goBack}
         >
@@ -196,6 +197,7 @@ export function ChooseRoleScreen() {
         </div>
       </header>
       <ChooseRoleContent />
+      <AdsCarouselFooter />
     </div>
   );
 }

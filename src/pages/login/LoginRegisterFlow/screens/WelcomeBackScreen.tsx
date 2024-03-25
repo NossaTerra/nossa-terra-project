@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import ImageCarousel from "~/components/common/ImageCarrousel";
+import { AdsCarouselFooter } from "~/components/common/AdsCarrousel";
 import { PasswordInput } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -159,7 +159,7 @@ export function WelcomeBackScreen() {
     <div className="flex min-h-screen flex-grow flex-col">
       <header className="items-between flex justify-between pt-12">
         <Button
-          className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
+          className="ml-8 gap-2 p-6 text-lg md:mt-8 lg:ml-14"
           variant="outline"
           onClick={goBack}
         >
@@ -171,14 +171,8 @@ export function WelcomeBackScreen() {
         </div>
       </header>
 
-      <WelcomeBackContent className="flex grow" />
-
-      <footer className="flex flex-col justify-center">
-        <ImageCarousel className="hidden md:block" />
-        <div className="flex justify-center p-12 md:hidden">
-          <NossaTerraLogo />
-        </div>
-      </footer>
+      <WelcomeBackContent className="flex md:grow" />
+      <AdsCarouselFooter />
     </div>
   );
 }

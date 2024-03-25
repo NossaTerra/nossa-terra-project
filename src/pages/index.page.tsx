@@ -1,5 +1,6 @@
 import { type InferGetServerSidePropsType } from "next";
 import { AppHeader } from "~/components/common/headers";
+
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import Image from "next/image";
@@ -28,6 +29,8 @@ import BounceLoader from "react-spinners/BounceLoader";
 import SearchCardShimmer from "./search/SearchCardShimmer";
 import { useDebouncedValue } from "~/hooks/useDebouncedValue";
 import Link from "next/link";
+import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
+import React from "react";
 
 const pageLimit = 10;
 
@@ -291,6 +294,8 @@ function SelectedProductListingsColumn({
   const shouldShowResultMessage = !!searchResults && searchResults?.length;
   const shouldShowLinkForFirstListing =
     searchResults?.length === 0 && !!user && user.role === "buyer";
+  const hasAtLeastTenResults =
+    searchResults && searchResults.length < 10 && searchResults.length > 0;
 
   return (
     <div
@@ -356,15 +361,25 @@ function SelectedProductListingsColumn({
               )}
             </div>
             <div>
-              {searchResults?.map((searchResult, index) => (
-                <div key={index} className="mb-10 md:mr-7">
-                  <SearchResultCard
-                    searchResult={searchResult}
-                    showBlured={!user}
-                    product={product}
-                  />
-                </div>
-              ))}
+              <div className="flex max-w-[890px] flex-col gap-0">
+                {searchResults?.map((searchResult, index) => (
+                  <React.Fragment key={index}>
+                    <div className="mb-10 md:mr-7">
+                      <SearchResultCard
+                        searchResult={searchResult}
+                        showBlured={!user}
+                        product={product}
+                      />
+                    </div>
+                    {(index + 1) % pageLimit === 0 &&
+                      index + 1 !== searchResults.length && (
+                        <AdsCarrouselListings />
+                      )}
+                  </React.Fragment>
+                ))}
+                {/* Show sponsored section at the end if there are fewer than ten results */}
+                {hasAtLeastTenResults && <AdsCarrouselListings />}
+              </div>
               {shouldShowLoader && (
                 <div className="mt-4 flex  w-full max-w-[880px] items-center justify-center ">
                   <span className="font-poppins-800 mr-2 text-accent  lg:mr-6">

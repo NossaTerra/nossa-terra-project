@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/button";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
 import useBeforeUnloadAndPopState from "~/pages/login/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
+import { AdsCarouselFooter } from "~/components/common/AdsCarrousel";
 
 function PasswordResetSentContent({ className }: ClassNameProps) {
   const router = useRouter();
@@ -31,11 +32,11 @@ function PasswordResetSentContent({ className }: ClassNameProps) {
       >
         Email enviado!
       </h1>
-      <p className="font-poppins-400 w-76 md:w-96 md:text-justify">
+      <p className="font-inter-500 w-76 text-lg md:w-96 md:text-justify">
         Fique de olho na caixa de entrada do seu email, talvez você precise
         verificar a sua pasta de spam.
       </p>
-      <p className="font-poppins-600  text-bold w-76 md:w-96 md:text-justify">
+      <p className="font-inter-600  text-bold w-76 md:w-96 md:text-justify">
         Lembre-se: O email pode demorar alguns minutos para chegar.
       </p>
       <Button variant="primary" className="w-40" type="button" onClick={goBack}>
@@ -48,12 +49,13 @@ function PasswordResetSentContent({ className }: ClassNameProps) {
 export default function PasswordResetSent() {
   return (
     <div className="flex min-h-screen flex-grow flex-col-reverse md:flex-col">
-      <header className="mb-12 flex items-end justify-center pt-12 md:mb-0 md:justify-end">
+      <header className="mb-12 hidden items-end justify-center pt-12 md:mb-0 md:flex md:justify-end">
         <div className=" block px-12">
           <NossaTerraLogo />
         </div>
       </header>
       <PasswordResetSentContent className="mt-16 flex grow md:mt-0 " />
+      <AdsCarouselFooter />
     </div>
   );
 }

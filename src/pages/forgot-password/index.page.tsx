@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import ImageCarousel from "~/components/common/ImageCarrousel";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -99,7 +98,7 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
         </span>
         ?
       </h1>
-      <p className="font-poppins-400 w-76 text-justify md:w-96">
+      <p className="font-inter-500 w-76 text-justify text-lg md:w-96">
         Não se preocupe, digite seu endereço de email abaixo e vamos enviar um
         link para você redefinir a sua senha.
       </p>
@@ -176,7 +175,6 @@ export default function ForgetPasswordScreen() {
       <ForgetPasswordContent className="flex grow" />
 
       <footer className="flex flex-col justify-center">
-        <ImageCarousel className="hidden md:block" />
         <div className="flex justify-center p-12 md:hidden">
           <NossaTerraLogo />
         </div>

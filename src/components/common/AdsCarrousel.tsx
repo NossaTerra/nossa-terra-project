@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn, type ClassNameProps } from "src/utils/ui";
 import { api } from "~/utils/api";
 import { useMediaQuery } from "react-responsive";
 
-const ImageCarousel: React.FC<ClassNameProps> = ({ className }) => {
+const AdsCarrousel: React.FC<ClassNameProps> = ({ className }) => {
   const { isLoading, data: adsData } = api.ad.getAll.useQuery();
 
   const [isDesktop, setIsDesktop] = useState(false);
@@ -114,4 +114,30 @@ const ImageCarousel: React.FC<ClassNameProps> = ({ className }) => {
   );
 };
 
-export default ImageCarousel;
+export default AdsCarrousel;
+
+export const AdsCarrouselListings = () => {
+  return (
+    <div className="mb-4 w-full pl-1 pr-[0.3vw] md:pr-[2.4vw] xl:pr-[1.5vw]">
+      <div className="mb-4 max-w-[890px] rounded-md bg-slate-100 pt-3">
+        <span className="font-poppins-500 pl-4">Patrocinado:</span>
+        <div className="mx-auto mt-4">
+          <AdsCarrousel />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const AdsCarouselFooter = () => {
+  return (
+    <footer className="mb-0 mt-auto flex max-h-52 flex-1 flex-col items-end justify-end bg-slate-100 pt-3 md:mt-auto md:block md:flex-initial">
+      <div className="w-[100vw] pb-10 md:pb-0 lg:mr-4 lg:w-full">
+        <span className="font-poppins-600 pl-4 underline">Patrocinado:</span>
+        <div className="mx-auto mt-6">
+          <AdsCarrousel />
+        </div>
+      </div>
+    </footer>
+  );
+};
