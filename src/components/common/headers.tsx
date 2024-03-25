@@ -36,7 +36,9 @@ function NavItem({
 }: NavItem) {
   const { pathname } = useRouter();
   const isSelected =
-    href === "/" ? pathname === href : pathname.startsWith(href) && isHighlightable;
+    href === "/"
+      ? pathname === href
+      : pathname.startsWith(href) && isHighlightable;
 
   return (
     <Link

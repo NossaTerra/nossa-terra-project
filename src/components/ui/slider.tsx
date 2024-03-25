@@ -30,7 +30,7 @@ Slider.displayName = SliderPrimitive.Root.displayName;
 
 interface SearchSliderProps
   extends React.ComponentProps<typeof SliderPrimitive.Root>,
-  ClassNameProps {
+    ClassNameProps {
   minDistanceKm?: number;
 }
 
@@ -50,7 +50,7 @@ function SearchSlider({
   const initialValue =
     distanceQueryParam !== undefined && !isNaN(Number(distanceQueryParam))
       ? maxSliderValue *
-      (Number(distanceQueryParam) / biggestTwoPointsKmDistanceInBrazil)
+        (Number(distanceQueryParam) / biggestTwoPointsKmDistanceInBrazil)
       : maxSliderValue;
 
   const [thumbPosition, setThumbPosition] = useState<number>(initialValue);
@@ -109,8 +109,8 @@ function SearchSlider({
         {thumbPosition === maxSliderValue
           ? "Mostrar Resultados para todo Brasil"
           : `Mostrar Resultados até ${kmDistanceFromSliderValue(
-            thumbPosition,
-          )} km`}
+              thumbPosition,
+            )} km`}
       </span>
     </div>
   );
