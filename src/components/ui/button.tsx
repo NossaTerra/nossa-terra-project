@@ -43,7 +43,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   isLoading?: boolean;
 }
@@ -64,13 +64,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          "text-black",
+          buttonVariants({ variant, size, className }),
+        )}
         disabled={isLoading}
         ref={ref}
         {...props}
       >
         {isLoading ? (
-          <Loader2 color="black" className=" mr-2 h-5 w-5 animate-spin" />
+          <div className="relative">
+            <div className="invisible">{children}</div>
+            <Loader2 className="absolute bottom-0 left-0 right-0 top-0 m-auto animate-spin" />
+          </div>
         ) : (
           children
         )}
