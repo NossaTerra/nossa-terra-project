@@ -33,18 +33,19 @@ import {
   SelectItem,
 } from "~/components/ui/select";
 import { AdTypeLabel } from "~/server/types/ad.type";
-import {
-  type AdFields,
-  type AdFieldsWithDefaults,
-  useAdSchema,
-} from "~/screens/LoginRegisterFlow/hooks/useAdSchema";
-import { AdUpload } from "~/components/common/AdUpload";
+
+import { AdUpload } from "~/pages/backoffice/ads/AdUpload";
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { api } from "~/utils/api";
 import { Label } from "@radix-ui/react-label";
 import { Switch } from "~/components/ui/switch";
+import {
+  type AdFields,
+  type AdFieldsWithDefaults,
+  useAdSchema,
+} from "~/pages/login/LoginRegisterFlow/hooks/useAdSchema";
 
 export const getServerSideProps = redirectGetServerSideProps.Backoffice;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -84,8 +85,7 @@ export default function BackofficeAdsScreen({ user }: Props) {
       return ads.filter((ad) => {
         const idMatches = ad.id.toLowerCase().includes(searchText);
         const nameMatches = ad.name.toLowerCase().includes(searchText);
-        const linkMatches =
-          ad.link && ad.link.toLowerCase().includes(searchText);
+        const linkMatches = ad.link?.toLowerCase().includes(searchText);
 
         return idMatches || nameMatches || linkMatches;
       });

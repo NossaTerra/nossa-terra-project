@@ -1,8 +1,8 @@
 import React, { type ChangeEvent, useState, useRef, useCallback } from "react";
 
 import { CameraIcon } from "lucide-react";
-import { Input } from "../ui/input";
-import { FormField, FormItem, FormMessage } from "../ui/form";
+import { Input } from "../../../components/ui/input";
+import { FormField, FormItem, FormMessage } from "../../../components/ui/form";
 import { kiloByte } from "~/utils/constants";
 import { api } from "~/utils/api";
 import { type UseFormReturn } from "react-hook-form";
