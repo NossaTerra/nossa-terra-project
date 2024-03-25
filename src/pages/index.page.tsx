@@ -148,17 +148,14 @@ export default function SearchScreen({ user }: Props) {
   }, [fetchNextPage, hasNextPage, isFetching]);
 
   return (
-    <>
+    <div className="flex grow flex-col lg:max-h-svh">
       <div
-        className={cn(
-          "flex flex-col-reverse md:flex-row-reverse",
-          user
-            ? "mt-0"
-            : "overflow-hidden border-b-2 bg-cardHover bg-opacity-25 shadow  md:py-16",
-        )}
+        className={cn("flex flex-col-reverse md:flex-row-reverse", {
+          "border-b-2 bg-cardHover bg-opacity-25 shadow md:py-8": !user,
+        })}
       >
         <AppHeader
-          className={cn("flex-col justify-center pb-4 pt-7")}
+          className="flex-col justify-center"
           user={user}
           hideLogo={!user}
         />
@@ -195,11 +192,9 @@ export default function SearchScreen({ user }: Props) {
           </div>
         )}
       </div>
-      {/* WORKAROUND */}
-      {/* The 99.5svw is a hack to show the scrollbar a little better */}
       <div
         className={cn(
-          "flex w-[99.5svw] flex-row overflow-hidden bg-opacity-60 lg:fixed",
+          "flex grow flex-row overflow-hidden bg-opacity-60",
           user ? "mt-0" : "mt-1.5",
         )}
       >
@@ -224,10 +219,7 @@ export default function SearchScreen({ user }: Props) {
             title="Pesquisa de Anúnicios"
             showSlider={!!user && !!user?.latitude && !!user?.longitude}
             className={cn(
-              "sticky top-0 h-full w-full bg-white lg:h-svh lg:overflow-y-auto lg:pb-[170px] xl:w-[56em]",
-              user
-                ? "lg:scrollbar-webkit"
-                : "lg:pb-[270px] lg:scrollbar-webkit-big-margin",
+              "flex w-full grow lg:overflow-y-auto lg:pr-8 lg:scrollbar-webkit xl:w-[58em]",
               {
                 "hidden xl:block": selectedProductId,
               },
@@ -242,17 +234,14 @@ export default function SearchScreen({ user }: Props) {
           isLoading={isLoading}
           user={user}
           className={cn(
-            "sticky top-0 px-3 pb-16 md:px-10 lg:h-svh lg:overflow-y-auto lg:pb-[170px] lg:scrollbar-webkit",
-            user
-              ? "lg:scrollbar-webkit"
-              : "pb-16 lg:pb-[270px] lg:scrollbar-webkit-big-margin ",
+            "grow px-3 pb-16 md:px-10 lg:overflow-y-auto lg:scrollbar-webkit",
             {
               "hidden xl:block": !selectedProductId,
             },
           )}
         />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -306,7 +295,7 @@ function SelectedProductListingsColumn({
   return (
     <div
       onScroll={handleScroll}
-      className={cn("sticky top-0 w-full", className)}
+      className={cn("w-full", className)}
       // This resets scroll position on key change,
       // cus key changes forces React to rerender the component
       key={product?.id}
