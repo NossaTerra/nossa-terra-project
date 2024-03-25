@@ -53,7 +53,7 @@ export function ProductSearchColumn({
   }, [noProductTypeFilterSelected, productTypeFilter, products, searchString]);
 
   return (
-    <div className={cn("flex flex-col items-center  pr-8", className)}>
+    <div className={cn("flex flex-col items-center", className)}>
       <div className="sticky top-0 z-10 w-full items-center">
         <div className="flex w-full justify-center  bg-backgroundPrimary">
           <div className="w-full max-w-[36em] pb-8  pt-2 md:pr-8">

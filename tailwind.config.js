@@ -70,7 +70,7 @@ module.exports = {
   plugins: [
     require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
-    function ({ addUtilities }) {
+    function({ addUtilities }) {
       const newUtilities = {
         ".scrollbar-webkit": {
           "&::-webkit-scrollbar": {
@@ -79,24 +79,6 @@ module.exports = {
           "&::-webkit-scrollbar-track": {
             backgroundColor: "#f1f1f1",
             paddingTop: "100px",
-            marginBottom: "200px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: "#2a1d10",
-            borderRadius: "6px",
-          },
-          ".break-before": { "page-break-before": "always" },
-          ".break-after": { "page-break-after": "always" },
-          ".break-inside-avoid": { "page-break-inside": "avoid" },
-        },
-        ".scrollbar-webkit-big-margin": {
-          "&::-webkit-scrollbar": {
-            width: "8px",
-          },
-          "&::-webkit-scrollbar-track": {
-            backgroundColor: "#f1f1f1",
-            paddingTop: "100px",
-            marginBottom: "265px",
           },
           "&::-webkit-scrollbar-thumb": {
             background: "#2a1d10",
