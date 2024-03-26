@@ -9,6 +9,7 @@ import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType } from "@prisma/client";
 import { SearchSlider } from "../ui/slider";
 import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
+import toast from "react-hot-toast";
 
 export function ProductSearchColumn({
   className,
@@ -20,7 +21,11 @@ export function ProductSearchColumn({
 }) {
   const router = useRouter();
   // TODO: maybe react to the loading state or make this query in server side rendering
-  const { data: products, isLoading } = api.product.getAll.useQuery();
+  const { data: products, isLoading } = api.product.getAll.useQuery(undefined, {
+    onError: () => {
+      toast.error("Erro ao Buscar produtos");
+    },
+  });
   const [searchString, setSearchString] = useState("");
   const onInputChange: ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {

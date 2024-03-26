@@ -28,6 +28,7 @@ import {
   getProductImageSrc,
 } from "~/server/types/product.type";
 import { ProductCard } from "~/components/common/ProductCard";
+import toast from "react-hot-toast";
 
 export const getServerSideProps = redirectGetServerSideProps.Admin;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -47,7 +48,11 @@ export default function ProductsScreen({ user }: Props) {
 
 function DangerZone({ className }: ClassNameProps) {
   const router = useRouter();
-  const resetProducts = api.product.dangerouslyResetProducts.useMutation();
+  const resetProducts = api.product.dangerouslyResetProducts.useMutation({
+    onError: () => {
+      toast.error("Erro ao Resetar Produtos");
+    },
+  });
   const onResetConfirm = useCallback(async () => {
     await resetProducts.mutateAsync(initialProducts);
     router.reload();
@@ -100,12 +105,19 @@ function DangerZone({ className }: ClassNameProps) {
 }
 
 function ProductsShowcase() {
-  const { data: products, isLoading } = api.product.getAll.useQuery();
+  const { data: products, isLoading } = api.product.getAll.useQuery(undefined, {
+    onError: () => {
+      toast.error("Erro ao Buscar Produtos");
+    },
+  });
 
   const apiUtils = api.useUtils();
   const createProduct = api.product.createProduct.useMutation({
     onSuccess() {
       void apiUtils.product.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Erro ao Criar Produto");
     },
   });
 
@@ -167,6 +179,9 @@ function ProductRow({ product }: { product: Product }) {
     onSuccess() {
       void apiUtils.product.getAll.invalidate();
     },
+    onError: () => {
+      toast.error("Erro ao Editar Produto");
+    },
   });
   const onClickSave = useCallback(
     () =>
@@ -180,6 +195,9 @@ function ProductRow({ product }: { product: Product }) {
   const deleteProduct = api.product.deleteProduct.useMutation({
     onSuccess() {
       void apiUtils.product.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Erro ao deletar produto");
     },
   });
   const onClickDelete = useCallback(
