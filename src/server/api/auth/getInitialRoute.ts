@@ -1,7 +1,8 @@
 import { type User } from "lucia";
-import { RoleTypeSchema } from "../../types/user.type";
+import { PermittedRoles } from "../../types/user.type";
+import { z } from "zod";
 
 export const getInitialRoute = (user: User) => {
-  const parseResult = RoleTypeSchema.Backoffice.safeParse(user.role);
+  const parseResult = z.enum(PermittedRoles.Backoffice).safeParse(user.role);
   return parseResult.success ? "/backoffice/users" : "/";
 };

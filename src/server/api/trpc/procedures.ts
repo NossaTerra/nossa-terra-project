@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { t, middleware } from "./trpc";
-import { RoleTypeSchema, type Role } from "../../types/user.type";
-import { type ZodEnum } from "zod";
+import { type Role, PermittedRoles } from "../../types/user.type";
+import { z, type ZodEnum } from "zod";
 
 const isAuthMiddleware = middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
@@ -48,14 +48,14 @@ export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(isAuthMiddleware);
 
 export const commonProcedure = t.procedure.use(
-  rolesFilterMiddleware(RoleTypeSchema.Common),
+  rolesFilterMiddleware(z.enum(PermittedRoles.Common)),
 );
 export const buyerOnlyProcedure = t.procedure.use(
-  rolesFilterMiddleware(RoleTypeSchema.BuyerOnly),
+  rolesFilterMiddleware(z.enum(PermittedRoles.BuyerOnly)),
 );
 export const backofficeProcedure = t.procedure.use(
-  rolesFilterMiddleware(RoleTypeSchema.Backoffice),
+  rolesFilterMiddleware(z.enum(PermittedRoles.Backoffice)),
 );
 export const adminProcedure = t.procedure.use(
-  rolesFilterMiddleware(RoleTypeSchema.Admin),
+  rolesFilterMiddleware(z.enum(PermittedRoles.Admin)),
 );

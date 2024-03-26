@@ -22,7 +22,7 @@ import { ArrowLeftIcon, CheckIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
-import { H2 } from "~/components/ui/typography";
+import { H3 } from "~/components/ui/typography";
 import { type Role } from "@prisma/client";
 
 function ChooseRoleContent({ className }: ClassNameProps) {
@@ -30,9 +30,6 @@ function ChooseRoleContent({ className }: ClassNameProps) {
 
   const schema = useChooseRoleSchema();
   const form = useForm<ChooseRoleFields>({
-    defaultValues: {
-      role: "seller",
-    },
     resolver: zodResolver(schema),
   });
 
@@ -85,7 +82,11 @@ function ChooseRoleContent({ className }: ClassNameProps) {
             render={({ field }) => (
               <FormItem className={className}>
                 <FormLabel>
-                  <H2 className="py-2">Qual a sua modalidade?</H2>
+                  <H3 className="py-2 font-medium">
+                    Você deseja se cadastrar como{" "}
+                    <span className="font-bold">"Produtor"</span> ou{"  "}
+                    <span className="font-bold">"Comprador"</span> ?
+                  </H3>
                 </FormLabel>
                 <FormMessage />
                 <RadioGroup

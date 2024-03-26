@@ -81,16 +81,10 @@ export type UserAttributes = z.infer<typeof userAttributes>;
 export const userSchema = userAttributes.merge(z.object({ id: z.string() }));
 export type User = z.infer<typeof userSchema>;
 
-// Permissions
+export const PermittedRoles = {
+  Common: ["seller", "buyer"],
+  BuyerOnly: ["buyer"],
 
-function roleParser<T extends [Role, ...Role[]]>(roles: T) {
-  return z.enum(roles);
-}
-
-export const RoleTypeSchema = {
-  Common: roleParser(["seller", "buyer"]),
-  BuyerOnly: roleParser(["buyer"]),
-
-  Backoffice: roleParser(["backoffice", "admin"]),
-  Admin: roleParser(["admin"]),
-} as const;
+  Backoffice: ["backoffice", "admin"],
+  Admin: ["admin"],
+} as const satisfies Record<string, Role[]>;
