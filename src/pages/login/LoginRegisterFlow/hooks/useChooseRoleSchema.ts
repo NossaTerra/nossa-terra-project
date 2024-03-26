@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import { RoleTypeSchema } from "~/server/types/user.type";
+import { PermittedRoles } from "~/server/types/user.type";
 
 export function useChooseRoleSchema() {
   // It's best to use a hook to get the schema because
@@ -9,7 +9,9 @@ export function useChooseRoleSchema() {
   return useMemo(
     () =>
       z.object({
-        role: RoleTypeSchema.Common,
+        role: z.enum(PermittedRoles.Common, {
+          required_error: "Por favor, escolha um tipo",
+        }),
       }),
     [],
   );

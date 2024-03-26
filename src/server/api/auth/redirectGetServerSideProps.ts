@@ -1,8 +1,8 @@
 import { type GetServerSidePropsContext, type GetServerSideProps } from "next";
 import { auth } from "./lucia";
 import { getInitialRoute } from "./getInitialRoute";
-import { RoleTypeSchema, type Role } from "../../types/user.type";
-import { type ZodEnum } from "zod";
+import { type Role, PermittedRoles } from "../../types/user.type";
+import { z, type ZodEnum } from "zod";
 
 const getUser = async (context: GetServerSidePropsContext) => {
   const { req, res } = context;
@@ -69,8 +69,8 @@ const Authed = <TRoles extends [Role, ...Role[]]>(
 export const redirectGetServerSideProps = {
   Public,
   MaybeAuthed,
-  Common: Authed(RoleTypeSchema.Common),
-  BuyerOnly: Authed(RoleTypeSchema.BuyerOnly),
-  Backoffice: Authed(RoleTypeSchema.Backoffice),
-  Admin: Authed(RoleTypeSchema.Admin),
+  Common: Authed(z.enum(PermittedRoles.Common)),
+  BuyerOnly: Authed(z.enum(PermittedRoles.BuyerOnly)),
+  Backoffice: Authed(z.enum(PermittedRoles.Backoffice)),
+  Admin: Authed(z.enum(PermittedRoles.Admin)),
 } as const;
