@@ -11,9 +11,8 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useCallback, useMemo } from "react";
-import { ArrowLeftIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/input";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { emptyString } from "~/utils/constants";
@@ -119,7 +118,7 @@ function ResetPasswordContent({
                   Nova Senha*
                 </FormLabel>
                 <FormControl>
-                  <Input
+                  <PasswordInput
                     className="mt-3x w-80 md:mt-0"
                     placeholder="Senha"
                     {...field}
@@ -143,7 +142,7 @@ function ResetPasswordContent({
                   Confirmar nova Senha*
                 </FormLabel>
                 <FormControl>
-                  <Input
+                  <PasswordInput
                     className="mt-3x w-full md:mt-0"
                     placeholder="Senha"
                     {...field}
@@ -194,20 +193,11 @@ export const getServerSideProps = (async (context) => {
 export default function ResetPasswordScreen({
   token,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const router = useRouter();
   console.log(token);
 
   return (
     <div className="flex min-h-screen flex-grow flex-col">
-      <header className="items-between flex justify-between pt-12">
-        <Button
-          className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
-          variant="outline"
-          onClick={router.back}
-        >
-          <ArrowLeftIcon />
-          Voltar
-        </Button>
+      <header className="items-between flex justify-end pt-12">
         <div className="hidden px-12 md:block">
           <NossaTerraLogo />
         </div>
