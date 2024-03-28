@@ -43,7 +43,11 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
   });
 
   const sendPasswordReset =
-    api.forgetPassword.sendResetPasswordEmail.useMutation();
+    api.forgetPassword.sendResetPasswordEmail.useMutation({
+      onError: () => {
+        toast.error("Erro ao enviar email de alteração de senha");
+      },
+    });
 
   const onSubmit: SubmitHandler<ForgotPasswordFields> = useCallback(
     async ({ email }) => {

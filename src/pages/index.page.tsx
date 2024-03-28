@@ -33,6 +33,7 @@ import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
 import React from "react";
 import { PermittedRoles } from "~/server/types/user.type";
 import { z } from "zod";
+import toast from "react-hot-toast";
 
 const pageLimit = 10;
 
@@ -68,49 +69,58 @@ export default function SearchScreen({ user }: Props) {
         : undefined,
   });
 
-  const { data, fetchNextPage, isFetching, hasNextPage, isLoading } =
-    api.search.getProductListings.useInfiniteQuery(
-      {
-        productId: selectedProductId,
-        searchingUserLatitude: user?.latitude ?? null,
-        searchingUserLongitude: user?.longitude ?? null,
-        distanceFilter: debouncedDistanceFilter,
-        limit: pageLimit,
+  const {
+    data,
+    error: listingsQueryError,
+    fetchNextPage,
+    isFetching,
+    hasNextPage,
+    isLoading,
+  } = api.search.getProductListings.useInfiniteQuery(
+    {
+      productId: selectedProductId,
+      searchingUserLatitude: user?.latitude ?? null,
+      searchingUserLongitude: user?.longitude ?? null,
+      distanceFilter: debouncedDistanceFilter,
+      limit: pageLimit,
+    },
+    {
+      refetchOnMount: false,
+      getNextPageParam: (lastPage) => {
+        if (lastPage?.nextCursor) {
+          return lastPage.nextCursor;
+        } else {
+          return undefined;
+        }
       },
-      {
-        refetchOnMount: false,
-        getNextPageParam: (lastPage) => {
-          if (lastPage?.nextCursor) {
-            return lastPage.nextCursor;
-          } else {
-            return undefined;
-          }
-        },
-        onSuccess: (data) => {
-          /* if there is a distance filter applied
+      onSuccess: (data) => {
+        /* if there is a distance filter applied
               it should always try to show the limit value per batch   
               this avoids states where there is no scroll bar but there 
               are more results to be returned and also keeps the number of
               shown results consistent if possible
            */
-          if (!data.pages[data.pages?.length - 1]?.nextCursor) {
-            return;
-          }
-          const searchResults =
-            data?.pages
-              .flatMap((page) => page?.searchResults ?? [])
-              .filter((result) => result !== undefined) ?? [];
+        if (!data.pages[data.pages?.length - 1]?.nextCursor) {
+          return;
+        }
+        const searchResults =
+          data?.pages
+            .flatMap((page) => page?.searchResults ?? [])
+            .filter((result) => result !== undefined) ?? [];
 
-          if (
-            data?.pages &&
-            searchResults &&
-            searchResults.length < data?.pages?.length * pageLimit
-          ) {
-            void fetchNextPage();
-          }
-        },
+        if (
+          data?.pages &&
+          searchResults &&
+          searchResults.length < data?.pages?.length * pageLimit
+        ) {
+          void fetchNextPage();
+        }
       },
-    );
+      onError: () => {
+        toast.error("Erro ao Buscar anúncios");
+      },
+    },
+  );
 
   const searchResults =
     data?.pages
@@ -242,6 +252,7 @@ export default function SearchScreen({ user }: Props) {
         <SelectedProductListingsColumn
           searchResults={searchResults}
           isFetching={isFetching}
+          listingsQueryError={!!listingsQueryError}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
           isLoading={isLoading}
@@ -262,6 +273,7 @@ function SelectedProductListingsColumn({
   searchResults,
   className,
   user,
+  listingsQueryError,
   isLoading,
   fetchNextPage,
   isFetching,
@@ -273,10 +285,16 @@ function SelectedProductListingsColumn({
   isFetching?: boolean;
   fetchNextPage?: () => Promise<unknown>;
   hasNextPage?: boolean;
+  listingsQueryError: boolean;
 } & Props) {
   const router = useRouter();
   const { selectedProductId } = useSearchScreenParams();
-  const { data: products } = api.product.getAll.useQuery();
+  const { data: products } = api.product.getAll.useQuery(undefined, {
+    onError: () => {
+      toast.error("Erro ao Buscar produtos");
+    },
+  });
+
   const product = products?.find((product) => product.id === selectedProductId);
 
   /*Big screens have custom scroll defined by tailwind scrollbar-webkit
@@ -300,10 +318,16 @@ function SelectedProductListingsColumn({
   );
 
   const shouldShowLoader =
-    !!searchResults && searchResults?.length > 0 && hasNextPage;
+    !!searchResults &&
+    searchResults?.length > 0 &&
+    hasNextPage &&
+    !listingsQueryError;
   const shouldShowResultMessage = !!searchResults && searchResults?.length;
   const shouldShowLinkForFirstListing =
-    searchResults?.length === 0 && !!user && user.role === "buyer";
+    searchResults?.length === 0 &&
+    !!user &&
+    user.role === "buyer" &&
+    !listingsQueryError;
   const hasAtLeastTenResults =
     searchResults && searchResults.length < 10 && searchResults.length > 0;
 
@@ -350,11 +374,19 @@ function SelectedProductListingsColumn({
           </Button>
           <div className="relative w-full rounded-xl md:p-8">
             <div className="mb-6  mr-2 mt-2 block max-w-[895px] rounded-lg bg-slate-100 p-4 lg:mr-8 ">
-              <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
-                {shouldShowResultMessage
-                  ? "Resultados Para Saca (60kg) de:"
-                  : "Ainda não há anúncios para distância pesquisada para:"}
-              </span>
+              {!listingsQueryError && (
+                <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
+                  {shouldShowResultMessage
+                    ? "Resultados Para Saca (60kg) de:"
+                    : "Ainda não há anúncios para distância pesquisada para:"}
+                </span>
+              )}
+              {listingsQueryError && (
+                <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
+                  Tente novamente mais tarde, houve um erro ao buscar anúncios
+                  de:
+                </span>
+              )}
               <span className="font-poppins-400 ml-2 mt-2 block pb-4 text-lg lg:text-xl">
                 {product.name}
               </span>

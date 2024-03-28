@@ -13,6 +13,7 @@ import { kiloByte } from "~/utils/constants";
 import Image from "next/image";
 import { api } from "~/utils/api";
 import { type UseFormReturn } from "react-hook-form";
+import toast from "react-hot-toast";
 
 const MAX_FILE_SIZE_MB = 1;
 
@@ -49,7 +50,11 @@ export function AvatarUpload<FormData extends AvatarFormData>({
   const [error, setError] = useState<ErrorType | null>(null);
   const errorMessage = useErrorMessage(error);
 
-  const uploadAvatar = api.auth.uploadAvatar.useMutation();
+  const uploadAvatar = api.auth.uploadAvatar.useMutation({
+    onError() {
+      toast.error("Erro ao salvar logo da empresa");
+    },
+  });
   const [localImagePreview, setLocalImagePreview] = useState<string | null>(
     null,
   );

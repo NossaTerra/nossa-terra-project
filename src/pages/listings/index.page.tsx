@@ -13,6 +13,7 @@ import { ListingCard } from "./ListingCard";
 import { ProductType } from "@prisma/client";
 import MyListingsCardShimmer from "./MyListingsCardShimmer";
 import { ImageBackgroundFooter } from "~/components/common/ImageBackgroundFooter";
+import toast from "react-hot-toast";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -93,7 +94,14 @@ function InactivePaymentMessage({ className }: ClassNameProps) {
 }
 
 function MyListingsDashboard({ className }: ClassNameProps) {
-  const { data: myListings, isLoading } = api.listing.getMyListings.useQuery();
+  const { data: myListings, isLoading } = api.listing.getMyListings.useQuery(
+    undefined,
+    {
+      onError: () => {
+        toast.error("Erro ao Buscar Meus anúncios");
+      },
+    },
+  );
 
   if (!isLoading && !myListings?.length) {
     return (
