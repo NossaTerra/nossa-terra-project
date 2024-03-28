@@ -1,27 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn, type ClassNameProps } from "src/utils/ui";
 import { api } from "~/utils/api";
-import { useMediaQuery } from "react-responsive";
+import { useIsMobile } from "~/hooks/useResponsive";
 
 const AdsCarrousel: React.FC<ClassNameProps> = ({ className }) => {
   const { isLoading, data: adsData } = api.ad.getAll.useQuery();
-
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  const desktop = useMediaQuery({ query: "(min-width: 768px)" });
-
-  useEffect(() => {
-    setIsDesktop(desktop);
-
-    const handleResize = () => {
-      setIsDesktop(desktop);
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, [desktop]);
+  const isMobile = useIsMobile();
 
   const filteredAds = useMemo(() => {
     if (!adsData) return [];
@@ -34,19 +20,19 @@ const AdsCarrousel: React.FC<ClassNameProps> = ({ className }) => {
         <motion.div
           className="relative mb-4 flex gap-12"
           animate={{
-            x: isDesktop
-              ? ["0%", "80%", "0%", "-80%"]
-              : [
-                  "0%",
-                  "80%",
-                  "0%",
-                  "-80%",
-                  "-160%",
-                  "-240%",
-                  "-320%",
-                  "-400%",
-                  "-480%",
-                ],
+            x: isMobile
+              ? [
+                "0%",
+                "80%",
+                "0%",
+                "-80%",
+                "-160%",
+                "-240%",
+                "-320%",
+                "-400%",
+                "-480%",
+              ]
+              : ["0%", "80%", "0%", "-80%"],
           }}
           transition={{
             duration: 45,
