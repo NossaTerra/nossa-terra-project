@@ -46,18 +46,27 @@ const AdsCarrousel: React.FC<ClassNameProps> = ({ className }) => {
               <React.Fragment key={index}>
                 {filteredAds?.map((ad, adIndex) => (
                   <div className="flex flex-shrink-0" key={adIndex}>
-                    <Image
-                      src={ad.adImage}
-                      alt={`Image ${adIndex + 1}`}
-                      onClick={() => ad?.link && window.open(ad.link, "_blank")}
-                      width={400}
-                      height={120}
-                      objectFit="cover"
-                      className={cn(
-                        "h-full max-h-20 w-full md:max-h-28 ",
-                        ad?.link && "cursor-pointer",
-                      )}
-                    />
+                    <a
+                      href={ad?.link ?? undefined}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (ad?.link) {
+                          window.open(ad.link, "_blank");
+                        }
+                      }}
+                    >
+                      <Image
+                        src={ad.adImage}
+                        alt={`Image ${adIndex + 1}`}
+                        width={400}
+                        height={120}
+                        objectFit="cover"
+                        className={cn(
+                          "h-full max-h-20 w-full md:max-h-28 ",
+                          ad?.link && "cursor-pointer",
+                        )}
+                      />
+                    </a>
                   </div>
                 ))}
                 {filteredAds.length < 3 && (
