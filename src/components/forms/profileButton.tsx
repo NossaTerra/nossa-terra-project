@@ -69,33 +69,41 @@ export function ProfileButton({
       try {
         const buyerForm: SecondDataStepBuyerFields =
           form.getValues() as SecondDataStepBuyerFields;
-        await editBuyer.mutateAsync({
-          id: user.id,
-          attributes: {
-            avatarImage: buyerForm.avatarImage,
-            businessMainSector: buyerForm.businessMainSector,
-            social: {
-              phone: formatPhone(buyerForm.phone),
-              phoneUsesWhatsapp: buyerForm.phoneUsesWhatsapp,
-              secondaryPhone: buyerForm.secondaryPhone
-                ? formatPhone(buyerForm.secondaryPhone)
-                : undefined,
-              secondaryPhoneUsesWhatsapp: buyerForm.secondaryPhoneUsesWhatsapp,
-              instagram: buyerForm.instagram,
-            },
-            address: {
-              zipCode: buyerForm.zipCode,
-              city: buyerForm.city,
-              province: buyerForm.province,
-              street: buyerForm.street,
-              district: buyerForm.district,
-              complementary: buyerForm.complementary,
-              streetNumber: buyerForm.streetNumber,
-              latitude: userLatitude,
-              longitude: userLongitude,
+        await editBuyer.mutateAsync(
+          {
+            id: user.id,
+            attributes: {
+              avatarImage: buyerForm.avatarImage,
+              businessMainSector: buyerForm.businessMainSector,
+              social: {
+                phone: formatPhone(buyerForm.phone),
+                phoneUsesWhatsapp: buyerForm.phoneUsesWhatsapp,
+                secondaryPhone: buyerForm.secondaryPhone
+                  ? formatPhone(buyerForm.secondaryPhone)
+                  : undefined,
+                secondaryPhoneUsesWhatsapp:
+                  buyerForm.secondaryPhoneUsesWhatsapp,
+                instagram: buyerForm.instagram,
+              },
+              address: {
+                zipCode: buyerForm.zipCode,
+                city: buyerForm.city,
+                province: buyerForm.province,
+                street: buyerForm.street,
+                district: buyerForm.district,
+                complementary: buyerForm.complementary,
+                streetNumber: buyerForm.streetNumber,
+                latitude: userLatitude,
+                longitude: userLongitude,
+              },
             },
           },
-        });
+          {
+            onError: () => {
+              toast.error("Erro ao Editar Perfil");
+            },
+          },
+        );
         window.location.reload();
       } catch (error) {
         setOpen(false);
@@ -105,27 +113,34 @@ export function ProfileButton({
       try {
         const sellerForm: SecondDataStepSellerFields =
           form.getValues() as SecondDataStepSellerFields;
-        await editSeller.mutateAsync({
-          id: user.id,
-          attributes: {
-            rg: sellerForm.rg,
-            social: {
-              phone: formatPhone(sellerForm.phone),
-              phoneUsesWhatsapp: sellerForm.phoneUsesWhatsapp,
-            },
-            address: {
-              zipCode: sellerForm.zipCode,
-              city: sellerForm.city,
-              province: sellerForm.province,
-              street: sellerForm.street,
-              district: sellerForm.district,
-              complementary: sellerForm.complementary,
-              streetNumber: sellerForm.streetNumber,
-              latitude: userLatitude,
-              longitude: userLongitude,
+        await editSeller.mutateAsync(
+          {
+            id: user.id,
+            attributes: {
+              rg: sellerForm.rg,
+              social: {
+                phone: formatPhone(sellerForm.phone),
+                phoneUsesWhatsapp: sellerForm.phoneUsesWhatsapp,
+              },
+              address: {
+                zipCode: sellerForm.zipCode,
+                city: sellerForm.city,
+                province: sellerForm.province,
+                street: sellerForm.street,
+                district: sellerForm.district,
+                complementary: sellerForm.complementary,
+                streetNumber: sellerForm.streetNumber,
+                latitude: userLatitude,
+                longitude: userLongitude,
+              },
             },
           },
-        });
+          {
+            onError: () => {
+              toast.error("Erro ao Editar Perfil");
+            },
+          },
+        );
         toast.success("Alterações realizadas com sucesso");
         setOpen(false);
       } catch {

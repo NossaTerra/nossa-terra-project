@@ -33,6 +33,7 @@ import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
 import React from "react";
 import { PermittedRoles } from "~/server/types/user.type";
 import { z } from "zod";
+import toast from "react-hot-toast";
 
 const pageLimit = 10;
 
@@ -68,7 +69,7 @@ export default function SearchScreen({ user }: Props) {
         : undefined,
   });
 
-  const { data, fetchNextPage, isFetching, hasNextPage, isLoading } =
+  const { data, error, fetchNextPage, isFetching, hasNextPage, isLoading } =
     api.search.getProductListings.useInfiniteQuery(
       {
         productId: selectedProductId,
@@ -108,6 +109,9 @@ export default function SearchScreen({ user }: Props) {
           ) {
             void fetchNextPage();
           }
+        },
+        onError: () => {
+          toast.error("Erro ao Buscar anúncios");
         },
       },
     );
@@ -242,6 +246,7 @@ export default function SearchScreen({ user }: Props) {
         <SelectedProductListingsColumn
           searchResults={searchResults}
           isFetching={isFetching}
+          error={!!error}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
           isLoading={isLoading}
@@ -262,6 +267,7 @@ function SelectedProductListingsColumn({
   searchResults,
   className,
   user,
+  error,
   isLoading,
   fetchNextPage,
   isFetching,
@@ -273,10 +279,16 @@ function SelectedProductListingsColumn({
   isFetching?: boolean;
   fetchNextPage?: () => Promise<unknown>;
   hasNextPage?: boolean;
+  error: boolean;
 } & Props) {
   const router = useRouter();
   const { selectedProductId } = useSearchScreenParams();
-  const { data: products } = api.product.getAll.useQuery();
+  const { data: products } = api.product.getAll.useQuery(undefined, {
+    onError: () => {
+      toast.error("Erro ao Buscar produtos");
+    },
+  });
+
   const product = products?.find((product) => product.id === selectedProductId);
 
   /*Big screens have custom scroll defined by tailwind scrollbar-webkit
@@ -300,10 +312,10 @@ function SelectedProductListingsColumn({
   );
 
   const shouldShowLoader =
-    !!searchResults && searchResults?.length > 0 && hasNextPage;
+    !!searchResults && searchResults?.length > 0 && hasNextPage && !error;
   const shouldShowResultMessage = !!searchResults && searchResults?.length;
   const shouldShowLinkForFirstListing =
-    searchResults?.length === 0 && !!user && user.role === "buyer";
+    searchResults?.length === 0 && !!user && user.role === "buyer" && !error;
   const hasAtLeastTenResults =
     searchResults && searchResults.length < 10 && searchResults.length > 0;
 
@@ -350,11 +362,19 @@ function SelectedProductListingsColumn({
           </Button>
           <div className="relative w-full rounded-xl md:p-8">
             <div className="mb-6  mr-2 mt-2 block max-w-[895px] rounded-lg bg-slate-100 p-4 lg:mr-8 ">
-              <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
-                {shouldShowResultMessage
-                  ? "Resultados Para Saca (60kg) de:"
-                  : "Ainda não há anúncios para distância pesquisada para:"}
-              </span>
+              {!error && (
+                <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
+                  {shouldShowResultMessage
+                    ? "Resultados Para Saca (60kg) de:"
+                    : "Ainda não há anúncios para distância pesquisada para:"}
+                </span>
+              )}
+              {error && (
+                <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
+                  Tente novamente mais tarde, houve um erro ao buscar anúncios
+                  de:
+                </span>
+              )}
               <span className="font-poppins-400 ml-2 mt-2 block pb-4 text-lg lg:text-xl">
                 {product.name}
               </span>

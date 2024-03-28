@@ -26,6 +26,7 @@ import { useCallback, useState } from "react";
 import { EditListingForm, type ListingFormData } from "./EditListingForm";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { getDisplayTime } from "~/utils/time";
+import toast from "react-hot-toast";
 
 export function ListingCard({
   listing,
@@ -101,11 +102,18 @@ function DeleteListingDialog({
     onSuccess() {
       void apiUtils.listing.getMyListings.invalidate();
     },
+    onError: () => {
+      toast.error("Erro ao Deletar Anúncio");
+    },
   });
 
   const onDelete = useCallback(async () => {
-    await deleteListing.mutateAsync({ id: listing.id });
-    onOpenChange(false);
+    try {
+      await deleteListing.mutateAsync({ id: listing.id });
+      onOpenChange(false);
+    } catch {
+      console.log("Error while delete listing");
+    }
   }, [deleteListing, listing.id, onOpenChange]);
 
   return (
@@ -150,11 +158,18 @@ function EditListingModal({
     onSuccess() {
       void apiUtils.listing.getMyListings.invalidate();
     },
+    onError: () => {
+      toast.error("Erro ao Editar Anúncio");
+    },
   });
   const onSuccess = useCallback(
     async (data: ListingFormData) => {
-      await editListing.mutateAsync({ ...listing, ...data });
-      onOpenChange(false);
+      try {
+        await editListing.mutateAsync({ ...listing, ...data });
+        onOpenChange(false);
+      } catch {
+        console.log("Error while editing listing");
+      }
     },
     [editListing, listing, onOpenChange],
   );

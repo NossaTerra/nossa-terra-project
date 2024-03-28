@@ -79,8 +79,16 @@ export function SellerForm({
     districtInputRef,
   } = useAutomaticAddressFill({ form });
 
-  const register = api.auth.registerSeller.useMutation();
-  const login = api.auth.login.useMutation();
+  const register = api.auth.registerSeller.useMutation({
+    onError() {
+      toast.error("Erro ao se Registrar no Nossa Terra");
+    },
+  });
+  const login = api.auth.login.useMutation({
+    onError() {
+      toast.error("Erro ao entrar no Nossa Terra");
+    },
+  });
   const router = useRouter();
   const isLoadingRegistration = register.isLoading;
 
@@ -102,38 +110,40 @@ export function SellerForm({
           return;
         }
         const { email, name, password, cpf } = state.accumulatedContext;
+        try {
+          await register.mutateAsync({
+            email,
+            name,
+            cpf,
+            password,
+            rg,
+            social: {
+              phone: formatPhone(phone),
+              phoneUsesWhatsapp,
+            },
+            address: {
+              zipCode,
+              city,
+              province,
+              street,
+              district,
+              complementary,
+              streetNumber,
+              latitude,
+              longitude,
+            },
+          });
 
-        await register.mutateAsync({
-          email,
-          name,
-          cpf,
-          password,
-          rg,
-          social: {
-            phone: formatPhone(phone),
-            phoneUsesWhatsapp,
-          },
-          address: {
-            zipCode,
-            city,
-            province,
-            street,
-            district,
-            complementary,
-            streetNumber,
-            latitude,
-            longitude,
-          },
-        });
-
-        await login.mutateAsync({
-          email,
-          password,
-        });
-
-        await router.replace("/");
-        toast.remove(toastRefId);
-        resetState();
+          await login.mutateAsync({
+            email,
+            password,
+          });
+          await router.replace("/");
+          toast.remove(toastRefId);
+          resetState();
+        } catch {
+          console.log("Error registering seller");
+        }
       },
       [
         state.stepKey,

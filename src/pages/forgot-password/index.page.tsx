@@ -43,7 +43,11 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
   });
 
   const sendPasswordReset =
-    api.forgetPassword.sendResetPasswordEmail.useMutation();
+    api.forgetPassword.sendResetPasswordEmail.useMutation({
+      onError: () => {
+        toast.error("Erro ao enviar email de alteração de senha");
+      },
+    });
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,7 +59,6 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
         await router.replace(`/password-reset-sent`);
         return new Response();
       } catch (e) {
-        toast.error("Erro ao enviar o email");
         return new Response(
           JSON.stringify({
             error: "An unknown error occurred",

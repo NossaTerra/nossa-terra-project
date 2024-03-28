@@ -94,9 +94,17 @@ export function BuyerForm({
     districtInputRef,
   } = useAutomaticAddressFill({ form });
 
-  const registerBuyer = api.auth.registerBuyer.useMutation();
+  const registerBuyer = api.auth.registerBuyer.useMutation({
+    onError() {
+      toast.error("Erro ao se registrar no Nossa Terra");
+    },
+  });
   const isLoadingRegistration = registerBuyer.isLoading;
-  const login = api.auth.login.useMutation();
+  const login = api.auth.login.useMutation({
+    onError() {
+      toast.error("Erro ao entrar no Nossa Terra");
+    },
+  });
   const router = useRouter();
 
   const onSubmitUserCreation: SubmitHandler<SecondDataStepBuyerFields> =
@@ -122,44 +130,45 @@ export function BuyerForm({
         }
 
         const { email, name, password, cpf } = state.accumulatedContext;
-
-        await registerBuyer.mutateAsync({
-          email,
-          name,
-          cpf,
-          password,
-          businessMainSector,
-          avatarImage,
-          social: {
-            phone: formatPhone(phone),
-            phoneUsesWhatsapp,
-            secondaryPhone: secondaryPhone
-              ? formatPhone(secondaryPhone)
-              : undefined,
-            secondaryPhoneUsesWhatsapp,
-            instagram,
-          },
-          address: {
-            zipCode,
-            city,
-            province,
-            street,
-            district,
-            complementary,
-            streetNumber,
-            latitude,
-            longitude,
-          },
-        });
-
-        await login.mutateAsync({
-          email,
-          password,
-        });
-
-        await router.replace("/");
-        toast.remove(toastRefId);
-        resetState();
+        try {
+          await registerBuyer.mutateAsync({
+            email,
+            name,
+            cpf,
+            password,
+            businessMainSector,
+            avatarImage,
+            social: {
+              phone: formatPhone(phone),
+              phoneUsesWhatsapp,
+              secondaryPhone: secondaryPhone
+                ? formatPhone(secondaryPhone)
+                : undefined,
+              secondaryPhoneUsesWhatsapp,
+              instagram,
+            },
+            address: {
+              zipCode,
+              city,
+              province,
+              street,
+              district,
+              complementary,
+              streetNumber,
+              latitude,
+              longitude,
+            },
+          });
+          await login.mutateAsync({
+            email,
+            password,
+          });
+          await router.replace("/");
+          toast.remove(toastRefId);
+          resetState();
+        } catch {
+          console.log("error registering buyer");
+        }
       },
       [
         state.stepKey,

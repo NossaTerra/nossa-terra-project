@@ -77,15 +77,22 @@ function ActivateDialogBody({ userData }: { userData: TUserData }) {
       onSuccess() {
         void apiUtils.backoffice.getAllBuyers.invalidate();
       },
+      onError() {
+        toast.error("Erro ao alterar estado de ativação");
+      },
     },
   );
 
   const onActivate = useCallback(async () => {
-    await apiChangeActiveState.mutateAsync({
-      userId: userData.id,
-      activeState: "active",
-    });
-    closeModal();
+    try {
+      await apiChangeActiveState.mutateAsync({
+        userId: userData.id,
+        activeState: "active",
+      });
+      closeModal();
+    } catch {
+      console.log("Error changing activation state");
+    }
   }, [apiChangeActiveState, closeModal, userData.id]);
 
   return (
@@ -122,15 +129,22 @@ function DeactivateDialogBody({ userData }: { userData: TUserData }) {
       onSuccess() {
         void apiUtils.backoffice.getAllBuyers.invalidate();
       },
+      onError() {
+        toast.error("Erro ao alterar estado de ativação");
+      },
     },
   );
 
   const onDeactivate = useCallback(async () => {
-    await apiChangeActiveState.mutateAsync({
-      userId: userData.id,
-      activeState: "inactive",
-    });
-    closeModal();
+    try {
+      await apiChangeActiveState.mutateAsync({
+        userId: userData.id,
+        activeState: "inactive",
+      });
+      closeModal();
+    } catch {
+      console.log("Error changing activation state");
+    }
   }, [apiChangeActiveState, closeModal, userData.id]);
 
   return (
@@ -166,14 +180,21 @@ function DeleteDialogBody({ userData }: { userData: TUserData }) {
     onSuccess() {
       void apiUtils.backoffice.getAllBuyers.invalidate();
     },
+    onError() {
+      toast.error("Erro ao deletar usuário");
+    },
   });
 
   const onDelete = useCallback(async () => {
-    await apiDeleteUser.mutateAsync({
-      userId: userData.id,
-    });
-    toast.success("Usuário deletado com sucesso!");
-    closeModal();
+    try {
+      await apiDeleteUser.mutateAsync({
+        userId: userData.id,
+      });
+      toast.success("Usuário deletado com sucesso!");
+      closeModal();
+    } catch {
+      console.log("Error deleting user");
+    }
   }, [apiDeleteUser, closeModal, userData.id]);
 
   return (
