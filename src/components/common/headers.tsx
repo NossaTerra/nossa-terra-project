@@ -135,8 +135,9 @@ export function AppHeader({
 export function BackofficeHeader({ user }: { user: User }) {
   const { logout } = useAuth();
   return (
-    <div className="flex w-full items-center justify-between p-10">
+    <div className="mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 pb-7 pt-10 shadow">
       <NavBar>
+        <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         <NavItem
           href="/backoffice/users"
           label="Controle de Usuários"

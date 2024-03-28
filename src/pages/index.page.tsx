@@ -1,5 +1,5 @@
 import { type InferGetServerSidePropsType } from "next";
-import { AppHeader } from "~/components/common/headers";
+import { AppHeader, BackofficeHeader } from "~/components/common/headers";
 
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { type ClassNameProps, cn } from "~/utils/ui";
@@ -31,6 +31,8 @@ import { useDebouncedValue } from "~/hooks/useDebouncedValue";
 import Link from "next/link";
 import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
 import React from "react";
+import { PermittedRoles } from "~/server/types/user.type";
+import { z } from "zod";
 
 const pageLimit = 10;
 
@@ -150,6 +152,10 @@ export default function SearchScreen({ user }: Props) {
     };
   }, [fetchNextPage, hasNextPage, isFetching]);
 
+  const isBackofficeUser = z
+    .enum(PermittedRoles.Backoffice)
+    .safeParse(user?.role).success;
+
   return (
     <div className="flex grow flex-col lg:max-h-svh">
       <div
@@ -157,11 +163,15 @@ export default function SearchScreen({ user }: Props) {
           "border-b-2 bg-cardHover bg-opacity-25 shadow md:py-8": !user,
         })}
       >
-        <AppHeader
-          className="flex-col justify-center"
-          user={user}
-          hideLogo={!user}
-        />
+        {isBackofficeUser && user ? (
+          <BackofficeHeader user={user} />
+        ) : (
+          <AppHeader
+            className="flex-col justify-center"
+            user={user}
+            hideLogo={!user}
+          />
+        )}
 
         {!user && (
           <div className="w-full px-10">
