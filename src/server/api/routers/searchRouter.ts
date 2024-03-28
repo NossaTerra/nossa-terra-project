@@ -15,9 +15,9 @@ function calculateGlobalDistanceKm({
   const a =
     Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
     Math.cos(deg2rad(pointA.lat)) *
-    Math.cos(deg2rad(pointB.lat)) *
-    Math.sin(deltaLon / 2) *
-    Math.sin(deltaLon / 2);
+      Math.cos(deg2rad(pointB.lat)) *
+      Math.sin(deltaLon / 2) *
+      Math.sin(deltaLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }

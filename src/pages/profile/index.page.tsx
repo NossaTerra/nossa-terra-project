@@ -27,6 +27,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import AdsCarrousel from "~/components/common/AdsCarrousel";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -84,11 +85,10 @@ export default function ProfileScreen({ user }: Props) {
             )}
           </div>
 
-          {showLogoutButton && (
-            <footer className="flex justify-center py-10 lg:justify-end">
-              <LogOutButton />
-            </footer>
-          )}
+          <footer className="flex justify-center py-10 lg:justify-end">
+            {showLogoutButton && <LogOutButton />}
+            {isEditingProfile && <AdsCarrousel className="mt-20" />}
+          </footer>
         </motion.div>
       </AnimatePresence>
     </>

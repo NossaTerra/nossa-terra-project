@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import ImageCarousel from "~/components/common/ImageCarrousel";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -143,29 +142,15 @@ function GreetingContent({ className }: ClassNameProps) {
 export function GreetingScreen() {
   useScrollToTop();
   return (
-    <div className="flex min-h-screen flex-grow flex-col">
-      <header className="flex items-start justify-center pt-12 md:justify-end">
-        <div className="hidden px-12 md:block">
+    <div className="flex h-screen flex-grow flex-col justify-center">
+      <header className="flex  items-start justify-center pt-12 md:justify-end">
+        <div className="absolute right-4 top-10 hidden px-12 md:block">
           <NossaTerraLogo />
         </div>
-        <ImageCarousel
-          pathArray={["", "", "", "", "", "", ""]}
-          height={220}
-          width={220}
-          className="block md:hidden"
-        />
       </header>
-
-      <GreetingContent className="flex grow" />
-
+      <GreetingContent className="flex " />
       <footer className="flex flex-col justify-center">
-        <ImageCarousel
-          pathArray={["", "", "", "", "", "", ""]}
-          height={220}
-          width={220}
-          className="hidden md:block"
-        />
-        <div className="flex justify-center p-12 md:hidden">
+        <div className="mt-8 flex justify-center p-12 md:hidden">
           <NossaTerraLogo />
         </div>
       </footer>

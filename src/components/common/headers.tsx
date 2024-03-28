@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   DollarSignIcon,
   FolderOpenIcon,
+  LogOut,
   MenuIcon,
   PhoneIcon,
   SearchIcon,
@@ -16,20 +17,25 @@ import {
 import { useRouter } from "next/router";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
+import { useAuth } from "~/hooks/useAuth";
 
 interface NavItem {
   href: string;
   label: string;
   icon: JSX.Element;
+  isSelectable?: boolean;
+  onClick?: () => void;
 }
 
-function NavItem({ href, label, icon }: NavItem) {
+function NavItem({ href, label, icon, onClick, isSelectable = true }: NavItem) {
   const { pathname } = useRouter();
   const isSelected =
-    href === "/" ? pathname === href : pathname.startsWith(href);
+    isSelectable &&
+    (href === "/" ? pathname === href : pathname.startsWith(href));
 
   return (
     <Link
+      onClick={onClick}
       href={href}
       className={cn(
         "flex w-full flex-row items-center justify-start gap-2 lg:w-auto",
@@ -120,9 +126,11 @@ export function AppHeader({
 }
 
 export function BackofficeHeader({ user }: { user: User }) {
+  const { logout } = useAuth();
   return (
-    <div className="flex w-full items-center justify-between p-10">
+    <div className="mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 pb-7 pt-10 shadow">
       <NavBar>
+        <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         <NavItem
           href="/backoffice/users"
           label="Controle de Usuários"
@@ -140,6 +148,13 @@ export function BackofficeHeader({ user }: { user: User }) {
             icon={<TagsIcon />}
           />
         )}
+        <NavItem
+          onClick={logout}
+          href="/"
+          isSelectable={false}
+          label="Sair"
+          icon={<LogOut />}
+        />
       </NavBar>
       <NossaTerraLogo />
     </div>

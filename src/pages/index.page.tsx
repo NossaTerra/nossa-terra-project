@@ -1,5 +1,6 @@
 import { type InferGetServerSidePropsType } from "next";
-import { AppHeader } from "~/components/common/headers";
+import { AppHeader, BackofficeHeader } from "~/components/common/headers";
+
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import Image from "next/image";
@@ -28,6 +29,10 @@ import BounceLoader from "react-spinners/BounceLoader";
 import SearchCardShimmer from "./search/SearchCardShimmer";
 import { useDebouncedValue } from "~/hooks/useDebouncedValue";
 import Link from "next/link";
+import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
+import React from "react";
+import { PermittedRoles } from "~/server/types/user.type";
+import { z } from "zod";
 
 const pageLimit = 10;
 
@@ -147,6 +152,10 @@ export default function SearchScreen({ user }: Props) {
     };
   }, [fetchNextPage, hasNextPage, isFetching]);
 
+  const isBackofficeUser = z
+    .enum(PermittedRoles.Backoffice)
+    .safeParse(user?.role).success;
+
   return (
     <div className="flex grow flex-col lg:max-h-svh">
       <div
@@ -154,11 +163,15 @@ export default function SearchScreen({ user }: Props) {
           "border-b-2 bg-cardHover bg-opacity-25 shadow md:py-8": !user,
         })}
       >
-        <AppHeader
-          className="flex-col justify-center"
-          user={user}
-          hideLogo={!user}
-        />
+        {isBackofficeUser && user ? (
+          <BackofficeHeader user={user} />
+        ) : (
+          <AppHeader
+            className="flex-col justify-center"
+            user={user}
+            hideLogo={!user}
+          />
+        )}
 
         {!user && (
           <div className="w-full px-10">
@@ -291,6 +304,8 @@ function SelectedProductListingsColumn({
   const shouldShowResultMessage = !!searchResults && searchResults?.length;
   const shouldShowLinkForFirstListing =
     searchResults?.length === 0 && !!user && user.role === "buyer";
+  const hasAtLeastTenResults =
+    searchResults && searchResults.length < 10 && searchResults.length > 0;
 
   return (
     <div
@@ -356,15 +371,25 @@ function SelectedProductListingsColumn({
               )}
             </div>
             <div>
-              {searchResults?.map((searchResult, index) => (
-                <div key={index} className="mb-10 md:mr-7">
-                  <SearchResultCard
-                    searchResult={searchResult}
-                    showBlured={!user}
-                    product={product}
-                  />
-                </div>
-              ))}
+              <div className="flex max-w-[890px] flex-col gap-0">
+                {searchResults?.map((searchResult, index) => (
+                  <React.Fragment key={index}>
+                    <div className="mb-10 md:mr-7">
+                      <SearchResultCard
+                        searchResult={searchResult}
+                        showBlured={!user}
+                        product={product}
+                      />
+                    </div>
+                    {(index + 1) % pageLimit === 0 &&
+                      index + 1 !== searchResults.length && (
+                        <AdsCarrouselListings />
+                      )}
+                  </React.Fragment>
+                ))}
+                {/* Show sponsored section at the end if there are fewer than ten results */}
+                {hasAtLeastTenResults && <AdsCarrouselListings />}
+              </div>
               {shouldShowLoader && (
                 <div className="mt-4 flex  w-full max-w-[880px] items-center justify-center ">
                   <span className="font-poppins-800 mr-2 text-accent  lg:mr-6">

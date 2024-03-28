@@ -182,6 +182,7 @@ function ProductRow({ product }: { product: Product }) {
       void apiUtils.product.getAll.invalidate();
     },
   });
+
   const onClickDelete = useCallback(
     () =>
       deleteProduct.mutate({
