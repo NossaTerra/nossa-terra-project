@@ -1,27 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { cn, type ClassNameProps } from "src/utils/ui";
 import { api } from "~/utils/api";
-import { useMediaQuery } from "react-responsive";
+import { useIsMobile } from "~/hooks/useResponsive";
 
 const AdsCarrousel: React.FC<ClassNameProps> = ({ className }) => {
   const { isLoading, data: adsData } = api.ad.getAll.useQuery();
-
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  const desktop = useMediaQuery({ query: "(min-width: 768px)" });
-
-  useEffect(() => {
-    setIsDesktop(desktop);
-
-    const handleResize = () => {
-      setIsDesktop(desktop);
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, [desktop]);
+  const isMobile = useIsMobile();
 
   const filteredAds = useMemo(() => {
     if (!adsData) return [];
@@ -34,19 +20,19 @@ const AdsCarrousel: React.FC<ClassNameProps> = ({ className }) => {
         <motion.div
           className="relative mb-4 flex gap-12"
           animate={{
-            x: isDesktop
-              ? ["0%", "80%", "0%", "-80%"]
-              : [
-                  "0%",
-                  "80%",
-                  "0%",
-                  "-80%",
-                  "-160%",
-                  "-240%",
-                  "-320%",
-                  "-400%",
-                  "-480%",
-                ],
+            x: isMobile
+              ? [
+                "0%",
+                "80%",
+                "0%",
+                "-80%",
+                "-160%",
+                "-240%",
+                "-320%",
+                "-400%",
+                "-480%",
+              ]
+              : ["0%", "80%", "0%", "-80%"],
           }}
           transition={{
             duration: 45,
@@ -60,18 +46,27 @@ const AdsCarrousel: React.FC<ClassNameProps> = ({ className }) => {
               <React.Fragment key={index}>
                 {filteredAds?.map((ad, adIndex) => (
                   <div className="flex flex-shrink-0" key={adIndex}>
-                    <Image
-                      src={ad.adImage}
-                      alt={`Image ${adIndex + 1}`}
-                      onClick={() => ad?.link && window.open(ad.link, "_blank")}
-                      width={400}
-                      height={120}
-                      objectFit="cover"
-                      className={cn(
-                        "h-full max-h-20 w-full md:max-h-28 ",
-                        ad?.link && "cursor-pointer",
-                      )}
-                    />
+                    <a
+                      href={ad?.link ?? undefined}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (ad?.link) {
+                          window.open(ad.link, "_blank");
+                        }
+                      }}
+                    >
+                      <Image
+                        src={ad.adImage}
+                        alt={`Image ${adIndex + 1}`}
+                        width={400}
+                        height={120}
+                        objectFit="cover"
+                        className={cn(
+                          "h-full max-h-20 w-full md:max-h-28 ",
+                          ad?.link && "cursor-pointer",
+                        )}
+                      />
+                    </a>
                   </div>
                 ))}
                 {filteredAds.length < 3 && (

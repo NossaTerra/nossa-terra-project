@@ -23,22 +23,15 @@ interface NavItem {
   href: string;
   label: string;
   icon: JSX.Element;
-  isHighlightable?: boolean;
+  isSelectable?: boolean;
   onClick?: () => void;
 }
 
-function NavItem({
-  href,
-  label,
-  icon,
-  onClick,
-  isHighlightable = true,
-}: NavItem) {
+function NavItem({ href, label, icon, onClick, isSelectable = true }: NavItem) {
   const { pathname } = useRouter();
   const isSelected =
-    href === "/"
-      ? pathname === href
-      : pathname.startsWith(href) && isHighlightable;
+    isSelectable &&
+    (href === "/" ? pathname === href : pathname.startsWith(href));
 
   return (
     <Link
@@ -135,8 +128,9 @@ export function AppHeader({
 export function BackofficeHeader({ user }: { user: User }) {
   const { logout } = useAuth();
   return (
-    <div className="flex w-full items-center justify-between p-10">
+    <div className="mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 pb-7 pt-10 shadow">
       <NavBar>
+        <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         <NavItem
           href="/backoffice/users"
           label="Controle de Usuários"
@@ -157,7 +151,7 @@ export function BackofficeHeader({ user }: { user: User }) {
         <NavItem
           onClick={logout}
           href="/"
-          isHighlightable={false}
+          isSelectable={false}
           label="Sair"
           icon={<LogOut />}
         />
