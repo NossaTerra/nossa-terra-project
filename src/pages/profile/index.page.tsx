@@ -53,11 +53,16 @@ export default function ProfileScreen({ user }: Props) {
         >
           <div>
             {user.role === "seller" && (
-              <SellerForm
-                isEditingProfile
-                user={user}
-                className="mb-10 md:pl-2"
-              />
+              <>
+                <h1 className="mt-10 mb-8 text-2xl font-bold md:text-4xl">
+                  Meu Perfil
+                </h1>
+                <SellerForm
+                  isEditingProfile
+                  user={user}
+                  className="mb-10 md:pl-2"
+                />
+              </>
             )}
             {user.role === "buyer" && isEditingProfile && (
               <>

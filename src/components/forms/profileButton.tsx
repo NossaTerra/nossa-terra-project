@@ -158,7 +158,7 @@ export function ProfileButton({
           <DialogTrigger className="mt-3 w-full" asChild>
             <Button
               isLoading={editBuyer.isLoading || editSeller.isLoading}
-              disabled={!form.formState.isValid}
+              disabled={!form.formState.isDirty}
               type="submit"
               variant="default"
               onClick={onSave}
