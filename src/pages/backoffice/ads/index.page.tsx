@@ -104,14 +104,6 @@ export default function BackofficeAdsScreen({ user }: Props) {
       } catch (e) {
         toast.error("Erro ao criar novo anúncio");
         setDialogOpen(false);
-        return new Response(
-          JSON.stringify({
-            error: "An unknown error occurred",
-          }),
-          {
-            status: 500,
-          },
-        );
       }
     },
     [addNewAd, form],
