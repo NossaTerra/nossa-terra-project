@@ -151,13 +151,18 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
         >
           <div>
             {user.role === "seller" && (
-              <SellerForm
-                key={keyUserChange}
-                className="my-10 md:pl-2"
-                onSuccess={onSellerFormSubmit}
-                formProps={formProps}
-                submitButtonProps={submitButtonProps}
-              />
+              <>
+                <h1 className="mb-8 mt-10 text-2xl font-bold md:text-4xl">
+                  Meu Perfil
+                </h1>
+                <SellerForm
+                  key={keyUserChange}
+                  className="my-10 md:pl-2"
+                  onSuccess={onSellerFormSubmit}
+                  formProps={formProps}
+                  submitButtonProps={submitButtonProps}
+                />
+              </>
             )}
             {user.role === "buyer" && isEditingProfile && (
               <>
