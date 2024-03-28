@@ -35,7 +35,7 @@ import {
 import { AdTypeLabel } from "~/server/types/ad.type";
 
 import { AdUpload } from "~/pages/backoffice/ads/AdUpload";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { api } from "~/utils/api";
@@ -43,7 +43,6 @@ import { Label } from "@radix-ui/react-label";
 import { Switch } from "~/components/ui/switch";
 import {
   type AdFields,
-  type AdFieldsWithDefaults,
   useAdSchema,
 } from "~/pages/login/LoginRegisterFlow/hooks/useAdSchema";
 
@@ -80,17 +79,16 @@ export default function BackofficeAdsScreen({ user }: Props) {
     setFilterText("");
   }, []);
 
-  const filterAds = useCallback(
-    (ads: AdFieldsWithDefaults[], searchText: string) => {
-      return ads.filter((ad) => {
-        const idMatches = ad.id.toLowerCase().includes(searchText);
-        const nameMatches = ad.name.toLowerCase().includes(searchText);
-        const linkMatches = ad.link?.toLowerCase().includes(searchText);
+  const filteredAdsData = useMemo(
+    () =>
+      adsData?.filter((ad) => {
+        const idMatches = ad.id.toLowerCase().includes(filterText);
+        const nameMatches = ad.name.toLowerCase().includes(filterText);
+        const linkMatches = ad.link?.toLowerCase().includes(filterText);
 
         return idMatches || nameMatches || linkMatches;
-      });
-    },
-    [],
+      }),
+    [adsData, filterText],
   );
 
   const apiUtils = api.useUtils();
@@ -333,127 +331,121 @@ export default function BackofficeAdsScreen({ user }: Props) {
                   </td>
                 </tr>
               ) : (
-                adsData &&
-                filterAds(adsData as AdFieldsWithDefaults[], filterText).map(
-                  (ad) => (
-                    <tr key={ad.id} className="hover:bg-gray-100">
-                      <td className="whitespace-nowrap px-6 py-4">
-                        <div className="flex items-center justify-center">
-                          <div className="h-30 w-30 flex items-center justify-center overflow-hidden rounded-md bg-gray-200">
-                            {ad?.adImage && (
-                              <Image
-                                src={ad.adImage}
-                                alt="Ad Image"
-                                height={90}
-                                width={90}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-4">{ad.id}</td>
-                      <td className="max-w-96 overflow-hidden overflow-ellipsis px-6 py-4">
-                        {ad.name}
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-4">
-                        {AdTypeLabel[ad.type]}
-                      </td>
-                      <td className="max-w-80 overflow-hidden overflow-ellipsis px-6 py-4">
-                        {ad.link}
-                      </td>
-                      <td
-                        className={`px-6 py-4 ${
-                          ad.isActive ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        <Label
-                          className="mb-1 flex h-full items-start "
-                          htmlFor="status"
-                        >
-                          {ad.isActive ? "Ativa" : "Inativa "}
-                        </Label>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Switch
-                              checked={ad.isActive}
-                              className="bg-slate-500"
-                              id="status"
+                filteredAdsData?.map((ad) => (
+                  <tr key={ad.id} className="hover:bg-gray-100">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="flex items-center justify-center">
+                        <div className="h-30 w-30 flex items-center justify-center overflow-hidden rounded-md bg-gray-200">
+                          {ad?.adImage && (
+                            <Image
+                              src={ad.adImage}
+                              alt="Ad Image"
+                              height={90}
+                              width={90}
                             />
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogTitle className="flex flex-row items-center gap-4 ">
-                              <div className="font-bold">
-                                {ad.isActive ? "Inativar" : "Ativar"} propaganda
-                              </div>
-                            </DialogTitle>
-                            <p className="text-md pb-4">
-                              Essa ação irá{" "}
-                              <span className="font-bold">
-                                {" "}
-                                {ad.isActive ? "Inativar" : "Ativar"} essa
-                                propaganda{" "}
-                              </span>
-                              Você tem certeza?
-                            </p>
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button variant="secondary">Cancelar</Button>
-                              </DialogClose>
-                              <DialogClose asChild>
-                                <Button
-                                  onClick={() =>
-                                    onSwitchStatus(ad.id, !ad.isActive)
-                                  }
-                                  variant="default"
-                                >
-                                  Confirmar
-                                </Button>
-                              </DialogClose>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-4">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="destructive" className="w-fit">
-                              Deletar
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogTitle className="flex flex-row items-center gap-4 text-red-900">
-                              <AlertTriangleIcon className="mb-3" />
-                              <div className="font-bold">
-                                Deletar propaganda
-                              </div>
-                            </DialogTitle>
-                            <p className="text-md pb-4">
-                              Essa ação irá{" "}
-                              <span className="font-bold text-red-900">
-                                {" "}
-                                Deletar essa propaganda{" "}
-                              </span>
-                              Você tem certeza?
-                            </p>
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button variant="secondary">Cancelar</Button>
-                              </DialogClose>
-                              <DialogClose asChild>
-                                <Button
-                                  onClick={() => onClickDelete(ad.id)}
-                                  variant="destructive"
-                                >
-                                  Confirmar
-                                </Button>
-                              </DialogClose>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </td>
-                    </tr>
-                  ),
-                )
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">{ad.id}</td>
+                    <td className="max-w-96 overflow-hidden overflow-ellipsis px-6 py-4">
+                      {ad.name}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      {AdTypeLabel[ad.type]}
+                    </td>
+                    <td className="max-w-80 overflow-hidden overflow-ellipsis px-6 py-4">
+                      {ad.link}
+                    </td>
+                    <td
+                      className={`px-6 py-4 ${ad.isActive ? "text-green-600" : "text-red-600"
+                        }`}
+                    >
+                      <Label
+                        className="mb-1 flex h-full items-start "
+                        htmlFor="status"
+                      >
+                        {ad.isActive ? "Ativa" : "Inativa "}
+                      </Label>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Switch
+                            checked={ad.isActive}
+                            className="bg-slate-500"
+                            id="status"
+                          />
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogTitle className="flex flex-row items-center gap-4 ">
+                            <div className="font-bold">
+                              {ad.isActive ? "Inativar" : "Ativar"} propaganda
+                            </div>
+                          </DialogTitle>
+                          <p className="text-md pb-4">
+                            Essa ação irá{" "}
+                            <span className="font-bold">
+                              {" "}
+                              {ad.isActive ? "Inativar" : "Ativar"} essa
+                              propaganda{" "}
+                            </span>
+                            Você tem certeza?
+                          </p>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button variant="secondary">Cancelar</Button>
+                            </DialogClose>
+                            <DialogClose asChild>
+                              <Button
+                                onClick={() =>
+                                  onSwitchStatus(ad.id, !ad.isActive)
+                                }
+                                variant="default"
+                              >
+                                Confirmar
+                              </Button>
+                            </DialogClose>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="destructive" className="w-fit">
+                            Deletar
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogTitle className="flex flex-row items-center gap-4 text-red-900">
+                            <AlertTriangleIcon className="mb-3" />
+                            <div className="font-bold">Deletar propaganda</div>
+                          </DialogTitle>
+                          <p className="text-md pb-4">
+                            Essa ação irá{" "}
+                            <span className="font-bold text-red-900">
+                              {" "}
+                              Deletar essa propaganda{" "}
+                            </span>
+                            Você tem certeza?
+                          </p>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button variant="secondary">Cancelar</Button>
+                            </DialogClose>
+                            <DialogClose asChild>
+                              <Button
+                                onClick={() => onClickDelete(ad.id)}
+                                variant="destructive"
+                              >
+                                Confirmar
+                              </Button>
+                            </DialogClose>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

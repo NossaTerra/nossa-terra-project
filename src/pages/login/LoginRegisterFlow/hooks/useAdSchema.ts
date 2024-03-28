@@ -40,6 +40,3 @@ export function useAdSchema() {
 }
 
 export type AdFields = z.infer<ReturnType<typeof useAdSchema>>;
-export type AdFieldsWithDefaults = AdFields & { id: string } & {
-  isActive: boolean;
-};
