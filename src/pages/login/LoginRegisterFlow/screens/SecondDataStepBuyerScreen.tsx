@@ -192,7 +192,7 @@ export function BuyerForm({
             <span className="absolute top-2 inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
             <span className="relative top-2 inline-flex h-3 w-3 rounded-full bg-accent"></span>
           </span>
-          <span className="ml-0.5 px-3 pb-3 block">
+          <span className="ml-0.5 block px-3 pb-3">
             Clique em salvar alterações para completar edição
           </span>
         </div>

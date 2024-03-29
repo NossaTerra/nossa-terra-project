@@ -43,7 +43,7 @@ export function ProfileButton({
     {} as DiffObject,
   );
   const [open, setOpen] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const onSave = useCallback(async () => {
     if (Object.keys(form.formState.errors).length > 0) {
