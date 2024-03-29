@@ -104,6 +104,9 @@ export function ProfileButton({
             onError: () => {
               toast.error("Erro ao Editar Perfil");
             },
+            onSuccess: () => {
+              toast.success("Alterações realizadas com sucesso");
+            },
           },
         );
         window.location.reload();
@@ -141,9 +144,11 @@ export function ProfileButton({
             onError: () => {
               toast.error("Erro ao Editar Perfil");
             },
+            onSuccess: () => {
+              toast.success("Alterações realizadas com sucesso");
+            },
           },
         );
-        toast.success("Alterações realizadas com sucesso");
         setOpen(false);
         form.reset();
       } catch {
