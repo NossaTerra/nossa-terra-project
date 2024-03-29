@@ -17,6 +17,7 @@ import {
 import { BuyerForm } from "~/pages/login/LoginRegisterFlow/screens/SecondDataStepBuyerScreen";
 import { SellerForm } from "~/pages/login/LoginRegisterFlow/screens/SecondDataStepSellerScreen";
 import { generateAvatarColor } from "~/utils/formHelpers";
+import { useCallback } from "react";
 
 import {
   Dialog,
@@ -28,6 +29,7 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import AdsCarrousel from "~/components/common/AdsCarrousel";
+import { cn, type ClassNameProps } from "src/utils/ui";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -35,7 +37,11 @@ type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 export default function ProfileScreen({ user }: Props) {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const direction = isEditingProfile ? Direction.Left : Direction.Right;
-  const showLogoutButton = !isEditingProfile || user.role === "seller";
+  const showLogoutButton = !isEditingProfile && user.role !== "seller";
+
+  const handleBackButtonClick = useCallback(() => {
+    setIsEditingProfile(false);
+  }, [setIsEditingProfile]);
 
   return (
     <>
@@ -54,9 +60,12 @@ export default function ProfileScreen({ user }: Props) {
           <div>
             {user.role === "seller" && (
               <>
-                <h1 className="mt-10 mb-8 text-2xl font-bold md:text-4xl">
-                  Meu Perfil
-                </h1>
+                <div className="flex flex-row justify-between ">
+                  <h1 className="mb-8 mt-10 text-2xl font-bold md:text-4xl">
+                    Meu Perfil
+                  </h1>
+                  <LogOutButton outline className="mt-10" />
+                </div>
                 <SellerForm
                   isEditingProfile
                   user={user}
@@ -69,7 +78,9 @@ export default function ProfileScreen({ user }: Props) {
                 <Button
                   className="mb-8 gap-3 p-4 text-lg"
                   variant="outline"
-                  onClick={() => setIsEditingProfile(false)}
+                  onClick={() => {
+                    handleBackButtonClick();
+                  }}
                 >
                   <ArrowLeftIcon />
                   Voltar
@@ -91,7 +102,7 @@ export default function ProfileScreen({ user }: Props) {
           </div>
 
           <footer className="flex justify-center py-10 lg:justify-end">
-            {showLogoutButton && <LogOutButton />}
+            {showLogoutButton && <LogOutButton outline className="ml-auto" />}
             {isEditingProfile && <AdsCarrousel className="mt-20" />}
           </footer>
         </motion.div>
@@ -121,15 +132,22 @@ export function CurrentProfileCardScreen({
   );
 }
 
-export function LogOutButton() {
+export function LogOutButton({
+  className,
+  outline,
+}: ClassNameProps & { outline?: boolean }) {
   const { logout, logoutLoading } = useAuth();
 
   return (
     <Dialog modal>
       <DialogTrigger asChild>
-        <Button isLoading={logoutLoading} variant="ghost" className="text-md">
-          <LogOut color="black" className="mr-2 inline h-6 w-6" />
-          Sair do Nossa Terra
+        <Button
+          isLoading={logoutLoading}
+          variant={outline ? "outline" : "ghost"}
+          className={cn("text-md hover:bg-slate-600", className)}
+        >
+          <LogOut color="black" className="mr-1 inline h-6 w-6" />
+          Sair
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[80vw] md:w-auto ">
