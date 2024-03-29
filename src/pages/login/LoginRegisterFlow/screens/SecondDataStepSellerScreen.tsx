@@ -42,7 +42,6 @@ import {
   TooltipContent,
 } from "~/components/ui/tooltip";
 import useZipCodeToast from "../hooks/useZipCodeToast";
-import { useState } from "react";
 import toast from "react-hot-toast";
 
 export function SellerForm({

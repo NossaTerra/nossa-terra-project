@@ -54,7 +54,6 @@ import { ProfileButton } from "~/components/forms/profileButton";
 import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
 import useZipCodeToast from "~/pages/login/LoginRegisterFlow/hooks/useZipCodeToast";
 import { toast } from "react-hot-toast";
-import { useEffect } from "react";
 
 export function BuyerForm({
   className,

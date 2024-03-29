@@ -20,7 +20,6 @@ import { type SecondDataStepSellerFields } from "~/pages/login/LoginRegisterFlow
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
 import { formatPhone } from "~/utils/formatters";
-import { useRouter } from "next/router";
 
 export function ProfileButton({
   user,
@@ -39,30 +38,28 @@ export function ProfileButton({
     | UseFormReturn<SecondDataStepBuyerFields>
     | UseFormReturn<SecondDataStepSellerFields>;
 }) {
+  const [userInfoObject, setUserInfoObject] = useState<User>(user!);
   const [diffEditingObject, setDiffEditingObject] = useState<DiffObject>(
     {} as DiffObject,
   );
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   const onSave = useCallback(async () => {
-    if (Object.keys(form.formState.errors).length > 0) {
-      return;
-    }
     if (isEditing) {
       setDiffEditingObject(
         user?.role === "buyer"
           ? getBuyerDiffObject(
               form as UseFormReturn<SecondDataStepBuyerFields>,
-              user,
+              userInfoObject,
             )
           : getSellerDiffObject(
               form as UseFormReturn<SecondDataStepSellerFields>,
-              user,
+              userInfoObject,
             ),
       );
     }
-  }, [form, isEditing, user]);
+  }, [form, isEditing, userInfoObject, user]);
+
   const editBuyer = api.profile.editBuyer.useMutation();
   const editSeller = api.profile.editSeller.useMutation();
 
@@ -104,11 +101,14 @@ export function ProfileButton({
             onError: () => {
               toast.error("Erro ao Editar Perfil");
             },
-            onSuccess: () => {
+            onSuccess: (data) => {
               toast.success("Alterações realizadas com sucesso");
+              setUserInfoObject(data as User);
+              form.reset(data as SecondDataStepBuyerFields);
             },
           },
         );
+        
         window.location.reload();
       } catch (error) {
         setOpen(false);
@@ -144,19 +144,23 @@ export function ProfileButton({
             onError: () => {
               toast.error("Erro ao Editar Perfil");
             },
-            onSuccess: () => {
+            onSuccess: (data) => {
+              setUserInfoObject(data as User);
               toast.success("Alterações realizadas com sucesso");
+              form.reset(data as SecondDataStepSellerFields);
             },
           },
         );
         setOpen(false);
-        form.reset();
       } catch {
         toast.error("Erro ao realizar alterações");
         setOpen(false);
       }
     }
   }, [editBuyer, editSeller, form, user, userLatitude, userLongitude]);
+
+  const doesNotHaveUpdates = Object.keys(diffEditingObject).length === 0;
+  const hasUpdates = Object.keys(diffEditingObject).length !== 0;
 
   return (
     <div>
@@ -166,9 +170,9 @@ export function ProfileButton({
           <DialogTrigger className="mt-3 w-full" asChild>
             <Button
               isLoading={editBuyer.isLoading || editSeller.isLoading}
-              disabled={!form.formState.isDirty}
               type="submit"
               variant="default"
+              disabled={!form.formState.isValid || !form.formState.isDirty}
               onClick={onSave}
             >
               Salvar Alterações
@@ -178,7 +182,7 @@ export function ProfileButton({
             <DialogHeader>
               <DialogTitle className="mb-4">Alterações</DialogTitle>
               <div className="prose flex max-h-[60vh] flex-col items-start justify-start overflow-y-auto pb-3 text-justify md:px-4">
-                {Object.keys(diffEditingObject).length === 0 ? (
+                {doesNotHaveUpdates ? (
                   <p className="text-slate-600">Nenhuma alteração realizada</p>
                 ) : (
                   <ul className="px-4">
@@ -201,7 +205,7 @@ export function ProfileButton({
                   </ul>
                 )}
               </div>
-              {Object.keys(diffEditingObject).length !== 0 && (
+              {hasUpdates && (
                 <Button
                   isLoading={editBuyer.isLoading || editSeller.isLoading}
                   onClick={onEdit}
