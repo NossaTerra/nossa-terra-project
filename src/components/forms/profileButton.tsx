@@ -20,6 +20,7 @@ import { type SecondDataStepSellerFields } from "~/pages/login/LoginRegisterFlow
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
 import { formatPhone } from "~/utils/formatters";
+import { useRouter } from "next/router";
 
 export function ProfileButton({
   user,
@@ -42,6 +43,7 @@ export function ProfileButton({
     {} as DiffObject,
   );
   const [open, setOpen] = useState(false);
+  const router = useRouter()
 
   const onSave = useCallback(async () => {
     if (Object.keys(form.formState.errors).length > 0) {
@@ -143,6 +145,7 @@ export function ProfileButton({
         );
         toast.success("Alterações realizadas com sucesso");
         setOpen(false);
+        form.reset();
       } catch {
         toast.error("Erro ao realizar alterações");
         setOpen(false);
