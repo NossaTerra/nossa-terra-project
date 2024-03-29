@@ -438,6 +438,8 @@ export function SellerForm({
             isEditing={isEditingProfile}
             user={user}
             form={form}
+            userLatitude={latitude}
+            userLongitude={longitude}
           />
         </form>
       </Form>
