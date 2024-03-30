@@ -235,7 +235,7 @@ export function AccountDataForm({ className }: ClassNameProps) {
             )}
           />
           <div>
-            <p className="pb-2.5 text-sm">*campo obrigatório</p>
+            <p className="pb-2.5 text-sm">*Campo obrigatório</p>
             <Button variant="primary" className="w-full" type="submit">
               Continuar
             </Button>
