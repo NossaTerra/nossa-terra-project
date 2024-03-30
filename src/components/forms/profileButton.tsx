@@ -172,7 +172,7 @@ export function ProfileButton({
               isLoading={editBuyer.isLoading || editSeller.isLoading}
               type="submit"
               variant="default"
-              disabled={!form.formState.isValid || !form.formState.isDirty}
+              disabled={!form.formState.isValid}
               onClick={onSave}
             >
               Salvar Alterações
