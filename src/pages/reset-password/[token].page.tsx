@@ -155,7 +155,7 @@ function ResetPasswordContent({
             )}
           />
           <div>
-            <p className="pb-2.5 text-sm">*campo obrigatório</p>
+            <p className="pb-2.5 text-sm font-semibold">*Campo obrigatório</p>
             <Button variant="primary" className="w-80" type="submit">
               Redefinir Senha
             </Button>

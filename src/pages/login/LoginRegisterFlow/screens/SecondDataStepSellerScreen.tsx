@@ -300,7 +300,7 @@ export function SellerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Cidade"
+                    placeholder="Cidade ..."
                     {...field}
                     ref={cityInputRef}
                     value={field.value ?? emptyString}
@@ -324,7 +324,7 @@ export function SellerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Estado"
+                    placeholder="Estado ..."
                     {...field}
                     ref={provinceInputRef}
                     value={field.value ?? emptyString}
@@ -352,7 +352,7 @@ export function SellerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Endereço"
+                    placeholder="Insira seu Endereço ..."
                     {...field}
                     ref={streetInputRef}
                     value={field.value ?? emptyString}
@@ -376,7 +376,7 @@ export function SellerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Bairro"
+                    placeholder="Insira seu Bairro ..."
                     {...field}
                     ref={districtInputRef}
                     value={field.value ?? emptyString}
@@ -400,7 +400,7 @@ export function SellerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Número"
+                    placeholder="Número ..."
                     {...field}
                     value={field.value ?? emptyString}
                   />
@@ -423,7 +423,7 @@ export function SellerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Complemento"
+                    placeholder="Complemento ..."
                     {...field}
                     value={field.value ?? emptyString}
                   />

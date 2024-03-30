@@ -164,7 +164,7 @@ export function ProfileButton({
 
   return (
     <div>
-      <p className="text-sm">*Campo obrigatório</p>
+      <p className="text-sm font-semibold">*Campo obrigatório</p>
       {isEditing ? (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="mt-3 w-full" asChild>

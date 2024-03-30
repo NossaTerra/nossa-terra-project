@@ -398,7 +398,7 @@ export function BuyerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Cidade"
+                    placeholder="Cidade ..."
                     {...field}
                     value={field.value ?? emptyString}
                     ref={cityInputRef}
@@ -422,7 +422,7 @@ export function BuyerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Estado"
+                    placeholder="Estado ..."
                     {...field}
                     value={field.value ?? emptyString}
                     ref={provinceInputRef}
@@ -450,7 +450,7 @@ export function BuyerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Endereço"
+                    placeholder="Insira seu Endereço ..."
                     {...field}
                     value={field.value ?? emptyString}
                     ref={streetInputRef}
@@ -474,7 +474,7 @@ export function BuyerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Bairro"
+                    placeholder="Insira seu Bairro ..."
                     {...field}
                     value={field.value ?? emptyString}
                     ref={districtInputRef}
@@ -498,7 +498,7 @@ export function BuyerForm({
                 <FormControl>
                   <Input
                     className="mt-3x w-full md:mt-0"
-                    placeholder="Número"
+                    placeholder="Número ..."
                     {...field}
                     value={field.value ?? emptyString}
                   />
