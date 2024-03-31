@@ -20,6 +20,8 @@ import {
 import { useLoginRegisterFlow } from "../state/machine";
 import { api } from "~/utils/api";
 import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
+import { Separator } from "~/components/ui/separator";
+import { GoogleOAuthButton } from "~/components/common/OAuthButton";
 
 function GreetingContent({ className }: ClassNameProps) {
   const greetingAction = useLoginRegisterFlow((s) => s.greetingAction);
@@ -101,6 +103,14 @@ function GreetingContent({ className }: ClassNameProps) {
             className="w-full md:max-w-xs lg:max-w-sm"
             onSubmit={form.handleSubmit(onSubmit)}
           >
+            <GoogleOAuthButton className="mb-4 w-full justify-center" />
+
+            <div className="flex flex-row items-center gap-4 py-4 text-gray-600">
+              <Separator className="flex flex-1 bg-gray-400" />
+              ou
+              <Separator className="flex flex-1 bg-gray-400" />
+            </div>
+
             <FormField
               control={form.control}
               name="email"
@@ -114,7 +124,7 @@ function GreetingContent({ className }: ClassNameProps) {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="mt-3x w-full md:mt-0"
+                      className="w-full md:mt-0"
                       placeholder="Email"
                       {...field}
                       value={field.value ?? ""}
