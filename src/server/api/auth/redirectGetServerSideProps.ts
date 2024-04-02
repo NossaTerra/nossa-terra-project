@@ -21,7 +21,7 @@ const redirectSignIn = (async (context) => {
   };
 }) satisfies GetServerSideProps;
 
-const Public = (async (context) => {
+const NoAuthOnly = (async (context) => {
   const user = await getUser(context);
   if (user) {
     return {
@@ -67,7 +67,7 @@ const Authed = <TRoles extends [Role, ...Role[]]>(
 };
 
 export const redirectGetServerSideProps = {
-  Public,
+  NoAuthOnly,
   MaybeAuthed,
   Common: Authed(z.enum(PermittedRoles.Common)),
   BuyerOnly: Authed(z.enum(PermittedRoles.BuyerOnly)),

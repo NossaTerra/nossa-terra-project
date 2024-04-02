@@ -8,7 +8,7 @@ import {
 import { validateRG } from "~/utils/validators";
 import { useAddressSchema } from "./useAddressSchema";
 
-export function useSecondDataStepSellerSchema() {
+export function useSellerProfileSchema() {
   // It's best to use a hook to get the schema because
   // we can later add internationalized error messages
 
@@ -45,6 +45,6 @@ export function useSecondDataStepSellerSchema() {
   );
 }
 
-export type SecondDataStepSellerFields = z.infer<
-  ReturnType<typeof useSecondDataStepSellerSchema>
+export type SellerProfileData = z.infer<
+  ReturnType<typeof useSellerProfileSchema>
 >;

@@ -1,13 +1,16 @@
-import { type ChosenRole } from "~/pages/login/LoginRegisterFlow/hooks/useFirstDataStepSchema";
 import { formatPhone, lengthFormattedCPF } from "./formatters";
-import { type BusinessSector, type User } from "~/server/types/user.type";
+import {
+  type Role,
+  type BusinessSector,
+  type User,
+} from "~/server/types/user.type";
 import { type FieldValues, type UseFormReturn } from "react-hook-form";
-import { type SecondDataStepBuyerFields } from "~/pages/login/LoginRegisterFlow/hooks/useSecondDataStepBuyerSchema";
 import { BusinessSectorLabel } from "~/server/types/user.type";
 import { emptyString } from "./constants";
-import { type SecondDataStepSellerFields } from "~/pages/login/LoginRegisterFlow/hooks/useSecondDataStepSellerSchema";
+import { type SellerProfileData } from "~/pages/signup/profile-data/hooks/useSellerProfileSchema";
+import { type BuyerProfileData } from "~/pages/signup/profile-data/hooks/useBuyerProfileSchema";
 
-export function cpfIsCNPJ({ cpf, role }: { cpf: string; role?: ChosenRole }) {
+export function cpfIsCNPJ({ cpf, role }: { cpf: string; role?: Role }) {
   if (role === "buyer") {
     return true;
   }
@@ -43,7 +46,7 @@ export type DiffObject = Record<
 
 export const getBuyerDiffObject = <T extends FieldValues>(
   form: UseFormReturn<T>,
-  user?: User,
+  user: User,
 ): DiffObject => {
   const diffObject: DiffObject = {};
   const whatsAppCheckboxToMessage = (acceptsWhatsapp: boolean) => {
@@ -77,23 +80,21 @@ export const getBuyerDiffObject = <T extends FieldValues>(
     return emptyString;
   };
 
-  const compareAndAddDiff = (field: keyof SecondDataStepBuyerFields) => {
-    if (user) {
-      const userValue = user[field];
-      const formValue =
-        field === "phone" || field === "secondaryPhone"
-          ? formatPhone((form.getValues()[field] as string | undefined) ?? "")
-          : (form.getValues()[field] as string | boolean | undefined);
+  const compareAndAddDiff = (field: keyof BuyerProfileData) => {
+    const userValue = user[field];
+    const formValue =
+      field === "phone" || field === "secondaryPhone"
+        ? formatPhone((form.getValues()[field] as string | undefined) ?? "")
+        : (form.getValues()[field] as string | boolean | undefined);
 
-      const shouldAddToFieldObject =
-        userValue !== formValue && fieldToFieldName.hasOwnProperty(field);
+    const shouldAddToDiffObject =
+      userValue !== formValue && fieldToFieldName.hasOwnProperty(field);
 
-      if (shouldAddToFieldObject) {
-        diffObject[field] = {
-          fieldName: fieldToFieldName[field],
-          currentValue: currentValueDisplayedToUser(field, formValue),
-        };
-      }
+    if (shouldAddToDiffObject) {
+      diffObject[field] = {
+        fieldName: fieldToFieldName[field],
+        currentValue: currentValueDisplayedToUser(field, formValue),
+      };
     }
   };
 
@@ -117,7 +118,7 @@ export const getBuyerDiffObject = <T extends FieldValues>(
 
 export const getSellerDiffObject = <T extends FieldValues>(
   form: UseFormReturn<T>,
-  user?: User,
+  user: User,
 ): DiffObject => {
   const diffObject: DiffObject = {};
 
@@ -146,22 +147,20 @@ export const getSellerDiffObject = <T extends FieldValues>(
     return emptyString;
   };
 
-  const compareAndAddDiff = (field: keyof SecondDataStepSellerFields) => {
-    if (user) {
-      const userValue = user[field];
-      const formValue =
-        field === "phone"
-          ? formatPhone((form.getValues()[field] as string | undefined) ?? "")
-          : (form.getValues()[field] as string | boolean | undefined);
-      const shouldAddToFieldObject =
-        userValue !== formValue && fieldToFieldName.hasOwnProperty(field);
+  const compareAndAddDiff = (field: keyof SellerProfileData) => {
+    const userValue = user[field];
+    const formValue =
+      field === "phone"
+        ? formatPhone((form.getValues()[field] as string | undefined) ?? "")
+        : (form.getValues()[field] as string | boolean | undefined);
+    const shouldAddToDiffObject =
+      userValue !== formValue && fieldToFieldName.hasOwnProperty(field);
 
-      if (shouldAddToFieldObject) {
-        diffObject[field] = {
-          fieldName: fieldToFieldName[field],
-          currentValue: currentValueDisplayedToUser(field, formValue),
-        };
-      }
+    if (shouldAddToDiffObject) {
+      diffObject[field] = {
+        fieldName: fieldToFieldName[field],
+        currentValue: currentValueDisplayedToUser(field, formValue),
+      };
     }
   };
 

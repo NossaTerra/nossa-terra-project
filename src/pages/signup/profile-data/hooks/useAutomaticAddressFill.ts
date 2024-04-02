@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
 import { type RouterOutputs, api } from "~/utils/api";
 import { emptyString } from "~/utils/constants";
+import type { Prettify } from "~/utils/typescript";
 import { validateZIPCode } from "~/utils/validators";
 
 // OBS: Vai facilitar bastante essa parte se a gente fizer a extração do
@@ -17,6 +18,11 @@ interface AddressFormData {
   streetNumber?: string | undefined;
 }
 
+export type AddressInferedData = Prettify<{
+  latitude?: number | undefined;
+  longitude?: number | undefined;
+}>;
+
 interface Props<FormData extends AddressFormData> {
   form: UseFormReturn<FormData>;
 }
@@ -31,8 +37,9 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
   // The safe constraint was already infered by the generic
   const form = anoyinglyTypedForm as unknown as UseFormReturn<AddressFormData>;
 
-  const [latitude, setLatitude] = useState<number | undefined>();
-  const [longitude, setLongitude] = useState<number | undefined>();
+  const [addressInferedData, setAddressInferedData] = useState<
+    AddressInferedData | undefined
+  >();
 
   const cityInputRef = useRef<HTMLInputElement | null>(null);
   const provinceInputRef = useRef<HTMLInputElement | null>(null);
@@ -89,12 +96,13 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
       province,
       district,
     }: RouterOutputs["auth"]["getAddressDetails"]) => {
-      if (!!coordinates?.latitude) {
-        setLatitude(coordinates.latitude);
-      }
-      if (!!coordinates?.longitude) {
-        setLongitude(coordinates?.longitude);
-      }
+      // OBS: this behavior of preserving the last "lat lon" state is
+      // result of a pure refactor, not necessarily the best approach
+      setAddressInferedData((previousData) => ({
+        ...previousData,
+        latitude: coordinates?.latitude ?? undefined,
+        longitude: coordinates?.longitude ?? undefined,
+      }));
 
       form.clearErrors("zipCode");
 
@@ -117,8 +125,7 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
   const onErrorFetchAddress = useCallback(() => {
     enableFields();
 
-    setLatitude(undefined);
-    setLongitude(undefined);
+    setAddressInferedData(undefined);
 
     form.setError("zipCode", {
       type: "manual",
@@ -173,8 +180,7 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
   return {
     isLoading,
 
-    latitude,
-    longitude,
+    addressInferedData,
 
     cityInputRef,
     provinceInputRef,

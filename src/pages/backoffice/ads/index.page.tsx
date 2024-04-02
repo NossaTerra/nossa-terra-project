@@ -41,18 +41,46 @@ import Image from "next/image";
 import { api } from "~/utils/api";
 import { Label } from "@radix-ui/react-label";
 import { Switch } from "~/components/ui/switch";
-import {
-  type AdFields,
-  useAdSchema,
-} from "~/pages/login/LoginRegisterFlow/hooks/useAdSchema";
+import { z } from "zod";
 
 export const getServerSideProps = redirectGetServerSideProps.Backoffice;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export default function BackofficeAdsScreen({ user }: Props) {
-  const schema = useAdSchema();
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z
+          .string({ required_error: "Você deve inserir o nome" })
+          .min(5, {
+            message: "O nome do anúncio deve ter ao menos 5 caracteres",
+          })
+          .max(40, {
+            message: "O nome do anúncio deve ter no máximo 40 caracteres",
+          }),
+        adImage: z.string({ required_error: "Você deve inserir a imagem" }),
+        link: z
+          .string({ required_error: "Você deve inserir o link" })
+          .url({ message: "Insira um link válido" })
+          .optional(),
+        type: z
+          .nativeEnum(AdType)
+          .optional()
+          .refine((type) => type !== undefined, {
+            message: "Por favor, insira o tipo do anúncio",
+          })
+          .transform((type) => {
+            if (type === undefined) {
+              throw new Error("DEV: you didnt' refine the ad to non nullable");
+            }
+            return type;
+          }),
+      }),
+    [],
+  );
+  type FormData = z.infer<typeof schema>;
 
-  const form = useForm<AdFields>({
+  const form = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -92,7 +120,7 @@ export default function BackofficeAdsScreen({ user }: Props) {
   );
 
   const apiUtils = api.useUtils();
-  const onSubmit: SubmitHandler<AdFields> = useCallback(
+  const onSubmit: SubmitHandler<FormData> = useCallback(
     async (data) => {
       try {
         await addNewAd.mutateAsync({ ...data, isActive: true });
