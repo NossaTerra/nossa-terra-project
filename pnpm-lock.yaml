@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@hookform/resolvers':
     specifier: ^3.3.3
@@ -7,6 +11,9 @@ dependencies:
   '@lucia-auth/adapter-prisma':
     specifier: ^3.0.2
     version: 3.0.2(@prisma/client@5.7.1)(lucia@2.7.6)
+  '@lucia-auth/oauth':
+    specifier: ^3.5.3
+    version: 3.5.3(lucia@2.7.6)
   '@prisma/client':
     specifier: ^5.6.0
     version: 5.7.1(prisma@5.7.1)
@@ -594,6 +601,14 @@ packages:
       lucia: ^2.0.0
     dependencies:
       '@prisma/client': 5.7.1(prisma@5.7.1)
+      lucia: 2.7.6
+    dev: false
+
+  /@lucia-auth/oauth@3.5.3(lucia@2.7.6):
+    resolution: {integrity: sha512-3blBldenf2zXsSJTZUwzB+NxI+0KJljfMHT0WR7hyLNwi4Ijss7F2cQqk2xW1lGH3lzdmsV93ZsY9Yv8ekBRUw==}
+    peerDependencies:
+      lucia: ^2.0.0
+    dependencies:
       lucia: 2.7.6
     dev: false
 
@@ -4879,7 +4894,3 @@ packages:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
