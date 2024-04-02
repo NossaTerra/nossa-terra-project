@@ -1,8 +1,7 @@
-import { useId, useCallback, useRef } from "react";
+import { useId, useCallback, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import React from "react";
 import Image from "next/image";
-import { useInvokeCallbackOnce } from "~/hooks/useInvokeCallbackOnce";
 
 const useZipCodeToast = () => {
   const zipCodeToastRef = useRef("");
@@ -54,12 +53,10 @@ const useZipCodeToast = () => {
     zipCodeToastRef.current = zipCodeToastId;
   }, [key]);
 
-  useInvokeCallbackOnce({
-    callback: zipCodeToast,
-    cleanUp: () => {
-      toast.remove(zipCodeToastRef.current);
-    },
-  });
+  useEffect(() => {
+    zipCodeToast();
+    return () => toast.remove(zipCodeToastRef.current);
+  }, [zipCodeToast]);
 
   return zipCodeToastRef;
 };

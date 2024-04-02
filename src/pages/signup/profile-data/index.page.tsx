@@ -8,11 +8,13 @@ import { BuyerForm, type BuyerFormProps } from "./buyer-form";
 import { SellerForm, type SellerFormProps } from "./seller-form";
 import { useCallback } from "react";
 import { api } from "~/utils/api";
+import useZipCodeToast from "./hooks/useZipCodeToast";
 import toast from "react-hot-toast";
 
 export const getServerSideProps = redirectGetServerSideProps.NoAuthOnly;
 
 export default function ProfileDataScreen() {
+  useZipCodeToast();
   const router = useRouter();
   const { email, role, accountData, picture } = useSignUpState();
 

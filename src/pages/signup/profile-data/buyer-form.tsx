@@ -45,7 +45,6 @@ import {
 } from "./hooks/useAutomaticAddressFill";
 import { AvatarUpload } from "~/components/common/AvatarUpload";
 import { Button, type ButtonProps } from "~/components/ui/button";
-import useZipCodeToast from "./hooks/useZipCodeToast";
 import {
   type BuyerProfileData,
   useBuyerProfileSchema,
@@ -68,8 +67,6 @@ export function BuyerForm({
   isLoading = false,
   submitButtonProps,
 }: BuyerFormProps) {
-  useZipCodeToast();
-
   const schema = useBuyerProfileSchema();
   const form = useForm<BuyerProfileData>({
     resolver: zodResolver(schema),
