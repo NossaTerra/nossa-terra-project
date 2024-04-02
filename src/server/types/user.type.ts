@@ -54,7 +54,9 @@ export const buyerSocialSchema = sellerSocialSchema.merge(
       .optional(),
     secondaryPhone: z
       .string()
-      .min(lowerEndLengthFormattedPhone)
+      // This is causing problems with the optional validation,
+      // when there is no secondary phone we're not supposed to error with `min` constraint
+      // .min(lowerEndLengthFormattedPhone)
       .max(higherEndLengthFormattedPhone)
       .optional(),
     secondaryPhoneUsesWhatsapp: z.boolean().optional(),

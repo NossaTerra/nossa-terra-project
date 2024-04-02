@@ -15,68 +15,54 @@ export const profileRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-        attributes: z.object({
-          avatarImage: z.string().optional(),
-          businessMainSector: z.nativeEnum(BusinessSector),
-          address: addressSchema,
-          social: buyerSocialSchema,
-        }),
+        data: z
+          .object({
+            avatarImage: z.string().optional(),
+            businessMainSector: z.nativeEnum(BusinessSector),
+          })
+          .merge(addressSchema)
+          .merge(buyerSocialSchema),
       }),
     )
-    .mutation(
-      async ({
-        ctx: { db },
-        input: {
-          id,
-          attributes: { social, address, ...rest },
-        },
-      }) => {
-        try {
-          return await db.user.update({
-            where: {
-              id,
-              role: "buyer",
-            },
-            data: { ...address, ...social, ...rest },
-          });
-        } catch (error) {
-          console.log(error);
-          throw new TRPCError({ code: "BAD_REQUEST" });
-        }
-      },
-    ),
+    .mutation(async ({ ctx: { db }, input: { id, data } }) => {
+      try {
+        return await db.user.update({
+          where: {
+            id,
+            role: "buyer",
+          },
+          data,
+        });
+      } catch (error) {
+        console.log(error);
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+    }),
 
   editSeller: protectedProcedure
     .input(
       z.object({
         id: z.string(),
-        attributes: z.object({
-          rg: z.string().min(6).max(15),
-          address: addressSchema,
-          social: sellerSocialSchema,
-        }),
+        data: z
+          .object({
+            rg: z.string().min(6).max(15),
+          })
+          .merge(addressSchema)
+          .merge(sellerSocialSchema),
       }),
     )
-    .mutation(
-      async ({
-        ctx: { db },
-        input: {
-          id,
-          attributes: { social, address, ...rest },
-        },
-      }) => {
-        try {
-          return await db.user.update({
-            where: {
-              id,
-              role: "seller",
-            },
-            data: { ...address, ...social, ...rest },
-          });
-        } catch (error) {
-          console.log(error);
-          throw new TRPCError({ code: "BAD_REQUEST" });
-        }
-      },
-    ),
+    .mutation(async ({ ctx: { db }, input: { id, data } }) => {
+      try {
+        return await db.user.update({
+          where: {
+            id,
+            role: "seller",
+          },
+          data,
+        });
+      } catch (error) {
+        console.log(error);
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+    }),
 });

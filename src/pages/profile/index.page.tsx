@@ -1,21 +1,29 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { type InferGetServerSidePropsType } from "next";
 import { AppHeader } from "~/components/common/headers";
-import { Button } from "~/components/ui/button";
+import { Button, type ButtonProps } from "~/components/ui/button";
 import { useAuth } from "~/hooks/useAuth";
 import Image from "next/image";
 import { MapPinIcon, Brush, LogOut, ArrowLeftIcon } from "lucide-react";
 
+import toast from "react-hot-toast";
+import { getBuyerDiffObject, getSellerDiffObject } from "~/utils/formHelpers";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Direction,
   transition,
   variants,
 } from "~/animation/horizontalCrossfade";
-import { BuyerForm } from "~/pages/login/LoginRegisterFlow/screens/SecondDataStepBuyerScreen";
-import { SellerForm } from "~/pages/login/LoginRegisterFlow/screens/SecondDataStepSellerScreen";
+import {
+  BuyerForm,
+  type BuyerFormProps,
+} from "~/pages/signup/profile-data/buyer-form";
+import {
+  SellerForm,
+  type SellerFormProps,
+} from "~/pages/signup/profile-data/seller-form";
 import { generateAvatarColor } from "~/utils/formHelpers";
 
 import {
@@ -28,17 +36,104 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import AdsCarrousel from "~/components/common/AdsCarrousel";
+import { api } from "~/utils/api";
+import { awaitDiffConfirmationDialog, DiffDialog } from "./DiffDialog";
+import { formatPhone } from "~/utils/formatters";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-export default function ProfileScreen({ user }: Props) {
+export default function ProfileScreen({ user: propsUser }: Props) {
+  const user = useMemo(() => {
+    const nonNullableUserProps = {} as Record<string, unknown>;
+    Object.entries(propsUser).forEach(([key, value]) => {
+      nonNullableUserProps[key] = value ?? undefined;
+    });
+    return nonNullableUserProps as NonNullable<typeof propsUser>;
+  }, [propsUser]);
+
+  const formProps = useMemo(() => {
+    return {
+      defaultValues: user,
+    };
+  }, [user]);
+
+  const editBuyer = api.profile.editBuyer.useMutation();
+  const onBuyerFormSubmit: BuyerFormProps["onSuccess"] = useCallback(
+    async ({ data, form }) => {
+      const diffObject = getBuyerDiffObject(form, user);
+      console.log(diffObject);
+      if (Object.entries(diffObject).length === 0) {
+        return;
+      }
+      await awaitDiffConfirmationDialog(diffObject);
+      try {
+        await editBuyer.mutateAsync({
+          id: user.id,
+          data: {
+            ...data,
+            phone: formatPhone(data.phone),
+            secondaryPhone: data.secondaryPhone
+              ? formatPhone(data.secondaryPhone)
+              : undefined,
+          },
+        });
+        toast.success("Alterações realizadas com sucesso");
+      } catch (e) {
+        toast.error("Erro ao realizar alterações");
+      }
+    },
+    [editBuyer, user],
+  );
+
+  const editSeller = api.profile.editSeller.useMutation();
+  const onSellerFormSubmit: SellerFormProps["onSuccess"] = useCallback(
+    async ({ data, form }) => {
+      const diffObject = getSellerDiffObject(form, user);
+      console.log(diffObject);
+      if (Object.entries(diffObject).length === 0) {
+        return;
+      }
+      await awaitDiffConfirmationDialog(diffObject);
+      try {
+        await editSeller.mutateAsync({
+          id: user.id,
+          data: {
+            ...data,
+            phone: formatPhone(data.phone),
+          },
+        });
+        toast.success("Alterações realizadas com sucesso");
+      } catch (e) {
+        toast.error("Erro ao realizar alterações");
+      }
+    },
+    [editSeller, user],
+  );
+
+  const diffDialogButtonProps = useMemo(
+    () => ({
+      isLoading: editSeller.isLoading || editBuyer.isLoading,
+    }),
+    [editBuyer.isLoading, editSeller.isLoading],
+  );
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const direction = isEditingProfile ? Direction.Left : Direction.Right;
   const showLogoutButton = !isEditingProfile || user.role === "seller";
 
+  const submitButtonProps: ButtonProps = useMemo(
+    () => ({
+      variant: "default",
+      children: "Salvar Alterações",
+    }),
+    [],
+  );
+
   return (
     <>
+      <DiffDialog buttonProps={diffDialogButtonProps} />
+
       <AppHeader user={user} />
       <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
@@ -54,9 +149,10 @@ export default function ProfileScreen({ user }: Props) {
           <div>
             {user.role === "seller" && (
               <SellerForm
-                isEditingProfile
-                user={user}
-                className="mb-10 md:pl-2"
+                className="my-10 md:pl-2"
+                onSuccess={onSellerFormSubmit}
+                formProps={formProps}
+                submitButtonProps={submitButtonProps}
               />
             )}
             {user.role === "buyer" && isEditingProfile && (
@@ -71,9 +167,10 @@ export default function ProfileScreen({ user }: Props) {
                 </Button>
 
                 <BuyerForm
-                  isEditingProfile
-                  user={user}
-                  className="mb-8 md:pl-2"
+                  className="my-8 md:pl-2"
+                  onSuccess={onBuyerFormSubmit}
+                  formProps={formProps}
+                  submitButtonProps={submitButtonProps}
                 />
               </>
             )}
