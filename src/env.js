@@ -7,60 +7,21 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z
-      .string()
-      .url()
-      .refine(
-        (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
-        "You forgot to change the default URL",
-      ),
-    ADDRESS_ZIP_CODE_API_URL: z
-      .string()
-      .url()
-      .refine(
-        (str) => !str.includes("ADDRESS_ZIP_CODE_API_URL_HERE"),
-        "You forgot to change the default zip code API URL",
-      ),
-    ADDRESS_ZIP_CODE_API_KEY: z
-      .string()
-      .refine(
-        (str) => !str.includes("ADDRESS_ZIP_CODE_API_KEY"),
-        "You forgot to change the default zip code API URL",
-      ),
-    APP_URL: z
-      .string()
-      .url()
-      .refine(
-        (str) => !str.includes("APP_URL"),
-        "You forgot to change the default APP_URL",
-      ),
-    CLOUDINARY_API_KEY: z
-      .string()
-      .refine(
-        (str) => !str.includes("CLOUDINARY_API_KEY"),
-        "You forgot to change the default CLOUDINARY_API_KEY",
-      ),
-    CLOUDINARY_API_SECRET: z
-      .string()
-      .refine(
-        (str) => !str.includes("CLOUDINARY_API_SECRET"),
-        "You forgot to change the default CLOUDINARY_API_SECRET",
-      ),
-    CLOUDINARY_CLOUD_NAME: z
-      .string()
-      .refine(
-        (str) => !str.includes("CLOUDINARY_CLOUD_NAME"),
-        "You forgot to change the default CLOUDINARY_CLOUD_NAME",
-      ),
-    SENDGRID_API_KEY: z
-      .string()
-      .refine(
-        (str) => !str.includes("SENDGRID_API_KEY"),
-        "You forgot to change the default SENDGRID_API_KEY",
-      ),
+    DATABASE_URL: z.string().url(),
+    ADDRESS_ZIP_CODE_API_URL: z.string().url(),
+    ADDRESS_ZIP_CODE_API_KEY: z.string(),
+    APP_URL: z.string().url(),
+    CLOUDINARY_API_KEY: z.string(),
+    CLOUDINARY_API_SECRET: z.string(),
+    CLOUDINARY_CLOUD_NAME: z.string(),
+    SENDGRID_API_KEY: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+
+    // OAuth
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
   },
 
   /**
@@ -87,6 +48,10 @@ export const env = createEnv({
     APP_URL: process.env.APP_URL,
     ADDRESS_ZIP_CODE_API_KEY: process.env.ADDRESS_ZIP_CODE_API_KEY,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+
+    // OAuth
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
