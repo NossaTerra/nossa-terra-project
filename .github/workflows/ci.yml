@@ -21,6 +21,8 @@ jobs:
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
       APP_URL: ${{ secrets.APP_URL }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
     runs-on: ubuntu-latest
 
