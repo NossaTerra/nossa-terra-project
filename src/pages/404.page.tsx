@@ -5,7 +5,7 @@ import { cn } from "~/utils/ui";
 
 export default function NotFoundPage() {
   return (
-    <main className="flex h-screen w-screen items-center justify-center bg-backgroundPrimary">
+    <main className="flex h-svh w-screen items-center justify-center bg-backgroundPrimary">
       <div className="flex flex-col gap-6 pb-10 lg:gap-8">
         <h1
           className={cn(

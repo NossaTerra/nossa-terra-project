@@ -12,14 +12,14 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { api } from "~/utils/api";
 import { ArrowLeftIcon } from "lucide-react";
 import router, { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { z } from "zod";
-import useBeforeUnloadAndPopState from "~/pages/login/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
+import useBeforeUnloadAndPopState from "~/hooks/useBeforeUnloadAndPopState";
 
 function useForgotPasswordSchema() {
   // It's best to use a hook to get the schema because
@@ -45,27 +45,13 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
   const sendPasswordReset =
     api.forgetPassword.sendResetPasswordEmail.useMutation();
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const onSubmit: SubmitHandler<ForgotPasswordFields> = useCallback(
     async ({ email }) => {
       try {
-        setIsLoading(true);
         await sendPasswordReset.mutateAsync({ email });
         await router.replace(`/password-reset-sent`);
-        return new Response();
       } catch (e) {
         toast.error("Erro ao enviar o email");
-        return new Response(
-          JSON.stringify({
-            error: "An unknown error occurred",
-          }),
-          {
-            status: 500,
-          },
-        );
-      } finally {
-        setIsLoading(false);
       }
     },
     [sendPasswordReset],
@@ -132,7 +118,7 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
             )}
           />
           <Button
-            isLoading={isLoading}
+            isLoading={sendPasswordReset.isLoading}
             variant="primary"
             className="w-full"
             type="submit"
@@ -145,14 +131,10 @@ function ForgetPasswordContent({ className }: ClassNameProps) {
   );
 }
 
-export const getServerSideProps = redirectGetServerSideProps.Public;
+export const getServerSideProps = redirectGetServerSideProps.NoAuthOnly;
 
 export default function ForgetPasswordScreen() {
   const router = useRouter();
-
-  const goBack = useCallback(() => {
-    router.back();
-  }, [router]);
 
   useBeforeUnloadAndPopState();
 
@@ -162,7 +144,7 @@ export default function ForgetPasswordScreen() {
         <Button
           className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
           variant="outline"
-          onClick={goBack}
+          onClick={router.back}
         >
           <ArrowLeftIcon />
           Voltar
