@@ -52,7 +52,7 @@ export function ProductSearchColumn({
       );
   }, [noProductTypeFilterSelected, productTypeFilter, products, searchString]);
 
-  const shouldShowEmptyState = filteredProducts.length === 0;
+  const shouldShowEmptyState = filteredProducts.length === 0 && !isLoading;
 
   return (
     <div className={cn("flex flex-col items-center", className)}>
@@ -67,7 +67,7 @@ export function ProductSearchColumn({
               <Input
                 value={searchString}
                 onChange={onInputChange}
-                className="border-slate-400 pr-[2vw] mr-3 pl-12 text-xl"
+                className="mr-4 border-slate-400 pl-12 pr-[2vw] text-xl md:mr-3"
               />
             </div>
             <div className="mt-6 flex gap-3 pl-12 md:gap-4">
@@ -86,7 +86,7 @@ export function ProductSearchColumn({
               ))}
             </div>
             {showSlider && (
-              <div className="ml-12 mt-4 flex items-center justify-center rounded-md px-2 pt-6">
+              <div className="ml-12 mt-4 flex items-center justify-center rounded-md pl-2 pr-4 pt-6 md:pr-2">
                 <SearchSlider className="m-0 p-0" step={1} />
               </div>
             )}
@@ -118,7 +118,7 @@ export function ProductSearchColumn({
           />
         ))}
         {shouldShowEmptyState && (
-          <span className="font-poppins-600 mb-2  ml-2 block text-md lg:mb-0 lg:pb-4 lg:text-xl">
+          <span className="font-poppins-600 text-md  mb-2 ml-2 block lg:mb-0 lg:pb-4 lg:text-xl">
             Não existem produtos que correspondem ao texto buscado
           </span>
         )}
