@@ -147,14 +147,13 @@ enum AdType {
     Medium
 }
 
-
 model Ad {
     id String @id @unique @default(cuid())
 
-    name String
-    type AdType
-    adImage  String
+    name    String
+    type    AdType
+    adImage String
 
-    link String?
+    link     String?
     isActive Boolean
 }

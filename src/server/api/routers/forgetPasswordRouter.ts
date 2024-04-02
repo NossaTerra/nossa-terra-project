@@ -23,6 +23,8 @@ export const forgetPasswordRouter = createTRPCRouter({
             message: "User with this email not found",
           });
         }
+        // Fail if there is no "email" / "password" key in the database for this user
+        await auth.getKey("email", email);
 
         const token = await getTokenResetPassword({
           userId: user.id,

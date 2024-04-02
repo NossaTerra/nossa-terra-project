@@ -3,8 +3,8 @@ import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
 import { Button } from "~/components/ui/button";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
-import useBeforeUnloadAndPopState from "~/pages/login/LoginRegisterFlow/hooks/useBeforeUnloadAndPopState";
 import { AdsCarouselFooter } from "~/components/common/AdsCarrousel";
+import useBeforeUnloadAndPopState from "~/hooks/useBeforeUnloadAndPopState";
 
 function PasswordResetSentContent({ className }: ClassNameProps) {
   const router = useRouter();
