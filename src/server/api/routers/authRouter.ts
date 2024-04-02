@@ -3,6 +3,7 @@ import {
   BusinessSector,
   buyerSocialSchema,
   sellerSocialSchema,
+  type UserAttributes,
 } from "../../types/user.type";
 import { z } from "zod";
 import { env } from "~/env";
@@ -16,14 +17,31 @@ import { addressDetailsApiSchema } from "~/server/api/addressApi";
 import { lengthFormattedCNPJ, lengthFormattedCPF } from "~/utils/formatters";
 import cloudinaryV2 from "~/utils/configs";
 
+export const authCredentialsSchema = z.discriminatedUnion("providerId", [
+  z.object({
+    providerId: z.literal("email"),
+    email: z.string(),
+    password: z.string().min(8).max(60),
+  }),
+  z.object({
+    providerId: z.literal("google"),
+  }),
+]);
+
 export const authRouter = createTRPCRouter({
   getUser: publicProcedure.query(({ ctx: { user } }) => user),
 
-  checkUserExists: publicProcedure
+  checkUserKeys: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .query(async ({ ctx: { db }, input: { email } }) => {
       const user = await db.user.findUnique({ where: { email } });
-      return !!user;
+      if (!user) {
+        return [];
+      }
+      const keys = (await auth.getAllUserKeys(user.id)).map(
+        (k) => k.providerId,
+      );
+      return keys;
     }),
 
   getUserByEmail: publicProcedure
@@ -40,98 +58,195 @@ export const authRouter = createTRPCRouter({
 
   registerSeller: publicProcedure
     .input(
-      z.object({
-        email: z.string().email().min(2).max(60),
-        name: z.string().min(2).max(120),
-        password: z.string().min(8).max(30),
-        cpf: z.string().min(lengthFormattedCPF).max(lengthFormattedCNPJ),
-        rg: z.string().min(6).max(15),
-        address: addressSchema,
-        social: sellerSocialSchema,
-      }),
+      z
+        .object({
+          email: z.string().email().min(2).max(60),
+          name: z.string().min(2).max(120),
+          cpf: z.string().min(lengthFormattedCPF).max(lengthFormattedCNPJ),
+          rg: z.string().min(6).max(15),
+          authCredentials: authCredentialsSchema,
+        })
+        .merge(addressSchema)
+        .merge(sellerSocialSchema),
     )
-    .mutation(({ input: { email, password, social, address, ...rest } }) => {
-      try {
-        const user = auth.createUser({
-          attributes: {
-            activeState: "inactive",
-            email,
-            role: "seller",
-            ...address,
-            ...social,
-            ...rest,
-          },
-          key: {
-            password,
-            providerId: "email",
-            providerUserId: email,
-          },
+    .mutation(
+      async ({
+        input: { email, authCredentials, ...rest },
+        ctx: { cookies, authRequest },
+      }) => {
+        const attributes = {
+          activeState: "inactive",
+          email,
+          role: "seller",
+          ...rest,
+        } satisfies UserAttributes;
+
+        if (authCredentials.providerId === "email") {
+          const newUser = await auth.createUser({
+            attributes,
+            key: {
+              ...authCredentials,
+              providerUserId: authCredentials.email,
+            },
+          });
+          const session = await auth.createSession({
+            userId: newUser.id,
+            attributes: {},
+          });
+          authRequest.setSession(session);
+          return newUser;
+        }
+
+        if (authCredentials.providerId === "google") {
+          const { google_access_token } = cookies;
+          if (!google_access_token) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Invalid OAuth cookies",
+            });
+          }
+
+          const googleUser = await getGoogleUser(google_access_token);
+          const newUser = await auth.createUser({
+            attributes,
+            key: {
+              providerId: "google",
+              providerUserId: googleUser.email,
+              password: null,
+            },
+          });
+          const session = await auth.createSession({
+            userId: newUser.id,
+            attributes: {},
+          });
+          authRequest.setSession(session);
+          return newUser;
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "authCredentials couldn't be processed",
         });
-        return user;
-      } catch (error) {
-        console.log(error);
-        throw new TRPCError({ code: "BAD_REQUEST" });
-      }
-    }),
+      },
+    ),
 
   registerBuyer: publicProcedure
     .input(
-      z.object({
-        email: z.string().email().min(2).max(60),
-        name: z.string().min(2).max(120),
-        password: z.string().min(8).max(60),
-        avatarImage: z.string().optional(),
-        cpf: z.string().min(lengthFormattedCNPJ).max(lengthFormattedCNPJ),
-        businessMainSector: z.nativeEnum(BusinessSector),
-        address: addressSchema,
-        social: buyerSocialSchema,
-      }),
+      z
+        .object({
+          email: z.string().email().min(2).max(60),
+          name: z.string().min(2).max(120),
+          authCredentials: authCredentialsSchema,
+          avatarImage: z.string().optional(),
+          cpf: z.string().min(lengthFormattedCNPJ).max(lengthFormattedCNPJ),
+          businessMainSector: z.nativeEnum(BusinessSector),
+        })
+        .merge(addressSchema)
+        .merge(buyerSocialSchema),
     )
-    .mutation(({ input: { email, password, address, social, ...rest } }) => {
-      try {
-        const user = auth.createUser({
-          attributes: {
-            activeState: "inactive",
-            role: "buyer",
-            email,
-            ...address,
-            ...social,
-            ...rest,
-          },
-          key: {
-            password,
-            providerId: "email",
-            providerUserId: email,
-          },
+    .mutation(
+      async ({
+        input: { email, authCredentials, ...rest },
+        ctx: { authRequest, cookies },
+      }) => {
+        const attributes = {
+          activeState: "inactive",
+          email,
+          role: "buyer",
+          ...rest,
+        } satisfies UserAttributes;
+
+        if (authCredentials.providerId === "email") {
+          const newUser = await auth.createUser({
+            attributes,
+            key: {
+              ...authCredentials,
+              providerUserId: authCredentials.email,
+            },
+          });
+          const session = await auth.createSession({
+            userId: newUser.id,
+            attributes: {},
+          });
+          authRequest.setSession(session);
+          return newUser;
+        }
+
+        if (authCredentials.providerId === "google") {
+          const { google_access_token } = cookies;
+          if (!google_access_token) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Invalid OAuth cookies",
+            });
+          }
+
+          const googleUser = await getGoogleUser(google_access_token);
+          const newUser = await auth.createUser({
+            attributes,
+            key: {
+              providerId: "google",
+              providerUserId: googleUser.email,
+              password: null,
+            },
+          });
+          const session = await auth.createSession({
+            userId: newUser.id,
+            attributes: {},
+          });
+          authRequest.setSession(session);
+          return newUser;
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "authCredentials couldn't be processed",
         });
-        return user;
-      } catch (error) {
-        console.log(error);
-        throw new TRPCError({ code: "BAD_REQUEST" });
-      }
-    }),
+      },
+    ),
 
   login: publicProcedure
-    .input(
-      z.object({
-        email: z.string(),
-        password: z.string(),
-      }),
-    )
-    .mutation(async ({ ctx: { authRequest }, input: { email, password } }) => {
-      try {
-        const key = await auth.useKey("email", email, password);
-        const session = await auth.createSession({
-          userId: key.userId,
-          attributes: {},
-        });
-        authRequest.setSession(session);
-        return session;
-      } catch (error) {
-        console.log(error);
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-    }),
+    .input(z.object({ authCredentials: authCredentialsSchema }))
+    .mutation(
+      async ({ ctx: { authRequest, cookies }, input: { authCredentials } }) => {
+        try {
+          if (authCredentials.providerId === "email") {
+            const { email, password } = authCredentials;
+            const key = await auth.useKey("email", email, password);
+
+            const session = await auth.createSession({
+              userId: key.userId,
+              attributes: {},
+            });
+            authRequest.setSession(session);
+            return session;
+          }
+
+          if (authCredentials.providerId === "google") {
+            const { google_access_token } = cookies;
+            if (!google_access_token) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Invalid OAuth cookies",
+              });
+            }
+            const googleUser = await getGoogleUser(google_access_token);
+            const key = await auth.useKey("google", googleUser.email, null);
+
+            const session = await auth.createSession({
+              userId: key.userId,
+              attributes: {},
+            });
+            authRequest.setSession(session);
+            return session;
+          }
+        } catch (error) {
+          console.log(error);
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      },
+    ),
 
   logout: protectedProcedure.mutation(
     async ({ ctx: { authRequest, session } }) => {
@@ -178,3 +293,21 @@ export const authRouter = createTRPCRouter({
       }
     }),
 });
+
+async function getGoogleUser(google_access_token: string) {
+  const response = await fetch(
+    "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
+    {
+      headers: {
+        Authorization: `Bearer ${google_access_token}`,
+      },
+    },
+  );
+  const googleUser = await z
+    .object({
+      email: z.string(),
+    })
+    .parseAsync(await response.json());
+
+  return googleUser;
+}
