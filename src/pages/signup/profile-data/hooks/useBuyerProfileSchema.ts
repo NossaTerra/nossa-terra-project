@@ -10,7 +10,7 @@ import {
 import { validateInstagram } from "~/utils/validators";
 import { useAddressSchema } from "./useAddressSchema";
 
-export function useSecondDataStepBuyerSchema() {
+export function useBuyerProfileSchema() {
   // It's best to use a hook to get the schema because
   // we can later add internationalized error messages
   const addressSchema = useAddressSchema();
@@ -59,7 +59,7 @@ export function useSecondDataStepBuyerSchema() {
                     (formatPhone(phone).length >=
                       lowerEndLengthFormattedPhone &&
                       formatPhone(phone).length <=
-                        higherEndLengthFormattedPhone) ||
+                      higherEndLengthFormattedPhone) ||
                     !phone
                   );
                 },
@@ -101,6 +101,6 @@ export function useSecondDataStepBuyerSchema() {
   );
 }
 
-export type SecondDataStepBuyerFields = z.infer<
-  ReturnType<typeof useSecondDataStepBuyerSchema>
+export type BuyerProfileData = z.infer<
+  ReturnType<typeof useBuyerProfileSchema>
 >;

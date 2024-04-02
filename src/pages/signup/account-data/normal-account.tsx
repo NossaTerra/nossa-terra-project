@@ -10,81 +10,79 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { useCallback } from "react";
-import { useLoginRegisterFlow } from "../state/machine";
-import { ArrowLeftIcon, CheckIcon } from "lucide-react";
-import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import {
-  type FirstDataStepFields,
-  useFirstDataStepSchema,
-} from "../hooks/useFirstDataStepSchema";
+import { useCallback, useMemo } from "react";
+import { CheckIcon } from "lucide-react";
 import { Input, PasswordInput } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
 import { formatCPF, formatCNPJ, lengthFormattedCNPJ } from "~/utils/formatters";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
 import { cpfIsCNPJ } from "~/utils/formHelpers";
-import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
+import { z } from "zod";
+import { useSignUpState } from "../useSignUpState";
+import { useOAuthAccountDataSchema } from "./oauth-account";
+import type { PermittedRoles } from "~/server/types/user.type";
 
-function FirstDataStepContent({ className }: ClassNameProps) {
-  const { state } = useLoginRegisterFlow();
+function useAccountDataSchema({
+  role,
+}: {
+  role: (typeof PermittedRoles)["Common"][number] | undefined;
+}) {
+  const oauthAccountSchema = useOAuthAccountDataSchema({ role });
 
-  const schema = useFirstDataStepSchema(
-    state.stepKey === "firstDataStep"
-      ? state.accumulatedContext.role
-      : undefined,
+  return useMemo(
+    () =>
+      oauthAccountSchema
+        .merge(
+          z.object({
+            password: z
+              .string({ required_error: "Você deve inserir uma senha" })
+              .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
+              .max(30, { message: "A senha deve ter no máximo 30 caracteres" })
+              .refine((value) => /[A-Z]/.test(value), {
+                message:
+                  "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
+              })
+              .refine((value) => /[a-z]/.test(value), {
+                message:
+                  "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
+              })
+              .refine((value) => /\d/.test(value), {
+                message:
+                  "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
+              }),
+            confirmPassword: z
+              .string({
+                required_error: "Você deve inserir a confirmação de senha",
+              })
+              .min(8, {
+                message:
+                  "A confirmação de senha deve ter no mínimo 8 caracteres",
+              }),
+          }),
+        )
+        .refine((data) => data.password === data.confirmPassword, {
+          message: "As senhas devem ser iguais",
+          path: ["confirmPassword"],
+        }),
+    [oauthAccountSchema],
   );
-  const form = useForm<FirstDataStepFields>({
+}
+
+export type AccountData = z.infer<ReturnType<typeof useAccountDataSchema>>;
+
+export function AccountDataForm({ className }: ClassNameProps) {
+  const { email, role, setAccountData } = useSignUpState();
+
+  const schema = useAccountDataSchema({ role });
+  const form = useForm<AccountData>({
     resolver: zodResolver(schema),
   });
 
-  const firstDataStepAction = useLoginRegisterFlow(
-    (s) => s.firstDataStepAction,
-  );
-
-  const onSubmit: SubmitHandler<FirstDataStepFields> = useCallback(
-    async ({
-      name,
-      cpf,
-      password,
-      confirmPassword,
-      agreeToTermsAndConditions,
-    }) => {
-      if (state.stepKey !== "firstDataStep") {
-        return;
-      }
-      const { role } = state.accumulatedContext;
-
-      if (role === "seller") {
-        firstDataStepAction({
-          command: "nextSeller",
-          data: {
-            name,
-            cpf,
-            password,
-            confirmPassword,
-            agreeToTermsAndConditions,
-          },
-          nextStep: "secondDataStepSeller",
-        });
-        return;
-      }
-
-      if (role === "buyer") {
-        firstDataStepAction({
-          command: "nextBuyer",
-          data: {
-            name,
-            cpf,
-            password,
-            confirmPassword,
-            agreeToTermsAndConditions,
-          },
-          nextStep: "secondDataStepBuyer",
-        });
-        return;
-      }
+  const onSubmit: SubmitHandler<AccountData> = useCallback(
+    async (data) => {
+      setAccountData({ isOAuth: false, ...data });
     },
-    [state.stepKey, state.accumulatedContext, firstDataStepAction],
+    [setAccountData],
   );
 
   return (
@@ -108,11 +106,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
 
       <div className="flex flex-col gap-2 font-bold">
         <label>Email</label>
-        <span className="opacity-60">
-          {state.stepKey === "firstDataStep"
-            ? state.accumulatedContext.email
-            : "----"}
-        </span>
+        <span className="opacity-60">{email ?? "----"}</span>
       </div>
 
       <div className="flex flex-col gap-2 font-bold">
@@ -121,13 +115,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-headingSecondary">
             <CheckIcon className="text-white" size={18} />
           </div>
-          <span>
-            {state.stepKey === "firstDataStep"
-              ? state.accumulatedContext.role === "seller"
-                ? "Produtor"
-                : "Comprador"
-              : "----"}
-          </span>
+          <span>{role === "seller" ? "Produtor" : "Comprador"}</span>
         </div>
       </div>
 
@@ -142,11 +130,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
             render={({ field, fieldState }) => (
               <FormItem className="mb-4 w-full text-gray-700">
                 <FormLabel className="block text-sm font-medium" htmlFor="name">
-                  {state.stepKey === "firstDataStep"
-                    ? state.accumulatedContext.role === "seller"
-                      ? "Nome*"
-                      : "Nome da empresa*"
-                    : "----"}
+                  {role === "seller" ? "Nome*" : "Nome da empresa*"}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -166,11 +150,7 @@ function FirstDataStepContent({ className }: ClassNameProps) {
             render={({ field, fieldState }) => (
               <FormItem className="mb-4 w-full text-gray-700">
                 <FormLabel className="block text-sm font-medium" htmlFor="cpf">
-                  {state.stepKey === "firstDataStep"
-                    ? state.accumulatedContext.role === "seller"
-                      ? "CPF/CNPJ*"
-                      : "CNPJ*"
-                    : "----"}
+                  {role === "seller" ? "CPF/CNPJ*" : "CNPJ*"}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -178,10 +158,9 @@ function FirstDataStepContent({ className }: ClassNameProps) {
                     placeholder="xxx.xxx.xxx-xx"
                     {...field}
                     value={
-                      state.stepKey === "firstDataStep" &&
                       cpfIsCNPJ({
                         cpf: field.value ?? "",
-                        role: state.accumulatedContext.role,
+                        role,
                       })
                         ? formatCNPJ(field?.value ?? "")
                         : formatCPF(field?.value ?? "")
@@ -272,40 +251,5 @@ function FirstDataStepContent({ className }: ClassNameProps) {
         </form>
       </Form>
     </main>
-  );
-}
-
-export function FirstDataStepScreen() {
-  useScrollToTop();
-  const firstDataStepAction = useLoginRegisterFlow(
-    (s) => s.firstDataStepAction,
-  );
-
-  const goBack = useCallback(
-    () =>
-      firstDataStepAction({
-        command: "goBack",
-        nextStep: "chooseRole",
-      }),
-    [firstDataStepAction],
-  );
-
-  return (
-    <div className="flex min-h-screen flex-grow flex-col">
-      <header className="items-between flex justify-between pt-12">
-        <Button
-          className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
-          variant="outline"
-          onClick={goBack}
-        >
-          <ArrowLeftIcon />
-          Voltar
-        </Button>
-        <div className="hidden px-12 md:block">
-          <NossaTerraLogo />
-        </div>
-      </header>
-      <FirstDataStepContent />
-    </div>
   );
 }

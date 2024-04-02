@@ -1,3 +1,4 @@
+import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { Button } from "~/components/ui/button";
@@ -11,23 +12,70 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useCallback } from "react";
-import {
-  type ChooseRoleFields,
-  useChooseRoleSchema,
-} from "../hooks/useChooseRoleSchema";
 import { RadioGroup } from "~/components/ui/radio-group";
 import { RadioGroupItem as RadixRadioGroupItem } from "@radix-ui/react-radio-group";
-import { useLoginRegisterFlow } from "../state/machine";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import useScrollToTop from "~/pages/login/LoginRegisterFlow/hooks/useScrolltoTop";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { H3 } from "~/components/ui/typography";
 import { type Role } from "@prisma/client";
 import { AdsCarouselFooter } from "~/components/common/AdsCarrousel";
+import { useMemo } from "react";
+import { z } from "zod";
+import { PermittedRoles } from "~/server/types/user.type";
+import { useSignUpState } from "./useSignUpState";
+import { useRouter } from "next/router";
+
+export const getServerSideProps = redirectGetServerSideProps.NoAuthOnly;
+
+export default function ChooseRoleScreen() {
+  const { isOAuth } = useSignUpState();
+  const router = useRouter();
+
+  const backAction = useCallback(() => {
+    if (isOAuth) {
+      return void router.replace("/login");
+    }
+    void router.back();
+  }, [isOAuth, router]);
+
+  return (
+    <div className="flex h-screen flex-grow flex-col">
+      <header className="items-between flex justify-between pt-12">
+        <Button
+          className="ml-8 mt-8 gap-3 p-6 text-lg lg:ml-14"
+          variant="outline"
+          onClick={backAction}
+        >
+          <ArrowLeftIcon />
+          Voltar
+        </Button>
+        <div className="hidden px-12 md:block">
+          <NossaTerraLogo />
+        </div>
+      </header>
+      <ChooseRoleContent />
+      <AdsCarouselFooter />
+    </div>
+  );
+}
+
+export function useChooseRoleSchema() {
+  return useMemo(
+    () =>
+      z.object({
+        role: z.enum(PermittedRoles.Common, {
+          required_error: "Por favor, escolha um tipo",
+        }),
+      }),
+    [],
+  );
+}
+
+export type ChooseRoleFields = z.infer<ReturnType<typeof useChooseRoleSchema>>;
 
 function ChooseRoleContent({ className }: ClassNameProps) {
-  const { state, chooseRoleAction } = useLoginRegisterFlow();
+  const { email, chooseRole } = useSignUpState();
 
   const schema = useChooseRoleSchema();
   const form = useForm<ChooseRoleFields>({
@@ -36,15 +84,9 @@ function ChooseRoleContent({ className }: ClassNameProps) {
 
   const onSubmit: SubmitHandler<ChooseRoleFields> = useCallback(
     ({ role }) => {
-      chooseRoleAction({
-        command: "next",
-        data: {
-          role,
-        },
-        nextStep: "firstDataStep",
-      });
+      chooseRole(role);
     },
-    [chooseRoleAction],
+    [chooseRole],
   );
 
   return (
@@ -68,11 +110,7 @@ function ChooseRoleContent({ className }: ClassNameProps) {
 
       <div className="flex flex-col gap-2 font-bold">
         <label>Email</label>
-        <span className="opacity-60">
-          {state.stepKey === "chooseRole"
-            ? state.accumulatedContext.email
-            : "----"}
-        </span>
+        <span className="opacity-60">{email ?? "----"}</span>
       </div>
 
       <Form {...form}>
@@ -165,39 +203,5 @@ function RoleRadioGroupItem({
         </RadixRadioGroupItem>
       </FormControl>
     </FormItem>
-  );
-}
-
-export function ChooseRoleScreen() {
-  const { chooseRoleAction } = useLoginRegisterFlow();
-  useScrollToTop();
-
-  const goBack = useCallback(
-    () =>
-      chooseRoleAction({
-        command: "goBack",
-        nextStep: "greeting",
-      }),
-    [chooseRoleAction],
-  );
-
-  return (
-    <div className="flex h-screen flex-grow flex-col">
-      <header className="items-between flex justify-between pt-12">
-        <Button
-          className="ml-8 gap-3 p-6 text-lg md:mt-8 lg:ml-14"
-          variant="outline"
-          onClick={goBack}
-        >
-          <ArrowLeftIcon />
-          Voltar
-        </Button>
-        <div className="hidden px-12 md:block">
-          <NossaTerraLogo />
-        </div>
-      </header>
-      <ChooseRoleContent />
-      <AdsCarouselFooter />
-    </div>
   );
 }
