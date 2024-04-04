@@ -43,7 +43,7 @@ export default function LoginScreen() {
   useToastWhenRedirected();
 
   return (
-    <div className="flex min-h-svh flex-grow flex-col justify-center">
+    <div className="flex min-h-dvh flex-grow flex-col justify-center">
       <header className="flex  items-start justify-center pt-12 md:justify-end">
         <div className="absolute right-4 top-10 hidden px-12 md:block">
           <NossaTerraLogo />

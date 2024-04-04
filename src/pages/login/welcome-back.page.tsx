@@ -28,7 +28,7 @@ export const getServerSideProps = redirectGetServerSideProps.NoAuthOnly;
 
 export default function WelcomeBackScreen() {
   return (
-    <div className="flex min-h-svh flex-grow flex-col">
+    <div className="flex min-h-dvh flex-grow flex-col">
       <header className="items-between flex justify-between pt-12">
         <Button variant="outline" asChild>
           <Link
