@@ -1,4 +1,4 @@
-import { formatPhone, lengthFormattedCPF } from "./formatters";
+import { formatPhone } from "./formatters";
 import {
   type Role,
   type BusinessSector,
@@ -9,13 +9,14 @@ import { BusinessSectorLabel } from "~/server/types/user.type";
 import { emptyString } from "./constants";
 import { type SellerProfileData } from "~/pages/signup/profile-data/hooks/useSellerProfileSchema";
 import { type BuyerProfileData } from "~/pages/signup/profile-data/hooks/useBuyerProfileSchema";
+import { cpfPattern } from "~/components/ui/input/masks/cpf-cnpj";
 
 export function cpfIsCNPJ({ cpf, role }: { cpf: string; role?: Role }) {
   if (role === "buyer") {
     return true;
   }
 
-  return cpf.length > lengthFormattedCPF;
+  return cpf.length > cpfPattern.length;
 }
 
 const fieldToFieldName = {

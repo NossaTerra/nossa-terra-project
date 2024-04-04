@@ -12,11 +12,9 @@ import {
 } from "~/components/ui/form";
 import { useCallback, useMemo } from "react";
 import { CheckIcon } from "lucide-react";
-import { Input, PasswordInput } from "~/components/ui/input";
+import { Input, MaskedInput, PasswordInput } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
-import { formatCPF, formatCNPJ, lengthFormattedCNPJ } from "~/utils/formatters";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
-import { cpfIsCNPJ } from "~/utils/formHelpers";
 import { z } from "zod";
 import { useSignUpState } from "../useSignUpState";
 import { useOAuthAccountDataSchema } from "./oauth-account";
@@ -134,7 +132,7 @@ export function AccountDataForm({ className }: ClassNameProps) {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="mt-3x w-full md:mt-0"
+                    className="w-full"
                     placeholder="Nome"
                     {...field}
                     value={field.value ?? ""}
@@ -153,19 +151,11 @@ export function AccountDataForm({ className }: ClassNameProps) {
                   {role === "seller" ? "CPF/CNPJ*" : "CNPJ*"}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
+                  <MaskedInput
+                    className="w-full"
                     placeholder="xxx.xxx.xxx-xx"
+                    maskPreset={role === "buyer" ? "CNPJ" : "CPF_or_CNPJ"}
                     {...field}
-                    value={
-                      cpfIsCNPJ({
-                        cpf: field.value ?? "",
-                        role,
-                      })
-                        ? formatCNPJ(field?.value ?? "")
-                        : formatCPF(field?.value ?? "")
-                    }
-                    maxLength={lengthFormattedCNPJ}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -185,7 +175,7 @@ export function AccountDataForm({ className }: ClassNameProps) {
                 </FormLabel>
                 <FormControl>
                   <PasswordInput
-                    className="mt-3x w-full md:mt-0"
+                    className="w-full"
                     placeholder="Senha"
                     {...field}
                     type="password"
@@ -209,7 +199,7 @@ export function AccountDataForm({ className }: ClassNameProps) {
                 </FormLabel>
                 <FormControl>
                   <PasswordInput
-                    className="mt-3x w-full md:mt-0"
+                    className="w-full"
                     placeholder="Senha"
                     {...field}
                     type="password"
