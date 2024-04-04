@@ -9,7 +9,6 @@ const rgPatternShort = [
   /\d/,
   /\d/,
   /\d/,
-  "-",
   /\d/,
 ] as const satisfies MaskitoMask;
 
@@ -33,7 +32,7 @@ export const RG_MaskConfig = {
     type: "tel",
   },
   maskitoOptions: {
-    ...maskitoWithPlaceholder("______-_"),
+    ...maskitoWithPlaceholder("_______"),
     mask: ({ value }) => {
       if (value.length <= rgPatternShort.length) {
         return rgPatternShort;
