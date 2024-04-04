@@ -157,7 +157,7 @@ export default function SearchScreen({ user }: Props) {
     .safeParse(user?.role).success;
 
   return (
-    <div className="flex grow flex-col lg:max-h-svh">
+    <div className="flex grow flex-col lg:max-h-dvh">
       <div
         className={cn("flex flex-col-reverse md:flex-row-reverse", {
           "border-b-2 bg-cardHover bg-opacity-25 shadow md:py-8": !user,

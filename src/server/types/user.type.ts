@@ -3,11 +3,11 @@ import { emptyString } from "~/utils/constants";
 import {
   higherEndLengthFormattedPhone,
   lowerEndLengthFormattedPhone,
-  lengthFormattedZIPCode,
 } from "~/utils/formatters";
 import { validateInstagram } from "~/utils/validators";
 
 import { UserActiveState, Role, BusinessSector } from "@prisma/client";
+import { zipCodePattern } from "~/components/ui/input/masks/zip-code";
 export { UserActiveState, Role, BusinessSector } from "@prisma/client";
 
 export const UserActiveStateLabel = {
@@ -24,7 +24,7 @@ export const BusinessSectorLabel = {
 } as const satisfies Record<BusinessSector, string>;
 
 export const addressSchema = z.object({
-  zipCode: z.string().min(lengthFormattedZIPCode).max(lengthFormattedZIPCode),
+  zipCode: z.string().length(zipCodePattern.length),
   city: z.string().min(2).max(80),
   province: z.string().min(2).max(2),
   street: z.string().min(2).max(100),

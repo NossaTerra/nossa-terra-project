@@ -14,6 +14,15 @@ dependencies:
   '@lucia-auth/oauth':
     specifier: ^3.5.3
     version: 3.5.3(lucia@2.7.6)
+  '@maskito/core':
+    specifier: ^2.2.0
+    version: 2.2.0
+  '@maskito/kit':
+    specifier: ^2.2.0
+    version: 2.2.0(@maskito/core@2.2.0)
+  '@maskito/react':
+    specifier: ^2.2.0
+    version: 2.2.0(@maskito/core@2.2.0)(react-dom@18.2.0)(react@18.2.0)
   '@prisma/client':
     specifier: ^5.6.0
     version: 5.7.1(prisma@5.7.1)
@@ -610,6 +619,30 @@ packages:
       lucia: ^2.0.0
     dependencies:
       lucia: 2.7.6
+    dev: false
+
+  /@maskito/core@2.2.0:
+    resolution: {integrity: sha512-5FRtl62j2qW89u8RoOVYLHAAmFAy0wFcEga4eO9PaNuqVBuNJpaPA0EtZ67yKPffOivso0b3rMjSkgvYEscz+w==}
+    dev: false
+
+  /@maskito/kit@2.2.0(@maskito/core@2.2.0):
+    resolution: {integrity: sha512-hLFWOWPD4vkn+uFZzO7D2s+bNujQUDHe5ooYiS6I4gkIE+zkCOi7GS9QvOh54KfWSYGLWazJcuW/JrXeU7mDyw==}
+    peerDependencies:
+      '@maskito/core': ^2.2.0
+    dependencies:
+      '@maskito/core': 2.2.0
+    dev: false
+
+  /@maskito/react@2.2.0(@maskito/core@2.2.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-7+2vbllRV93ICbScsWZ8tMi046himxO2Yul6bQVZlkY8bsQoS1lccKjeO1kqtzJeVnrNFvVlidDIkXabHUAonw==}
+    peerDependencies:
+      '@maskito/core': ^2.2.0
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@maskito/core': 2.2.0
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@next/env@14.0.4:

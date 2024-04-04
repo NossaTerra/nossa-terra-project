@@ -21,12 +21,7 @@ import {
   TooltipContent,
 } from "~/components/ui/tooltip";
 import { useCallback } from "react";
-import { Input } from "~/components/ui/input";
-import {
-  formatPhone,
-  formatZIPCode,
-  lengthFormattedZIPCode,
-} from "~/utils/formatters";
+import { Input, MaskedInput } from "~/components/ui/input";
 import { emptyString } from "~/utils/constants";
 import { Checkbox } from "~/components/ui/checkbox";
 import { MapPin } from "lucide-react";
@@ -122,11 +117,10 @@ export function BuyerForm({
                   Telefone*
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="(XX) XXXXX-XXXX"
+                  <MaskedInput
+                    className="w-full"
+                    maskPreset="BrazilianPhone"
                     {...field}
-                    value={formatPhone(field.value ?? emptyString)}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -178,11 +172,10 @@ export function BuyerForm({
                   Telefone secundário (opcional)
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="(XX) XXXXX-XXXX"
+                  <MaskedInput
+                    className="w-full"
+                    maskPreset="BrazilianPhone"
                     {...field}
-                    value={formatPhone(field.value ?? emptyString)}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -243,7 +236,7 @@ export function BuyerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder=" Ex: @minhaempresa"
                   {...field}
                   value={field.value ?? emptyString}
@@ -268,12 +261,10 @@ export function BuyerForm({
                       CEP*
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        className="mt-3x w-full md:mt-0"
-                        maxLength={lengthFormattedZIPCode}
-                        placeholder="Ex: 99999- 999"
+                      <MaskedInput
+                        className="w-full"
+                        maskPreset="ZipCode"
                         {...field}
-                        value={formatZIPCode(field.value ?? emptyString)}
                       />
                     </FormControl>
                     <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -299,7 +290,7 @@ export function BuyerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Cidade"
                   {...field}
                   value={field.value ?? emptyString}
@@ -323,7 +314,7 @@ export function BuyerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Estado"
                   {...field}
                   value={field.value ?? emptyString}
@@ -348,7 +339,7 @@ export function BuyerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Endereço"
                   {...field}
                   value={field.value ?? emptyString}
@@ -372,7 +363,7 @@ export function BuyerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Bairro"
                   {...field}
                   value={field.value ?? emptyString}
@@ -396,7 +387,7 @@ export function BuyerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Número"
                   {...field}
                   value={field.value ?? emptyString}
@@ -419,7 +410,7 @@ export function BuyerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Complemento"
                   {...field}
                   value={field.value ?? emptyString}
@@ -467,7 +458,7 @@ export function BuyerForm({
         <Button
           isLoading={isLoading}
           variant="primary"
-          className="mt-3 w-full"
+          className="mt-3 md:mt-8 w-full"
           type="submit"
           children="Cadastrar"
           {...submitButtonProps}

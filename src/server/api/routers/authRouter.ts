@@ -14,8 +14,8 @@ import { auth } from "../auth/lucia";
 import { protectedProcedure, publicProcedure } from "../trpc/procedures";
 import axios from "axios";
 import { addressDetailsApiSchema } from "~/server/api/addressApi";
-import { lengthFormattedCNPJ, lengthFormattedCPF } from "~/utils/formatters";
 import cloudinaryV2 from "~/utils/configs";
+import { cnpjPattern, cpfPattern } from "~/components/ui/input/masks/cpf-cnpj";
 
 export const authCredentialsSchema = z.discriminatedUnion("providerId", [
   z.object({
@@ -67,7 +67,7 @@ export const authRouter = createTRPCRouter({
               email: z.string().email().min(2).max(60),
               name: z.string().min(2).max(120),
               avatarImage: z.string().optional(),
-              cpf: z.string().min(lengthFormattedCNPJ).max(lengthFormattedCNPJ),
+              cpf: z.string().length(cnpjPattern.length),
               businessMainSector: z.nativeEnum(BusinessSector),
             })
             .merge(addressSchema)
@@ -77,7 +77,7 @@ export const authRouter = createTRPCRouter({
               role: z.literal("seller"),
               email: z.string().email().min(2).max(60),
               name: z.string().min(2).max(120),
-              cpf: z.string().min(lengthFormattedCPF).max(lengthFormattedCNPJ),
+              cpf: z.string().min(cpfPattern.length).max(cnpjPattern.length),
               rg: z.string().min(6).max(15),
             })
             .merge(addressSchema)

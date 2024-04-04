@@ -1,5 +1,12 @@
 import { cn } from "~/utils/ui";
 
+export function formatCurrencyReais(value: number) {
+  return value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export function PriceTag({
   value,
   small,
@@ -15,7 +22,7 @@ export function PriceTag({
       )}
       {...rest}
     >
-      R$ <span className="font-semibold">{value.toFixed(2)}</span>
+      R$ <span className="font-semibold">{formatCurrencyReais(value)}</span>
     </div>
   );
 }

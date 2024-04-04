@@ -35,7 +35,7 @@ function ListingCreationFlow() {
   const selectedProductId = router.query.product;
 
   return (
-    <div className="h-svh overflow-auto">
+    <div className="h-dvh overflow-auto">
       <div className="px-8">
         <Button className="mt-8 gap-3 p-6 text-lg" variant="outline" asChild>
           <Link href="/listings">
@@ -90,7 +90,7 @@ function ListingDetailsColumn({ className }: ClassNameProps) {
   );
 
   return (
-    <div className={cn("sticky top-0 h-svh w-full", className)}>
+    <div className={cn("sticky top-0 h-dvh w-full", className)}>
       {!product && (
         <div className="flex h-full w-full">
           <div className="flex flex-row items-center gap-8 text-3xl">

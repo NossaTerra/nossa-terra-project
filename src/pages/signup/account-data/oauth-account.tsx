@@ -12,9 +12,8 @@ import {
 } from "~/components/ui/form";
 import { useCallback, useMemo } from "react";
 import { CheckIcon } from "lucide-react";
-import { Input } from "~/components/ui/input";
+import { Input, MaskedInput } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
-import { formatCPF, formatCNPJ, lengthFormattedCNPJ } from "~/utils/formatters";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
 import { cpfIsCNPJ } from "~/utils/formHelpers";
 import { z } from "zod";
@@ -133,7 +132,7 @@ export function OAuthAccountDataForm({ className }: ClassNameProps) {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="mt-3x w-full md:mt-0"
+                    className="w-full"
                     placeholder="Nome"
                     {...field}
                     value={field.value ?? ""}
@@ -152,19 +151,10 @@ export function OAuthAccountDataForm({ className }: ClassNameProps) {
                   {role === "seller" ? "CPF/CNPJ*" : "CNPJ*"}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="xxx.xxx.xxx-xx"
+                  <MaskedInput
+                    className="w-full"
+                    maskPreset={role === "buyer" ? "CNPJ" : "CPF_or_CNPJ"}
                     {...field}
-                    value={
-                      cpfIsCNPJ({
-                        cpf: field.value ?? "",
-                        role,
-                      })
-                        ? formatCNPJ(field?.value ?? "")
-                        : formatCPF(field?.value ?? "")
-                    }
-                    maxLength={lengthFormattedCNPJ}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
