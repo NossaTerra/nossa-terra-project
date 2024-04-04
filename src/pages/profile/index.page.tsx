@@ -39,6 +39,7 @@ import AdsCarrousel from "~/components/common/AdsCarrousel";
 import { api } from "~/utils/api";
 import { awaitDiffConfirmationDialog, DiffDialog } from "./DiffDialog";
 import { type User } from "~/server/types/user.type";
+import { scrollToTopAsync } from "~/utils/scroll";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -87,6 +88,7 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
           data,
         });
         toast.success("Alterações realizadas com sucesso");
+        await scrollToTopAsync(500);
         setIsEditingProfile(false);
       } catch (e) {
         toast.error("Erro ao realizar alterações");
