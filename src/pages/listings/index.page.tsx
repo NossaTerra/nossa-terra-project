@@ -12,6 +12,7 @@ import { getProductImageSrc } from "~/server/types/product.type";
 import { ListingCard } from "./ListingCard";
 import { ProductType } from "@prisma/client";
 import MyListingsCardShimmer from "./MyListingsCardShimmer";
+import { ImageBackgroundFooter } from "~/components/common/ImageBackgroundFooter";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -41,28 +42,6 @@ export default function MyListingsScreen({ user }: Props) {
       <div className="px-10 pb-16">
         <h1 className="my-12 text-2xl font-bold md:text-4xl">Meus Anúncios</h1>
         <MyListingsDashboard className="mt-5" />
-      </div>
-    </div>
-  );
-}
-
-// NOTE: Possible optimization to reduce image sizes.
-// Serve a JPG with a circular gradient mask (which could be from a file or made programatically via "CSS").
-function ImageBackgroundFooter({ src }: { src: string }) {
-  return (
-    <div
-      className={cn(
-        "pointer-events-none z-0 -mt-[30vw] flex min-h-[70vh] flex-1 flex-col items-end justify-end overflow-hidden",
-      )}
-    >
-      <div className="relative -mb-32 flex h-full max-h-[70vh] w-full flex-1">
-        <Image
-          src={src}
-          objectFit="contain"
-          objectPosition="right 0% bottom 50%"
-          alt="Imagem de fundo"
-          fill
-        />
       </div>
     </div>
   );
