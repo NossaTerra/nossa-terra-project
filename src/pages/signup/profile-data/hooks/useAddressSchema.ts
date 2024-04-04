@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import { lengthFormattedZIPCode } from "~/utils/formatters";
 import { validateZIPCode } from "~/utils/validators";
 
 export function useAddressSchema() {
@@ -13,12 +12,6 @@ export function useAddressSchema() {
         zipCode: z
           .string({
             required_error: "Você deve inserir o CEP da sua empresa",
-          })
-          .min(lengthFormattedZIPCode, {
-            message: `O CEP deve ter no mínimo ${lengthFormattedZIPCode} dígitos, caso more na zona rural digite um CEP válido qualquer do seu município.`,
-          })
-          .max(lengthFormattedZIPCode, {
-            message: `O CEP deve ter no máximo ${lengthFormattedZIPCode} dígitos, se more na zona rural digite um CEP válido qualquer do seu município.`,
           })
           .refine(validateZIPCode, {
             message:

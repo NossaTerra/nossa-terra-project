@@ -1,5 +1,18 @@
 import { maskitoWithPlaceholder } from "@maskito/kit";
 import type { MaskInputPresetConfig } from "..";
+import { type MaskitoMask } from "@maskito/core";
+
+export const zipCodePattern = [
+  /\d/,
+  /\d/,
+  /\d/,
+  /\d/,
+  /\d/,
+  "-",
+  /\d/,
+  /\d/,
+  /\d/,
+] as const satisfies MaskitoMask;
 
 export const ZipCodeMaskConfig = {
   inputProps: {
@@ -8,6 +21,6 @@ export const ZipCodeMaskConfig = {
   },
   maskitoOptions: {
     ...maskitoWithPlaceholder("_____-___"),
-    mask: [/\d/, /\d/, /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/],
+    mask: zipCodePattern,
   },
 } satisfies MaskInputPresetConfig;
