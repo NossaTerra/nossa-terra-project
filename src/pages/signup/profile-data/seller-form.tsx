@@ -21,13 +21,7 @@ import {
   TooltipContent,
 } from "~/components/ui/tooltip";
 import { useCallback } from "react";
-import { Input } from "~/components/ui/input";
-import {
-  formatPhone,
-  formatRG,
-  formatZIPCode,
-  lengthFormattedZIPCode,
-} from "~/utils/formatters";
+import { Input, MaskedInput } from "~/components/ui/input";
 import { emptyString } from "~/utils/constants";
 import { Checkbox } from "~/components/ui/checkbox";
 import { MapPin } from "lucide-react";
@@ -106,11 +100,11 @@ export function SellerForm({
                 RG*
               </FormLabel>
               <FormControl>
-                <Input
-                  className="mt-3x w-full md:mt-0"
+                <MaskedInput
+                  className="w-full"
                   placeholder="RG"
+                  maskPreset="RG"
                   {...field}
-                  value={formatRG(field.value ?? emptyString)}
                 />
               </FormControl>
               <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -130,11 +124,10 @@ export function SellerForm({
                   Telefone*
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
-                    placeholder="(XX) XXXXX-XXXX"
+                  <MaskedInput
+                    className="w-full"
+                    maskPreset="BrazilianPhone"
                     {...field}
-                    value={formatPhone(field.value) ?? emptyString}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -188,12 +181,10 @@ export function SellerForm({
                       CEP*
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        className="mt-3x w-full md:mt-0"
-                        maxLength={lengthFormattedZIPCode}
-                        placeholder="Ex: 99999- 999"
+                      <MaskedInput
+                        className="w-full"
+                        maskPreset="ZipCode"
                         {...field}
-                        value={formatZIPCode(field.value)}
                       />
                     </FormControl>
                     <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -219,7 +210,7 @@ export function SellerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Cidade"
                   {...field}
                   ref={cityInputRef}
@@ -243,7 +234,7 @@ export function SellerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Estado"
                   {...field}
                   ref={provinceInputRef}
@@ -268,7 +259,7 @@ export function SellerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Endereço"
                   {...field}
                   ref={streetInputRef}
@@ -292,7 +283,7 @@ export function SellerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Bairro"
                   {...field}
                   ref={districtInputRef}
@@ -316,7 +307,7 @@ export function SellerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Número"
                   {...field}
                   value={field.value ?? emptyString}
@@ -339,7 +330,7 @@ export function SellerForm({
               </FormLabel>
               <FormControl>
                 <Input
-                  className="mt-3x w-full md:mt-0"
+                  className="w-full"
                   placeholder="Complemento"
                   {...field}
                   value={field.value ?? emptyString}

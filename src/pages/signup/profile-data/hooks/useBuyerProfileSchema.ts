@@ -2,13 +2,12 @@ import { useMemo } from "react";
 import { z } from "zod";
 import { BusinessSector } from "~/server/types/user.type";
 import { emptyString } from "~/utils/constants";
-import {
-  lowerEndLengthFormattedPhone,
-  higherEndLengthFormattedPhone,
-  formatPhone,
-} from "~/utils/formatters";
 import { validateInstagram } from "~/utils/validators";
 import { useAddressSchema } from "./useAddressSchema";
+import {
+  landlinePhonePattern,
+  mobilePhonePattern,
+} from "~/components/ui/input/masks/phone";
 
 export function useBuyerProfileSchema() {
   // It's best to use a hook to get the schema because
@@ -20,21 +19,22 @@ export function useBuyerProfileSchema() {
       addressSchema
         .merge(
           z.object({
-            phone: z
-              .string({
-                required_error: "Por favor, insira um telefone da sua empresa",
-              })
-              .refine(
-                (phone) => {
-                  return (
-                    formatPhone(phone).length >= lowerEndLengthFormattedPhone &&
-                    formatPhone(phone).length <= higherEndLengthFormattedPhone
-                  );
-                },
-                {
-                  message: "Telefone inválido",
-                },
-              ),
+          phone: z
+            .string({
+              required_error: "Por favor, insira um telefone da sua empresa",
+            })
+            .refine(
+              (phone) => {
+                const withoutPlaceholder = phone.replace(/_/g, "");
+                return (
+                  withoutPlaceholder.length >= landlinePhonePattern.length &&
+                  withoutPlaceholder.length <= mobilePhonePattern.length
+                );
+              },
+              {
+                message: "Telefone inválido",
+              },
+            ),
 
             businessMainSector: z
               .nativeEnum(BusinessSector)
@@ -51,23 +51,25 @@ export function useBuyerProfileSchema() {
                 return sector;
               }),
 
-            secondaryPhone: z
-              .string()
-              .refine(
-                (phone) => {
-                  return (
-                    (formatPhone(phone).length >=
-                      lowerEndLengthFormattedPhone &&
-                      formatPhone(phone).length <=
-                      higherEndLengthFormattedPhone) ||
-                    !phone
-                  );
-                },
-                {
-                  message: "Telefone inválido",
-                },
-              )
-              .optional(),
+            secondaryPhone: z.ostring().refine(
+              (phone) => {
+                if (!phone) {
+                  return true;
+                }
+                const numbersCount = phone.replace(/\D/g, "").length;
+                if (numbersCount == 0) {
+                  return true;
+                }
+                const withoutPlaceholder = phone.replace(/_/g, "");
+                return (
+                  withoutPlaceholder.length >= landlinePhonePattern.length &&
+                  withoutPlaceholder.length <= mobilePhonePattern.length
+                );
+              },
+              {
+                message: "Telefone inválido",
+              },
+            ),
             instagram: z
               .string()
               .refine(

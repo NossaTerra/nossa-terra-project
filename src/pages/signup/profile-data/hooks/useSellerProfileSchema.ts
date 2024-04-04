@@ -1,12 +1,11 @@
 import { useMemo } from "react";
 import { z } from "zod";
-import {
-  lowerEndLengthFormattedPhone,
-  higherEndLengthFormattedPhone,
-  formatPhone,
-} from "~/utils/formatters";
 import { validateRG } from "~/utils/validators";
 import { useAddressSchema } from "./useAddressSchema";
+import {
+  landlinePhonePattern,
+  mobilePhonePattern,
+} from "~/components/ui/input/masks/phone";
 
 export function useSellerProfileSchema() {
   // It's best to use a hook to get the schema because
@@ -29,9 +28,10 @@ export function useSellerProfileSchema() {
             })
             .refine(
               (phone) => {
+                const withoutPlaceholder = phone.replace(/_/g, "");
                 return (
-                  formatPhone(phone).length >= lowerEndLengthFormattedPhone &&
-                  formatPhone(phone).length <= higherEndLengthFormattedPhone
+                  withoutPlaceholder.length >= landlinePhonePattern.length &&
+                  withoutPlaceholder.length <= mobilePhonePattern.length
                 );
               },
               {
