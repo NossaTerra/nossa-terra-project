@@ -54,6 +54,10 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
     return nonNullableUserProps as NonNullable<typeof rawUserData>;
   }, [rawUserData]);
 
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const direction = isEditingProfile ? Direction.Right : Direction.Left;
+  const showLogoutButton = !isEditingProfile || user.role === "seller";
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keyUserChange = useMemo(() => crypto.randomUUID(), [user]);
 
@@ -83,6 +87,7 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
           data,
         });
         toast.success("Alterações realizadas com sucesso");
+        setIsEditingProfile(false);
       } catch (e) {
         toast.error("Erro ao realizar alterações");
       }
@@ -117,10 +122,6 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
     }),
     [editBuyer.isLoading, editSeller.isLoading],
   );
-
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const direction = isEditingProfile ? Direction.Right : Direction.Left;
-  const showLogoutButton = !isEditingProfile || user.role === "seller";
 
   const submitButtonProps: ButtonProps = useMemo(
     () => ({
