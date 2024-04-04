@@ -119,7 +119,7 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
   );
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const direction = isEditingProfile ? Direction.Left : Direction.Right;
+  const direction = isEditingProfile ? Direction.Right : Direction.Left;
   const showLogoutButton = !isEditingProfile || user.role === "seller";
 
   const submitButtonProps: ButtonProps = useMemo(
@@ -184,7 +184,6 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
               />
             )}
           </div>
-
           <footer className="flex justify-center py-10 lg:justify-end">
             {showLogoutButton && <LogOutButton />}
             {isEditingProfile && <AdsCarrousel className="mt-20" />}
