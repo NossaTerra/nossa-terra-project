@@ -38,19 +38,24 @@ import {
 import AdsCarrousel from "~/components/common/AdsCarrousel";
 import { api } from "~/utils/api";
 import { awaitDiffConfirmationDialog, DiffDialog } from "./DiffDialog";
-import { formatPhone } from "~/utils/formatters";
+import { type User } from "~/server/types/user.type";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-export default function ProfileScreen({ user: propsUser }: Props) {
+export default function ProfileScreen({ user: ssrUser }: Props) {
+  const rawUserData = api.auth.getUser.useQuery()?.data ?? ssrUser;
+
   const user = useMemo(() => {
     const nonNullableUserProps = {} as Record<string, unknown>;
-    Object.entries(propsUser).forEach(([key, value]) => {
+    Object.entries(rawUserData).forEach(([key, value]) => {
       nonNullableUserProps[key] = value ?? undefined;
     });
-    return nonNullableUserProps as NonNullable<typeof propsUser>;
-  }, [propsUser]);
+    return nonNullableUserProps as NonNullable<typeof rawUserData>;
+  }, [rawUserData]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const keyUserChange = useMemo(() => crypto.randomUUID(), [user]);
 
   const formProps = useMemo(() => {
     return {
@@ -58,11 +63,16 @@ export default function ProfileScreen({ user: propsUser }: Props) {
     };
   }, [user]);
 
-  const editBuyer = api.profile.editBuyer.useMutation();
+  const apiUtils = api.useUtils();
+  const editBuyer = api.profile.editBuyer.useMutation({
+    onSuccess: async () => {
+      await apiUtils.auth.getUser.invalidate();
+    },
+  });
+
   const onBuyerFormSubmit: BuyerFormProps["onSuccess"] = useCallback(
     async ({ data, form }) => {
       const diffObject = getBuyerDiffObject(form, user);
-      console.log(diffObject);
       if (Object.entries(diffObject).length === 0) {
         return;
       }
@@ -70,13 +80,7 @@ export default function ProfileScreen({ user: propsUser }: Props) {
       try {
         await editBuyer.mutateAsync({
           id: user.id,
-          data: {
-            ...data,
-            phone: formatPhone(data.phone),
-            secondaryPhone: data.secondaryPhone
-              ? formatPhone(data.secondaryPhone)
-              : undefined,
-          },
+          data,
         });
         toast.success("Alterações realizadas com sucesso");
       } catch (e) {
@@ -90,7 +94,6 @@ export default function ProfileScreen({ user: propsUser }: Props) {
   const onSellerFormSubmit: SellerFormProps["onSuccess"] = useCallback(
     async ({ data, form }) => {
       const diffObject = getSellerDiffObject(form, user);
-      console.log(diffObject);
       if (Object.entries(diffObject).length === 0) {
         return;
       }
@@ -98,10 +101,7 @@ export default function ProfileScreen({ user: propsUser }: Props) {
       try {
         await editSeller.mutateAsync({
           id: user.id,
-          data: {
-            ...data,
-            phone: formatPhone(data.phone),
-          },
+          data,
         });
         toast.success("Alterações realizadas com sucesso");
       } catch (e) {
@@ -149,6 +149,7 @@ export default function ProfileScreen({ user: propsUser }: Props) {
           <div>
             {user.role === "seller" && (
               <SellerForm
+                key={keyUserChange}
                 className="my-10 md:pl-2"
                 onSuccess={onSellerFormSubmit}
                 formProps={formProps}
@@ -167,6 +168,7 @@ export default function ProfileScreen({ user: propsUser }: Props) {
                 </Button>
 
                 <BuyerForm
+                  key={keyUserChange}
                   className="my-8 md:pl-2"
                   onSuccess={onBuyerFormSubmit}
                   formProps={formProps}
@@ -176,6 +178,7 @@ export default function ProfileScreen({ user: propsUser }: Props) {
             )}
             {user.role === "buyer" && !isEditingProfile && (
               <CurrentProfileCardScreen
+                key={keyUserChange}
                 user={user}
                 onEditing={() => setIsEditingProfile(true)}
               />
@@ -195,7 +198,10 @@ export default function ProfileScreen({ user: propsUser }: Props) {
 export function CurrentProfileCardScreen({
   user,
   onEditing,
-}: Props & { onEditing: () => void }) {
+}: {
+  onEditing: () => void;
+  user: User;
+}) {
   return (
     <>
       <h1 className="mt-10 text-2xl font-bold md:text-4xl">Meu Perfil</h1>
@@ -241,7 +247,7 @@ export function LogOutButton() {
   );
 }
 
-export function UserAnnouncementCard({ user }: Props) {
+export function UserAnnouncementCard({ user }: { user: User }) {
   const commonPhones = useMemo(() => {
     const phones: string[] = [];
 
