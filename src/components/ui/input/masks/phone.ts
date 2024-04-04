@@ -40,7 +40,7 @@ export const mobilePhonePattern = [
 export const BrazilianPhoneMaskConfig = {
   inputProps: {
     type: "tel",
-    placeholder: "(DDD) XXXXX-XXXX",
+    placeholder: "(XX) XXXX-XXXX",
   },
   maskitoOptions: {
     ...maskitoWithPlaceholder("(__) ____-____"),
