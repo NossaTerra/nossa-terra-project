@@ -22,7 +22,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { EditListingForm, type ListingFormData } from "./EditListingForm";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { getDisplayTime } from "~/utils/time";
@@ -159,6 +159,9 @@ function EditListingModal({
     [editListing, listing, onOpenChange],
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const keyRefreshForm = useMemo(() => crypto.randomUUID(), [listing, isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -167,6 +170,7 @@ function EditListingModal({
         </DialogTitle>
 
         <EditListingForm
+          key={keyRefreshForm}
           isLoading={editListing.isLoading}
           product={listing.product}
           listing={listing}

@@ -14,6 +14,7 @@ import { BrazilianPhoneMaskConfig } from "./masks/phone";
 import { ZipCodeMaskConfig } from "./masks/zip-code";
 import { CNPJ_MaskConfig, CPF_or_CNPJ_MaskConfig } from "./masks/cpf-cnpj";
 import { RG_MaskConfig } from "./masks/rg";
+import { CurrencyReaisMaskConfig } from "./masks/currency";
 
 export interface MaskInputPresetConfig {
   inputProps?: Partial<HTMLInputElement>;
@@ -27,6 +28,8 @@ export const MaskInputPresetConfigs = {
   RG: RG_MaskConfig,
   CNPJ: CNPJ_MaskConfig,
   CPF_or_CNPJ: CPF_or_CNPJ_MaskConfig,
+
+  CurrencyReais: CurrencyReaisMaskConfig,
 } as const satisfies Record<string, MaskInputPresetConfig>;
 
 export type MaskInputPreset = keyof typeof MaskInputPresetConfigs;

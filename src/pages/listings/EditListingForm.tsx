@@ -3,7 +3,7 @@ import { type Product } from "@prisma/client";
 import { useCallback, useMemo } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-import { PriceTag } from "~/components/common/PriceTag";
+import { PriceTag, formatCurrencyReais } from "~/components/common/PriceTag";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Button } from "~/components/ui/button";
 import {
@@ -15,7 +15,8 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
+import { MaskedInput } from "~/components/ui/input";
+import { getNumberFromCurrencyReais } from "~/components/ui/input/masks/currency";
 import { H3 } from "~/components/ui/typography";
 import { type MyListing } from "~/utils/api";
 import { cn } from "~/utils/ui";
@@ -26,10 +27,16 @@ function useEditListingSchema() {
       z.object({
         price: z
           .string({ required_error: "Você deve inserir um preço" })
-          .min(1, {
-            message: "Você deve inserir um preço",
-          })
-          .transform(Number),
+          .refine(
+            (inputValue) => {
+              const price = getNumberFromCurrencyReais(inputValue);
+              return price !== 0 && !isNaN(price);
+            },
+            {
+              message: "Você deve inserir um preço",
+            },
+          )
+          .transform(getNumberFromCurrencyReais),
       }),
     [],
   );
@@ -53,9 +60,11 @@ export function EditListingForm({
     resolver: zodResolver(schema),
     defaultValues: listing
       ? {
-          ...listing,
-          price: Number(listing.price),
-        }
+        ...listing,
+        price: `R$ ${formatCurrencyReais(
+          Number(listing.price),
+        )}` as unknown as number,
+      }
       : undefined,
   });
 
@@ -66,7 +75,9 @@ export function EditListingForm({
     [onSuccess],
   );
 
-  const price = Number(form.watch("price") ?? "0");
+  const price = getNumberFromCurrencyReais(
+    (form.watch("price") ?? "") as unknown as string,
+  );
 
   return (
     <Form {...form}>
@@ -99,11 +110,10 @@ export function EditListingForm({
                   <H3 className="p-0 pb-8">Preço</H3>
                 </FormLabel>
                 <FormControl>
-                  <Input
+                  <MaskedInput
+                    maskPreset="CurrencyReais"
                     placeholder="Preço"
                     {...field}
-                    type="number"
-                    step={0.01}
                   />
                 </FormControl>
                 <FormDescription>
