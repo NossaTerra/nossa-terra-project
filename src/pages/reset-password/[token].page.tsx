@@ -13,7 +13,7 @@ import {
 import { useCallback, useMemo } from "react";
 import { ArrowLeftIcon } from "lucide-react";
 import { NossaTerraLogo } from "~/components/common/NossaTerraLogo";
-import { Input } from "~/components/ui/input";
+import { PasswordInput } from "~/components/ui/input";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { emptyString } from "~/utils/constants";
@@ -23,34 +23,21 @@ import {
   type GetServerSideProps,
 } from "next";
 import { TokenStatus, checkResetPasswordToken } from "~/server/api/auth/token";
-import { z } from "zod";
+import { useCreatePasswordSchema } from "../signup/account-data/normal-account";
+import { type z } from "zod";
 
 function useResetPasswordSchema() {
-  // It's best to use a hook to get the schema because
-  // we can later add internationalized error messages
-
+  const createPasswordSchema = useCreatePasswordSchema();
   return useMemo(
     () =>
-      z
-        .object({
-          password: z
-            .string({ required_error: "Você deve inserir uma senha" })
-            .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
-            .max(30, { message: "A senha deve ter no máximo 30 caracteres" }),
-
-          confirmPassword: z
-            .string({
-              required_error: "Você deve inserir a confirmação de senha",
-            })
-            .min(8, {
-              message: "A confirmação de senha deve ter no mínimo 8 caracteres",
-            }),
-        })
-        .refine((data) => data.password === data.confirmPassword, {
+      createPasswordSchema.refine(
+        (data) => data.password === data.confirmPassword,
+        {
           message: "As senhas devem ser iguais",
           path: ["confirmPassword"],
-        }),
-    [],
+        },
+      ),
+    [createPasswordSchema],
   );
 }
 
@@ -119,12 +106,10 @@ function ResetPasswordContent({
                   Nova Senha*
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="mt-3x w-80 md:mt-0"
+                  <PasswordInput
+                    className="w-80"
                     placeholder="Senha"
                     {...field}
-                    type="password"
-                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -143,12 +128,10 @@ function ResetPasswordContent({
                   Confirmar nova Senha*
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    className="mt-3x w-full md:mt-0"
+                  <PasswordInput
+                    className="w-full"
                     placeholder="Senha"
                     {...field}
-                    type="password"
-                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
