@@ -12,7 +12,7 @@ import {
 } from "~/components/ui/form";
 import { useCallback, useMemo } from "react";
 import { CheckIcon } from "lucide-react";
-import { Input, MaskedInput, PasswordInput } from "~/components/ui/input";
+import { Input, PasswordInput } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
 import { z } from "zod";
@@ -153,7 +153,7 @@ export function AccountDataForm({ className }: ClassNameProps) {
                   {role === "seller" ? "CPF/CNPJ*" : "CNPJ*"}
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     className="w-full"
                     placeholder="xxx.xxx.xxx-xx"
                     maskPreset={role === "buyer" ? "CNPJ" : "CPF_or_CNPJ"}

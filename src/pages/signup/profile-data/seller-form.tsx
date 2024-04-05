@@ -21,7 +21,7 @@ import {
   TooltipContent,
 } from "~/components/ui/tooltip";
 import { useCallback, useEffect } from "react";
-import { Input, MaskedInput } from "~/components/ui/input";
+import { Input } from "~/components/ui/input";
 import { emptyString } from "~/utils/constants";
 import { Checkbox } from "~/components/ui/checkbox";
 import { MapPin } from "lucide-react";
@@ -106,7 +106,7 @@ export function SellerForm({
                 RG*
               </FormLabel>
               <FormControl>
-                <MaskedInput
+                <Input
                   className="w-full"
                   placeholder="RG"
                   maskPreset="RG"
@@ -130,7 +130,7 @@ export function SellerForm({
                   Telefone*
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     className="w-full"
                     maskPreset="BrazilianPhone"
                     {...field}
@@ -187,7 +187,7 @@ export function SellerForm({
                       CEP*
                     </FormLabel>
                     <FormControl>
-                      <MaskedInput
+                      <Input
                         className="w-full"
                         maskPreset="ZipCode"
                         {...field}
