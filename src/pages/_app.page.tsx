@@ -7,6 +7,7 @@ import { api } from "~/utils/api";
 import { Toaster } from "react-hot-toast";
 
 import "~/styles/globals.css";
+import Head from "next/head";
 
 const fontInter = Inter({
   subsets: ["latin"],
@@ -25,6 +26,10 @@ const AppWrapper: AppType = ({ Component, pageProps }) => {
     <div
       className={`${fontInter.variable} ${fontPoppins.variable} flex min-h-dvh flex-col overflow-x-hidden bg-backgroundPrimary`}
     >
+      <Head>
+        <title>Nossa Terra</title>
+        <meta property="og:title" content="Nossa Terra" key="title" />
+      </Head>
       <Toaster />
       <Component {...pageProps} />
     </div>
