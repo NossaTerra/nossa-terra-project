@@ -133,6 +133,8 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
     [],
   );
 
+  const [isDirty, setIsDirty] = useState(false);
+
   return (
     <>
       <DiffDialog buttonProps={diffDialogButtonProps} />
@@ -158,12 +160,15 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
                   </h1>
                   <LogOutButton className="mt-10" />
                 </div>
+
+                {isDirty && <PingHasUnsavedEditing />}
                 <SellerForm
                   key={keyUserChange}
                   className="my-10 md:pl-2"
                   onSuccess={onSellerFormSubmit}
                   formProps={formProps}
                   submitButtonProps={submitButtonProps}
+                  onIsDirty={setIsDirty}
                 />
               </>
             )}
@@ -178,12 +183,14 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
                   Voltar
                 </Button>
 
+                {isDirty && <PingHasUnsavedEditing />}
                 <BuyerForm
                   key={keyUserChange}
                   className="my-8 md:pl-2"
                   onSuccess={onBuyerFormSubmit}
                   formProps={formProps}
                   submitButtonProps={submitButtonProps}
+                  onIsDirty={setIsDirty}
                 />
               </>
             )}
@@ -392,6 +399,20 @@ export function UserAnnouncementCard({ user }: { user: User }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PingHasUnsavedEditing() {
+  return (
+    <div className="animate-fade-in font-poppins-400 mb-6 mt-4 text-sm ">
+      <span className="relative flex h-3 w-3">
+        <span className="absolute top-2 inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
+        <span className="relative top-2 inline-flex h-3 w-3 rounded-full bg-accent"></span>
+      </span>
+      <span className="ml-0.5 block px-3 pb-3">
+        Clique em salvar alterações para completar edição
+      </span>
     </div>
   );
 }

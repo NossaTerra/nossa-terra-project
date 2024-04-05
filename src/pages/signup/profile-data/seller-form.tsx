@@ -20,7 +20,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "~/components/ui/tooltip";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Input, MaskedInput } from "~/components/ui/input";
 import { emptyString } from "~/utils/constants";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -43,6 +43,7 @@ export interface SellerFormProps extends ClassNameProps {
   }) => Promise<void>;
   isLoading?: boolean;
   formProps?: Partial<UseFormProps<SellerProfileData>>;
+  onIsDirty?: (isDirty: boolean) => void;
   submitButtonProps?: ButtonProps;
 }
 
@@ -51,6 +52,7 @@ export function SellerForm({
   formProps,
   onSuccess,
   isLoading = false,
+  onIsDirty,
   submitButtonProps,
 }: SellerFormProps) {
   const schema = useSellerProfileSchema();
@@ -63,6 +65,10 @@ export function SellerForm({
       ...formProps?.defaultValues,
     },
   });
+
+  useEffect(() => {
+    onIsDirty?.(form.formState.isDirty);
+  }, [form.formState.isDirty, onIsDirty]);
 
   const {
     addressInferedData,
