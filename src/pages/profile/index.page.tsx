@@ -40,6 +40,7 @@ import { api } from "~/utils/api";
 import { awaitDiffConfirmationDialog, DiffDialog } from "./DiffDialog";
 import { type User } from "~/server/types/user.type";
 import { scrollToTopAsync } from "~/utils/scroll";
+import { type ClassNameProps, cn } from "~/utils/ui";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -57,7 +58,6 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const direction = isEditingProfile ? Direction.Right : Direction.Left;
-  const showLogoutButton = !isEditingProfile || user.role === "seller";
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keyUserChange = useMemo(() => crypto.randomUUID(), [user]);
@@ -152,9 +152,12 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
           <div>
             {user.role === "seller" && (
               <>
-                <h1 className="mb-8 mt-10 text-2xl font-bold md:text-4xl">
-                  Meu Perfil
-                </h1>
+                <div className="flex flex-row justify-between ">
+                  <h1 className="mb-8 mt-10 text-2xl font-bold md:text-4xl">
+                    Meu Perfil
+                  </h1>
+                  <LogOutButton className="mt-10" />
+                </div>
                 <SellerForm
                   key={keyUserChange}
                   className="my-10 md:pl-2"
@@ -192,8 +195,8 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
               />
             )}
           </div>
-          <footer className="flex justify-center py-10 lg:justify-end">
-            {showLogoutButton && <LogOutButton />}
+          <footer className="flex w-full justify-end py-10">
+            {user.role === "buyer" && !isEditingProfile && <LogOutButton />}
             {isEditingProfile && <AdsCarrousel className="mt-20" />}
           </footer>
         </motion.div>
@@ -226,15 +229,19 @@ export function CurrentProfileCardScreen({
   );
 }
 
-export function LogOutButton() {
+export function LogOutButton({ className }: ClassNameProps) {
   const { logout, logoutLoading } = useAuth();
 
   return (
     <Dialog modal>
       <DialogTrigger asChild>
-        <Button isLoading={logoutLoading} variant="ghost" className="text-md">
-          <LogOut color="black" className="mr-2 inline h-6 w-6" />
-          Sair do Nossa Terra
+        <Button
+          isLoading={logoutLoading}
+          variant="outline"
+          className={cn("text-md", className)}
+        >
+          <LogOut className="mr-1 inline h-6 w-6" />
+          Sair
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[80vw] md:w-auto ">
