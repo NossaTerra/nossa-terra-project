@@ -60,11 +60,11 @@ export function EditListingForm({
     resolver: zodResolver(schema),
     defaultValues: listing
       ? {
-        ...listing,
-        price: `R$ ${formatCurrencyReais(
-          Number(listing.price),
-        )}` as unknown as number,
-      }
+          ...listing,
+          price: `R$ ${formatCurrencyReais(
+            Number(listing.price),
+          )}` as unknown as number,
+        }
       : undefined,
   });
 

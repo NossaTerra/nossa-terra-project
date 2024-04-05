@@ -7,10 +7,10 @@ export function ImageBackgroundFooter({ src }: { src: string }) {
   return (
     <div
       className={cn(
-        "pointer-events-none z-0 -mt-[36vw] md:-mt-[30vw] flex min-h-[70vh] flex-1 flex-col items-end justify-end overflow-hidden",
+        "pointer-events-none z-0 -mt-[36vw] flex min-h-[70vh] flex-1 flex-col items-end justify-end overflow-hidden md:-mt-[30vw]",
       )}
     >
-      <div className="relative md:-mb-32 flex h-full max-h-[58vh] md:max-h-[62vh] w-full flex-1">
+      <div className="relative flex h-full max-h-[58vh] w-full flex-1 md:-mb-32 md:max-h-[62vh]">
         <Image
           src={src}
           objectFit="contain"

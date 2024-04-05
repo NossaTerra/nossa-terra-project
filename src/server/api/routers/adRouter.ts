@@ -1,10 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter } from "~/server/api/trpc/trpc";
-import {
-  backofficeProcedure,
-  publicProcedure,
-} from "../trpc/procedures";
+import { backofficeProcedure, publicProcedure } from "../trpc/procedures";
 
 import { TRPCError } from "@trpc/server";
 import cloudinaryV2 from "~/utils/configs";

@@ -12,8 +12,9 @@ const useZipCodeToast = () => {
       (t) => (
         <div
           key={key}
-          className={`${t.visible ? "animate-enter" : "animate-leave"
-            } pointer-events-auto flex w-full max-w-md rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5`}
+          className={`${
+            t.visible ? "animate-enter" : "animate-leave"
+          } pointer-events-auto flex w-full max-w-md rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5`}
         >
           <div className="w-0 flex-1 p-4">
             <div className="flex items-start">

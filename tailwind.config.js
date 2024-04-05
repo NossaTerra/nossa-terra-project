@@ -70,7 +70,7 @@ module.exports = {
   plugins: [
     require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
-    function({ addUtilities }) {
+    function ({ addUtilities }) {
       const newUtilities = {
         ".scrollbar-webkit": {
           "&::-webkit-scrollbar": {

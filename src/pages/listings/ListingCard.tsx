@@ -66,9 +66,12 @@ export function ListingCard({
         topRightElement={
           <DropdownMenu>
             <DropdownMenuTrigger
-              className= {cn(buttonVariants({ size: "icon", variant: "outline" }), "bg-slate-300 rounded-full border-0")}
+              className={cn(
+                buttonVariants({ size: "icon", variant: "outline" }),
+                "rounded-full border-0 bg-slate-300",
+              )}
             >
-              <MoreVerticalIcon  />
+              <MoreVerticalIcon />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => setIsEditing(true)}>

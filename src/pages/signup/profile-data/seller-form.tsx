@@ -349,7 +349,7 @@ export function SellerForm({
         <Button
           isLoading={isLoading}
           variant="primary"
-          className="mt-3 md:mt-8 w-full"
+          className="mt-3 w-full md:mt-8"
           type="submit"
           children="Cadastrar"
           {...submitButtonProps}

@@ -19,22 +19,22 @@ export function useBuyerProfileSchema() {
       addressSchema
         .merge(
           z.object({
-          phone: z
-            .string({
-              required_error: "Por favor, insira um telefone da sua empresa",
-            })
-            .refine(
-              (phone) => {
-                const withoutPlaceholder = phone.replace(/_/g, "");
-                return (
-                  withoutPlaceholder.length >= landlinePhonePattern.length &&
-                  withoutPlaceholder.length <= mobilePhonePattern.length
-                );
-              },
-              {
-                message: "Telefone inválido",
-              },
-            ),
+            phone: z
+              .string({
+                required_error: "Por favor, insira um telefone da sua empresa",
+              })
+              .refine(
+                (phone) => {
+                  const withoutPlaceholder = phone.replace(/_/g, "");
+                  return (
+                    withoutPlaceholder.length >= landlinePhonePattern.length &&
+                    withoutPlaceholder.length <= mobilePhonePattern.length
+                  );
+                },
+                {
+                  message: "Telefone inválido",
+                },
+              ),
 
             businessMainSector: z
               .nativeEnum(BusinessSector)
