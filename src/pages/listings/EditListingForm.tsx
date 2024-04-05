@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { MaskedInput } from "~/components/ui/input";
+import { Input } from "~/components/ui/input";
 import { getNumberFromCurrencyReais } from "~/components/ui/input/masks/currency";
 import { H3 } from "~/components/ui/typography";
 import { type MyListing } from "~/utils/api";
@@ -60,11 +60,11 @@ export function EditListingForm({
     resolver: zodResolver(schema),
     defaultValues: listing
       ? {
-        ...listing,
-        price: `R$ ${formatCurrencyReais(
-          Number(listing.price),
-        )}` as unknown as number,
-      }
+          ...listing,
+          price: `R$ ${formatCurrencyReais(
+            Number(listing.price),
+          )}` as unknown as number,
+        }
       : undefined,
   });
 
@@ -110,7 +110,7 @@ export function EditListingForm({
                   <H3 className="p-0 pb-8">Preço</H3>
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     maskPreset="CurrencyReais"
                     placeholder="Preço"
                     {...field}

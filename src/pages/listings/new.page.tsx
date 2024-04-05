@@ -10,6 +10,7 @@ import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { EditListingForm, type ListingFormData } from "./EditListingForm";
 import { ProductSearchColumn } from "~/components/common/ProductSearchColumn";
+import toast from "react-hot-toast";
 
 export const getServerSideProps = redirectGetServerSideProps.BuyerOnly;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -65,13 +66,20 @@ function ListingCreationFlow() {
 function ListingDetailsColumn({ className }: ClassNameProps) {
   const router = useRouter();
   const selectedProductId = router.query.product;
-  const { data: products } = api.product.getAll.useQuery();
+  const { data: products } = api.product.getAll.useQuery(undefined, {
+    onError: () => {
+      toast.error("Erro ao Buscar produtos");
+    },
+  });
   const product = products?.find((product) => product.id === selectedProductId);
 
   const apiUtils = api.useUtils();
   const createListing = api.listing.createListing.useMutation({
     onSuccess() {
       void apiUtils.listing.getMyListings.invalidate();
+    },
+    onError: () => {
+      toast.error("Erro ao Criar Anúncio, tente novamente mais tarde");
     },
   });
 
@@ -80,11 +88,15 @@ function ListingDetailsColumn({ className }: ClassNameProps) {
       if (!product) {
         return;
       }
-      await createListing.mutateAsync({
-        price: data.price,
-        productId: product.id,
-      });
-      await router.push("/listings");
+      try {
+        await createListing.mutateAsync({
+          price: data.price,
+          productId: product.id,
+        });
+        await router.push("/listings");
+      } catch {
+        console.log("Error while creating listing ");
+      }
     },
     [createListing, product, router],
   );

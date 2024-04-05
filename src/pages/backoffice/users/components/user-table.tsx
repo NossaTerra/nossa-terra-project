@@ -30,9 +30,13 @@ import {
   type UserColumnVisibilityState,
 } from "./user-table-columns";
 import { ModalProviderUserActions } from "./user-table-actions";
+import toast from "react-hot-toast";
 
 function useUserTableQuery() {
   return api.backoffice.getAllBuyers.useQuery(undefined, {
+    onError() {
+      toast.error("Erro ao buscar compradores");
+    },
     initialData: [],
   });
 }

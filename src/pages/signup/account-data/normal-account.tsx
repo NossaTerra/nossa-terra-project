@@ -12,7 +12,7 @@ import {
 } from "~/components/ui/form";
 import { useCallback, useMemo } from "react";
 import { CheckIcon } from "lucide-react";
-import { Input, MaskedInput, PasswordInput } from "~/components/ui/input";
+import { Input, PasswordInput } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
 import { z } from "zod";
@@ -20,49 +20,51 @@ import { useSignUpState } from "../useSignUpState";
 import { useOAuthAccountDataSchema } from "./oauth-account";
 import type { PermittedRoles } from "~/server/types/user.type";
 
+export function useCreatePasswordSchema() {
+  return useMemo(
+    () =>
+      z.object({
+        password: z
+          .string({ required_error: "Você deve inserir uma senha" })
+          .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
+          .max(30, { message: "A senha deve ter no máximo 30 caracteres" })
+          .refine(
+            (value) =>
+              /[A-Z]/.test(value) && /[a-z]/.test(value) && /\d/.test(value),
+            {
+              message:
+                "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
+            },
+          ),
+        confirmPassword: z
+          .string({
+            required_error: "Você deve inserir a confirmação de senha",
+          })
+          .min(8, {
+            message: "A confirmação de senha deve ter no mínimo 8 caracteres",
+          }),
+      }),
+    [],
+  );
+}
+
 function useAccountDataSchema({
   role,
 }: {
   role: (typeof PermittedRoles)["Common"][number] | undefined;
 }) {
   const oauthAccountSchema = useOAuthAccountDataSchema({ role });
+  const createPasswordSchema = useCreatePasswordSchema();
 
   return useMemo(
     () =>
       oauthAccountSchema
-        .merge(
-          z.object({
-            password: z
-              .string({ required_error: "Você deve inserir uma senha" })
-              .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
-              .max(30, { message: "A senha deve ter no máximo 30 caracteres" })
-              .refine((value) => /[A-Z]/.test(value), {
-                message:
-                  "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
-              })
-              .refine((value) => /[a-z]/.test(value), {
-                message:
-                  "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
-              })
-              .refine((value) => /\d/.test(value), {
-                message:
-                  "A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número",
-              }),
-            confirmPassword: z
-              .string({
-                required_error: "Você deve inserir a confirmação de senha",
-              })
-              .min(8, {
-                message:
-                  "A confirmação de senha deve ter no mínimo 8 caracteres",
-              }),
-          }),
-        )
+        .merge(createPasswordSchema)
         .refine((data) => data.password === data.confirmPassword, {
           message: "As senhas devem ser iguais",
           path: ["confirmPassword"],
         }),
-    [oauthAccountSchema],
+    [oauthAccountSchema, createPasswordSchema],
   );
 }
 
@@ -151,7 +153,7 @@ export function AccountDataForm({ className }: ClassNameProps) {
                   {role === "seller" ? "CPF/CNPJ*" : "CNPJ*"}
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     className="w-full"
                     placeholder="xxx.xxx.xxx-xx"
                     maskPreset={role === "buyer" ? "CNPJ" : "CPF_or_CNPJ"}
@@ -233,7 +235,7 @@ export function AccountDataForm({ className }: ClassNameProps) {
             )}
           />
           <div>
-            <p className="pb-2.5 text-sm">*campo obrigatório</p>
+            <p className="pb-2.5 text-sm">*Campo obrigatório</p>
             <Button variant="primary" className="w-full" type="submit">
               Continuar
             </Button>

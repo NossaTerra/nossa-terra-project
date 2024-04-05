@@ -10,13 +10,18 @@ import { env } from "~/env";
 import { buyerValidatedEmail } from "~/utils/buyerValidatedEmail";
 
 export const backofficeRouter = createTRPCRouter({
-  getAllBuyers: backofficeProcedure.query(({ ctx: { db } }) =>
-    db.user.findMany({
-      where: {
-        role: "buyer",
-      },
-    }),
-  ),
+  getAllBuyers: backofficeProcedure.query(({ ctx: { db } }) => {
+    try {
+      return db.user.findMany({
+        where: {
+          role: "buyer",
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching all buyers: ", error);
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    }
+  }),
 
   changeUserActiveState: backofficeProcedure
     .input(
@@ -67,8 +72,13 @@ export const backofficeRouter = createTRPCRouter({
       }),
     )
     .mutation(({ input: { userId }, ctx: { db } }) => {
-      return db.user.delete({
-        where: { id: userId },
-      });
+      try {
+        return db.user.delete({
+          where: { id: userId },
+        });
+      } catch (error) {
+        console.error("Error deleting user: ", error);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
     }),
 });

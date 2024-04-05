@@ -378,8 +378,9 @@ export default function BackofficeAdsScreen({ user }: Props) {
                       {ad.link}
                     </td>
                     <td
-                      className={`px-6 py-4 ${ad.isActive ? "text-green-600" : "text-red-600"
-                        }`}
+                      className={`px-6 py-4 ${
+                        ad.isActive ? "text-green-600" : "text-red-600"
+                      }`}
                     >
                       <Label
                         className="mb-1 flex h-full items-start "

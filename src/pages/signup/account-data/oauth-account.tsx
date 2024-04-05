@@ -12,7 +12,7 @@ import {
 } from "~/components/ui/form";
 import { useCallback, useMemo } from "react";
 import { CheckIcon } from "lucide-react";
-import { Input, MaskedInput } from "~/components/ui/input";
+import { Input } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
 import { TermsAndConditionsLink } from "~/components/common/TermsAndConditions";
 import { cpfIsCNPJ } from "~/utils/formHelpers";
@@ -151,7 +151,7 @@ export function OAuthAccountDataForm({ className }: ClassNameProps) {
                   {role === "seller" ? "CPF/CNPJ*" : "CNPJ*"}
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     className="w-full"
                     maskPreset={role === "buyer" ? "CNPJ" : "CPF_or_CNPJ"}
                     {...field}

@@ -18,7 +18,11 @@ export default function ProfileDataScreen() {
   const router = useRouter();
   const { email, role, accountData, picture } = useSignUpState();
 
-  const registerAndLogin = api.auth.registerAndLogin.useMutation();
+  const registerAndLogin = api.auth.registerAndLogin.useMutation({
+    onError() {
+      toast.error("Erro ao se registrar no Nossa Terra");
+    },
+  });
   const onBuyerSuccessSubmit: BuyerFormProps["onSuccess"] = useCallback(
     async ({ data }) => {
       if (!email || !accountData) {

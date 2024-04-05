@@ -46,12 +46,12 @@ function useSignUpQueryParams(): SignUpQueryParams {
 export interface SignUpStore {
   role?: ChooseRoleFields["role"];
   accountData?:
-  | ({
-    isOAuth: true;
-  } & OAuthAccountData)
-  | ({
-    isOAuth: false;
-  } & AccountData);
+    | ({
+        isOAuth: true;
+      } & OAuthAccountData)
+    | ({
+        isOAuth: false;
+      } & AccountData);
 }
 
 const useSignUpStore = create<SignUpStore>(() => ({}));

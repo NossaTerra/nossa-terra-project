@@ -20,8 +20,8 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "~/components/ui/tooltip";
-import { useCallback } from "react";
-import { Input, MaskedInput } from "~/components/ui/input";
+import { useCallback, useEffect } from "react";
+import { Input } from "~/components/ui/input";
 import { emptyString } from "~/utils/constants";
 import { Checkbox } from "~/components/ui/checkbox";
 import { MapPin } from "lucide-react";
@@ -52,6 +52,7 @@ export interface BuyerFormProps extends ClassNameProps {
   }) => Promise<void>;
   isLoading?: boolean;
   formProps?: Partial<UseFormProps<BuyerProfileData>>;
+  onIsDirty?: (isDirty: boolean) => void;
   submitButtonProps?: ButtonProps;
 }
 
@@ -60,6 +61,7 @@ export function BuyerForm({
   formProps,
   onSuccess,
   isLoading = false,
+  onIsDirty,
   submitButtonProps,
 }: BuyerFormProps) {
   const schema = useBuyerProfileSchema();
@@ -73,6 +75,10 @@ export function BuyerForm({
       ...formProps?.defaultValues,
     },
   });
+
+  useEffect(() => {
+    onIsDirty?.(form.formState.isDirty);
+  }, [form.formState.isDirty, onIsDirty]);
 
   const {
     addressInferedData,
@@ -117,7 +123,7 @@ export function BuyerForm({
                   Telefone*
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     className="w-full"
                     maskPreset="BrazilianPhone"
                     {...field}
@@ -172,7 +178,7 @@ export function BuyerForm({
                   Telefone secundário (opcional)
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     className="w-full"
                     maskPreset="BrazilianPhone"
                     {...field}
@@ -261,7 +267,7 @@ export function BuyerForm({
                       CEP*
                     </FormLabel>
                     <FormControl>
-                      <MaskedInput
+                      <Input
                         className="w-full"
                         maskPreset="ZipCode"
                         {...field}
@@ -458,7 +464,7 @@ export function BuyerForm({
         <Button
           isLoading={isLoading}
           variant="primary"
-          className="mt-3 md:mt-8 w-full"
+          className="mt-3 w-full md:mt-8"
           type="submit"
           children="Cadastrar"
           {...submitButtonProps}

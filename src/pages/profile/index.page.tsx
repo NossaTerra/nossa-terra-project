@@ -40,6 +40,7 @@ import { api } from "~/utils/api";
 import { awaitDiffConfirmationDialog, DiffDialog } from "./DiffDialog";
 import { type User } from "~/server/types/user.type";
 import { scrollToTopAsync } from "~/utils/scroll";
+import { type ClassNameProps, cn } from "~/utils/ui";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -57,7 +58,6 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const direction = isEditingProfile ? Direction.Right : Direction.Left;
-  const showLogoutButton = !isEditingProfile || user.role === "seller";
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keyUserChange = useMemo(() => crypto.randomUUID(), [user]);
@@ -133,6 +133,8 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
     [],
   );
 
+  const [isDirty, setIsDirty] = useState(false);
+
   return (
     <>
       <DiffDialog buttonProps={diffDialogButtonProps} />
@@ -151,13 +153,24 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
         >
           <div>
             {user.role === "seller" && (
-              <SellerForm
-                key={keyUserChange}
-                className="my-10 md:pl-2"
-                onSuccess={onSellerFormSubmit}
-                formProps={formProps}
-                submitButtonProps={submitButtonProps}
-              />
+              <>
+                <div className="flex flex-row justify-between ">
+                  <h1 className="mb-8 mt-10 text-2xl font-bold md:text-4xl">
+                    Meu Perfil
+                  </h1>
+                  <LogOutButton className="mt-10" />
+                </div>
+
+                {isDirty && <PingHasUnsavedEditing />}
+                <SellerForm
+                  key={keyUserChange}
+                  className="my-10 md:pl-2"
+                  onSuccess={onSellerFormSubmit}
+                  formProps={formProps}
+                  submitButtonProps={submitButtonProps}
+                  onIsDirty={setIsDirty}
+                />
+              </>
             )}
             {user.role === "buyer" && isEditingProfile && (
               <>
@@ -170,12 +183,14 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
                   Voltar
                 </Button>
 
+                {isDirty && <PingHasUnsavedEditing />}
                 <BuyerForm
                   key={keyUserChange}
                   className="my-8 md:pl-2"
                   onSuccess={onBuyerFormSubmit}
                   formProps={formProps}
                   submitButtonProps={submitButtonProps}
+                  onIsDirty={setIsDirty}
                 />
               </>
             )}
@@ -187,8 +202,8 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
               />
             )}
           </div>
-          <footer className="flex justify-center py-10 lg:justify-end">
-            {showLogoutButton && <LogOutButton />}
+          <footer className="flex w-full justify-end py-10">
+            {user.role === "buyer" && !isEditingProfile && <LogOutButton />}
             {isEditingProfile && <AdsCarrousel className="mt-20" />}
           </footer>
         </motion.div>
@@ -221,15 +236,19 @@ export function CurrentProfileCardScreen({
   );
 }
 
-export function LogOutButton() {
+export function LogOutButton({ className }: ClassNameProps) {
   const { logout, logoutLoading } = useAuth();
 
   return (
     <Dialog modal>
       <DialogTrigger asChild>
-        <Button isLoading={logoutLoading} variant="ghost" className="text-md">
-          <LogOut color="black" className="mr-2 inline h-6 w-6" />
-          Sair do Nossa Terra
+        <Button
+          isLoading={logoutLoading}
+          variant="outline"
+          className={cn("text-md", className)}
+        >
+          <LogOut className="mr-1 inline h-6 w-6" />
+          Sair
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[80vw] md:w-auto ">
@@ -380,6 +399,20 @@ export function UserAnnouncementCard({ user }: { user: User }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PingHasUnsavedEditing() {
+  return (
+    <div className="animate-fade-in font-poppins-400 mb-6 mt-4 text-sm ">
+      <span className="relative flex h-3 w-3">
+        <span className="absolute top-2 inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
+        <span className="relative top-2 inline-flex h-3 w-3 rounded-full bg-accent"></span>
+      </span>
+      <span className="ml-0.5 block px-3 pb-3">
+        Clique em salvar alterações para completar edição
+      </span>
     </div>
   );
 }

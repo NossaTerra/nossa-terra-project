@@ -20,8 +20,8 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "~/components/ui/tooltip";
-import { useCallback } from "react";
-import { Input, MaskedInput } from "~/components/ui/input";
+import { useCallback, useEffect } from "react";
+import { Input } from "~/components/ui/input";
 import { emptyString } from "~/utils/constants";
 import { Checkbox } from "~/components/ui/checkbox";
 import { MapPin } from "lucide-react";
@@ -43,6 +43,7 @@ export interface SellerFormProps extends ClassNameProps {
   }) => Promise<void>;
   isLoading?: boolean;
   formProps?: Partial<UseFormProps<SellerProfileData>>;
+  onIsDirty?: (isDirty: boolean) => void;
   submitButtonProps?: ButtonProps;
 }
 
@@ -51,6 +52,7 @@ export function SellerForm({
   formProps,
   onSuccess,
   isLoading = false,
+  onIsDirty,
   submitButtonProps,
 }: SellerFormProps) {
   const schema = useSellerProfileSchema();
@@ -63,6 +65,10 @@ export function SellerForm({
       ...formProps?.defaultValues,
     },
   });
+
+  useEffect(() => {
+    onIsDirty?.(form.formState.isDirty);
+  }, [form.formState.isDirty, onIsDirty]);
 
   const {
     addressInferedData,
@@ -100,7 +106,7 @@ export function SellerForm({
                 RG*
               </FormLabel>
               <FormControl>
-                <MaskedInput
+                <Input
                   className="w-full"
                   placeholder="RG"
                   maskPreset="RG"
@@ -124,7 +130,7 @@ export function SellerForm({
                   Telefone*
                 </FormLabel>
                 <FormControl>
-                  <MaskedInput
+                  <Input
                     className="w-full"
                     maskPreset="BrazilianPhone"
                     {...field}
@@ -181,7 +187,7 @@ export function SellerForm({
                       CEP*
                     </FormLabel>
                     <FormControl>
-                      <MaskedInput
+                      <Input
                         className="w-full"
                         maskPreset="ZipCode"
                         {...field}
@@ -343,7 +349,7 @@ export function SellerForm({
         <Button
           isLoading={isLoading}
           variant="primary"
-          className="mt-3 md:mt-8 w-full"
+          className="mt-3 w-full md:mt-8"
           type="submit"
           children="Cadastrar"
           {...submitButtonProps}
