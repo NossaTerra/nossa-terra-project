@@ -3,7 +3,6 @@ import { AppHeader } from "~/components/common/headers";
 import { P } from "~/components/ui/typography";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { type ClassNameProps, cn } from "~/utils/ui";
-import Image from "next/image";
 import { ImageBackgroundFooter } from "~/components/common/ImageBackgroundFooter";
 
 export const getServerSideProps = redirectGetServerSideProps.Common;
