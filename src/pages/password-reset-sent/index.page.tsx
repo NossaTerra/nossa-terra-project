@@ -4,7 +4,6 @@ import { Button } from "~/components/ui/button";
 import { useCallback } from "react";
 import { useRouter } from "next/router";
 import { AdsCarouselFooter } from "~/components/common/AdsCarrousel";
-import useBeforeUnloadAndPopState from "~/hooks/useBeforeUnloadAndPopState";
 
 function PasswordResetSentContent({ className }: ClassNameProps) {
   const router = useRouter();
@@ -12,8 +11,6 @@ function PasswordResetSentContent({ className }: ClassNameProps) {
   const goBack = useCallback(() => {
     router.back();
   }, [router]);
-
-  useBeforeUnloadAndPopState();
 
   return (
     <main

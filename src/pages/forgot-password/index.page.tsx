@@ -19,7 +19,6 @@ import router, { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { z } from "zod";
-import useBeforeUnloadAndPopState from "~/hooks/useBeforeUnloadAndPopState";
 
 function useForgotPasswordSchema() {
   // It's best to use a hook to get the schema because
@@ -139,8 +138,6 @@ export const getServerSideProps = redirectGetServerSideProps.NoAuthOnly;
 
 export default function ForgetPasswordScreen() {
   const router = useRouter();
-
-  useBeforeUnloadAndPopState();
 
   return (
     <div className="flex min-h-screen flex-grow flex-col">
