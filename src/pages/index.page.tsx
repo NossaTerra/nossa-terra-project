@@ -356,7 +356,7 @@ function SelectedProductListingsColumn({
         <div className="flex flex-col items-end">
           <Button
             variant="ghost"
-            className="fixed bottom-4 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2 lg:sticky lg:right-0 lg:top-2"
+            className="fixed bottom-4 z-20 rounded-full bg-slate-100 bg-opacity-100 p-2 lg:sticky lg:right-0 lg:top-2"
             onClick={() =>
               router.replace(
                 {
