@@ -22,6 +22,9 @@ export const env = createEnv({
     // OAuth
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+
+    // Lock to hide the app before launch
+    APP_SECRET_KEY_LOCK: z.string().optional(),
   },
 
   /**
@@ -52,6 +55,9 @@ export const env = createEnv({
     // OAuth
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+    // Lock to hide the app before launch
+    APP_SECRET_KEY_LOCK: process.env.APP_SECRET_KEY_LOCK,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
