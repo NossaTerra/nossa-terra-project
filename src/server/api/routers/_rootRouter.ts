@@ -7,6 +7,7 @@ import { backofficeRouter } from "./backofficeRouter";
 import { productRouter } from "./productRouter";
 import { listingRouter } from "./listingRouter";
 import { searchRouter } from "./searchRouter";
+import { secretRouter } from "./secretRouter";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -17,6 +18,8 @@ export const appRouter = createTRPCRouter({
   search: searchRouter,
   listing: listingRouter,
   ad: adRouter,
+
+  secret: secretRouter,
 });
 
 export type AppRouter = typeof appRouter;
