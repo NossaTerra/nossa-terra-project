@@ -42,6 +42,7 @@ export default function MyListingsScreen({ user }: Props) {
       <AppHeader user={user} />
       <div className="px-10 pb-16">
         <h1 className="my-12 text-2xl font-bold md:text-4xl">Meus Anúncios</h1>
+        <FreeListingsBanner />
         <MyListingsDashboard className="mt-5" />
       </div>
     </div>
@@ -104,17 +105,11 @@ function MyListingsDashboard({ className }: ClassNameProps) {
   );
 
   if (!isLoading && !myListings?.length) {
-    return (
-      <>
-        <FreeListingsBanner />
-        <EmptyStateNoListings className={className} />
-      </>
-    );
+    return <EmptyStateNoListings className={className} />;
   }
 
   return (
     <div className={className}>
-      <FreeListingsBanner />
       <Button asChild variant="primary">
         <Link href="/listings/new" className="flex items-center gap-2">
           <PlusIcon size={20} /> Novo Anúncio

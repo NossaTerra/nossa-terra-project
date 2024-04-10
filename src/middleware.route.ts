@@ -5,17 +5,24 @@ import { env } from "~/env";
 const alwaysAllowedPaths = /((api|_next\/static|_next\/image|favicon\.ico).*)/;
 const appLockRedirect = "/lock";
 
-export function middleware(req: NextRequest) {
-  if (
-    !env.APP_SECRET_KEY_LOCK ||
-    alwaysAllowedPaths.test(req.nextUrl.pathname)
-  ) {
-    return;
+function getIsAuthorized(req: NextRequest) {
+  if (!env.APP_SECRET_KEY_LOCK) {
+    return true;
   }
 
   const storedValue = req.cookies.get("app_secret");
-  const isAuthorized = storedValue?.value === env.APP_SECRET_KEY_LOCK;
+  if (storedValue === undefined) {
+    return false;
+  }
+  return storedValue.value === env.APP_SECRET_KEY_LOCK;
+}
 
+export function middleware(req: NextRequest) {
+  if (alwaysAllowedPaths.test(req.nextUrl.pathname)) {
+    return;
+  }
+
+  const isAuthorized = getIsAuthorized(req);
   if (!isAuthorized && req.nextUrl.pathname !== appLockRedirect) {
     return NextResponse.redirect(new URL(appLockRedirect, req.url));
   }

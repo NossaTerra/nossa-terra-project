@@ -42,7 +42,11 @@ export function ProductCard({
         alt="marca dágua do produto"
         className="absolute -bottom-4 -right-3 opacity-60"
       />
-      <div className={small ? "mb-2 pl-5 pr-2" : "pl-6 pr-16"}>
+      <div
+        className={cn("flex flex-col pl-6 pr-16", {
+          "mb-2 pl-5 pr-2": small,
+        })}
+      >
         <p className="text-lg">{product.name}</p>
         {footer}
       </div>
