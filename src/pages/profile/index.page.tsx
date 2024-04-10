@@ -97,7 +97,11 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
     [editBuyer, user],
   );
 
-  const editSeller = api.profile.editSeller.useMutation();
+  const editSeller = api.profile.editSeller.useMutation({
+    onSuccess: async () => {
+      await apiUtils.auth.getUser.invalidate();
+    },
+  });
   const onSellerFormSubmit: SellerFormProps["onSuccess"] = useCallback(
     async ({ data, form }) => {
       const diffObject = getSellerDiffObject(form, user);
