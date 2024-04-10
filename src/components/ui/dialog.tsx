@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { cn } from "src/utils/ui";
 
 const Dialog = DialogPrimitive.Root;
+export type DialogProps = React.ComponentProps<typeof Dialog>;
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
