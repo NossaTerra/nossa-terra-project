@@ -27,6 +27,12 @@ import { EditListingForm, type ListingFormData } from "./EditListingForm";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { getDisplayTime } from "~/utils/time";
 import toast from "react-hot-toast";
+import {
+  ResponsiveModal,
+  ResponsiveModalProps,
+} from "~/components/ui/responsive-modal";
+import { DrawerProps } from "~/components/ui/drawer";
+import { useIsMobile } from "~/hooks/useResponsive";
 
 export function ListingCard({
   listing,
@@ -180,21 +186,24 @@ function EditListingModal({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const keyRefreshForm = useMemo(() => crypto.randomUUID(), [listing, isOpen]);
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogTitle>
-          <div className="font-bold">Editar Anúncio</div>
-        </DialogTitle>
+  const isMobile = useIsMobile();
 
-        <EditListingForm
-          key={keyRefreshForm}
-          isLoading={editListing.isLoading}
-          product={listing.product}
-          listing={listing}
-          onSuccess={onSuccess}
-        />
-      </DialogContent>
-    </Dialog>
+  return (
+    <ResponsiveModal
+      open={isOpen}
+      onOpenChange={onOpenChange}
+      className="lg:max-w-5xl"
+    >
+      <EditListingForm
+        key={keyRefreshForm}
+        isLoading={editListing.isLoading}
+        product={listing.product}
+        listing={listing}
+        onSuccess={onSuccess}
+        className={cn({
+          "max-w-md self-center": isMobile,
+        })}
+      />
+    </ResponsiveModal>
   );
 }

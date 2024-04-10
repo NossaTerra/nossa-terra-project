@@ -19,7 +19,7 @@ import { Input } from "~/components/ui/input";
 import { getNumberFromCurrencyReais } from "~/components/ui/input/masks/currency";
 import { H3 } from "~/components/ui/typography";
 import { type MyListing } from "~/utils/api";
-import { cn } from "~/utils/ui";
+import { type ClassNameProps, cn } from "~/utils/ui";
 
 function useEditListingSchema() {
   return useMemo(
@@ -49,22 +49,23 @@ export function EditListingForm({
   listing,
   product,
   onSuccess,
+  className,
 }: {
   isLoading: boolean;
   listing?: MyListing;
   product: Product;
   onSuccess?: (data: ListingFormData) => void;
-}) {
+} & ClassNameProps) {
   const schema = useEditListingSchema();
   const form = useForm<ListingFormData>({
     resolver: zodResolver(schema),
     defaultValues: listing
       ? {
-          ...listing,
-          price: `R$ ${formatCurrencyReais(
-            Number(listing.price),
-          )}` as unknown as number,
-        }
+        ...listing,
+        price: `R$ ${formatCurrencyReais(
+          Number(listing.price),
+        )}` as unknown as number,
+      }
       : undefined,
   });
 
@@ -83,7 +84,7 @@ export function EditListingForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full flex-wrap gap-10"
+        className={cn("flex flex-wrap gap-10", className)}
       >
         <div className="w-full max-w-[28em]">
           <H3 className="p-0 pb-8">Produto</H3>

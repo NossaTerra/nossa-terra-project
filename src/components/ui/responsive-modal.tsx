@@ -50,7 +50,7 @@ export function ResponsiveModal({
             <DrawerTitle>{title}</DrawerTitle>
             <DrawerDescription>{description}</DrawerDescription>
           </DrawerHeader>
-          <div className="p-4">{children}</div>
+          {children}
           <DrawerFooter className="pt-2">{footer}</DrawerFooter>
         </DrawerContent>
       </Drawer>
