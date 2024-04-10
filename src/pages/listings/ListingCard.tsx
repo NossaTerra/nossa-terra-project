@@ -56,12 +56,12 @@ export function ListingCard({
         product={listing.product}
         className={cn("w-full max-w-[28em]", className)}
         footer={
-          <>
+          <div className="flex grow flex-col justify-end">
             <p className="mt-8 flex items-center gap-2">
               <TimerIcon size={20} /> {timeString}
             </p>
             <PriceTag value={Number(listing.price)} className="mt-2" />
-          </>
+          </div>
         }
         topRightElement={
           <DropdownMenu>
