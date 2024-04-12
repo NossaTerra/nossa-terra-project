@@ -130,7 +130,7 @@ function ResetPasswordContent({
                 <FormControl>
                   <PasswordInput
                     className="w-full"
-                    placeholder="Senha"
+                    placeholder="Confirmar nova Senha"
                     {...field}
                   />
                 </FormControl>
