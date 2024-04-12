@@ -338,7 +338,7 @@ export function resetPasswordEmail(token: string): string {
                                                               manter sua conta segura.<br>
                                                               Ligue para nós pelo número +11 9999-999<br>
                                                               ou envie um e-mail para
-                                                              nossa-terra-support@nossaterra.com</span></div>
+                                                              contato@nossaterra.tech</span></div>
                                                           <div style="font-family: inherit; text-align: inherit"><br>
                                                           </div>
                                                           <div style="font-family: inherit; text-align: inherit"><br>

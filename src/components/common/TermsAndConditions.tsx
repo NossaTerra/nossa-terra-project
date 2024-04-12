@@ -488,7 +488,7 @@ const PrivacyPolicyContent = () => {
         Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em
         contato conosco:
       </p>
-      <p>Por e-mail: contato@nossaterra.com</p>
+      <p>Por e-mail: contato@nossaterra.tech</p>
     </div>
   );
 };

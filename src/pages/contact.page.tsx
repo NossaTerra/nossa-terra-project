@@ -31,7 +31,7 @@ function ContactUsMessage({ className }: ClassNameProps) {
           Entre em contato consco caso tenha dúvidas, ou esteja passando por
           algum problema com a sua conta nosssa terra.
           <div className="my-4 font-bold">Fone: (XX)XXXX-XXXX </div>
-          <div className="font-bold">Email: Contato@nossaterra.com </div>
+          <div className="font-bold">Email: contato@nossaterra.tech</div>
         </P>
         <P className="md:text-lg lg:text-xl">
           Caso queira anunciar nos banners de anúncio das seções de

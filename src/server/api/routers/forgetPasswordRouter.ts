@@ -40,7 +40,7 @@ export const forgetPasswordRouter = createTRPCRouter({
 
         await transporter
           .sendMail({
-            from: '"Nossa Terra" <nossaterra.dev@gmail.com>',
+            from: '"Nossa Terra" <contato@nossaterra.tech>',
             to: email,
             subject: "Redefinição de senha",
             html: emailHtml,

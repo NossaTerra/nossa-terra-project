@@ -47,7 +47,7 @@ export const backofficeRouter = createTRPCRouter({
             }),
           );
           await transporter.sendMail({
-            from: '"Nossa Terra" <nossaterra.dev@gmail.com>',
+            from: '"Nossa Terra" <contato@nossaterra.tech>',
             to: email,
             subject: "Sua empresa já pode anunciar no Nossa Terra!",
             html: emailHtml,
