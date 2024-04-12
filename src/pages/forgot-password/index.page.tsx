@@ -27,7 +27,7 @@ function useForgotPasswordSchema() {
   return useMemo(
     () =>
       z.object({
-        email: z.string().email(),
+        email: z.string().email({ message: "Email inválido" }),
       }),
     [],
   );
