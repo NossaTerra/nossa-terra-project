@@ -100,7 +100,11 @@ export function AppHeader({
             <UserIcon /> Entrar
           </Link>
         </Button>
-        {!hideLogo && <NossaTerraLogo />}
+        {!hideLogo && (
+          <Link href="/">
+            <NossaTerraLogo />
+          </Link>
+        )}
       </div>
     );
   }
@@ -120,7 +124,11 @@ export function AppHeader({
         <NavItem href="/contact" label="Fale Conosco" icon={<PhoneIcon />} />
       </NavBar>
 
-      {!hideLogo && <NossaTerraLogo />}
+      {!hideLogo && (
+        <Link href="/">
+          <NossaTerraLogo />
+        </Link>
+      )}
     </div>
   );
 }
@@ -156,7 +164,9 @@ export function BackofficeHeader({ user }: { user: User }) {
           icon={<LogOut />}
         />
       </NavBar>
-      <NossaTerraLogo />
+      <Link href="/">
+        <NossaTerraLogo />
+      </Link>
     </div>
   );
 }
