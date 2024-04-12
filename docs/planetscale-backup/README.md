@@ -37,7 +37,6 @@ Esse pop-up é aberto clique no botão azul `database settings page`
 
 ![6](/docs/planetscale-backup/assets/backup-6.png)
 
-
 ## 7
 
 No drop-down seleciona a nova branch que é para ser a default
