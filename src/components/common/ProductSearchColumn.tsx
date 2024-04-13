@@ -1,4 +1,4 @@
-import { SearchIcon } from "lucide-react";
+import { CheckIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { type ChangeEventHandler, useCallback, useMemo, useState } from "react";
 import { ProductCard } from "~/components/common/ProductCard";
@@ -6,10 +6,19 @@ import { Input } from "~/components/ui/input";
 import { CheckboxProductType } from "~/components/ui/checkbox";
 import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
-import { ProductType } from "@prisma/client";
+import { type ProductType, type Role } from "@prisma/client";
+import {
+  RadioGroup,
+  RadioGroupItem,
+  RadioGroupItem as RadixRadioGroupItem,
+} from "@radix-ui/react-radio-group";
 import { SearchSlider } from "../ui/slider";
 import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
 import toast from "react-hot-toast";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { ProductTypeLabel } from "~/server/types/product.type";
+
+type ExtendedProductType = ProductType | "Todos";
 
 export function ProductSearchColumn({
   className,
@@ -34,28 +43,18 @@ export function ProductSearchColumn({
     [],
   );
 
-  const [productTypeFilter, setProductTypeFilter] = useState<
-    Record<ProductType, boolean>
-  >({
-    [ProductType.CoffeeArabica]: true,
-    [ProductType.CoffeeRobusta]: true,
-  });
-
-  const noProductTypeFilterSelected = useMemo(() => {
-    return Object.values(productTypeFilter).every((value) => !value);
-  }, [productTypeFilter]);
+  const [selectedProductType, setSelectedProductType] = useState<
+    ProductType | undefined
+  >(undefined);
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
-    return products
-      .filter((product) =>
-        product.name.toLowerCase().includes(searchString.toLowerCase()),
-      )
-      .filter(
-        (product) =>
-          noProductTypeFilterSelected || productTypeFilter[product.type],
-      );
-  }, [noProductTypeFilterSelected, productTypeFilter, products, searchString]);
+    return products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(searchString.toLowerCase()) &&
+        (selectedProductType === null || product.type === selectedProductType),
+    );
+  }, [products, searchString, selectedProductType]);
 
   const shouldShowEmptyState = filteredProducts.length === 0 && !isLoading;
 
@@ -76,19 +75,27 @@ export function ProductSearchColumn({
               />
             </div>
             <div className="mt-6 flex gap-3 pl-12 md:gap-4">
-              {Object.values(ProductType).map((productType) => (
-                <CheckboxProductType
-                  key={productType}
-                  productType={productType}
-                  checked={productTypeFilter[productType]}
-                  onCheckedChange={(checked) =>
-                    setProductTypeFilter((prev) => ({
-                      ...prev,
-                      [productType]: checked,
-                    }))
-                  }
-                />
-              ))}
+              <RadioGroup
+                value={selectedProductType}
+                onValueChange={setSelectedProductType}
+                className="flex w-full flex-row flex-wrap gap-8 pb-16 pt-2"
+              >
+                {Object.entries(ProductTypeLabel).map(([type, label]) => (
+                  <RadioGroupItem
+                    key={type}
+                    value={type}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      type="radio"
+                      className="radio-button"
+                      checked={selectedProductType === type}
+                      onChange={() => setSelectedProductType(type)}
+                    />
+                    <label>{label}</label>
+                  </RadioGroupItem>
+                ))}
+              </RadioGroup>
             </div>
             {showSlider && (
               <div className="ml-12 mt-4 flex items-center justify-center rounded-md pl-2 pr-4 pt-6 md:pr-2">
@@ -129,5 +136,42 @@ export function ProductSearchColumn({
         )}
       </div>
     </div>
+  );
+}
+
+function ProducRadioGroupItem({
+  isSelected,
+  productType,
+  title,
+}: {
+  isSelected?: boolean;
+  productType: ProductType;
+  title: string;
+}) {
+  return (
+    <>
+      <RadixRadioGroupItem
+        value={productType}
+        className={cn("h-16 rounded-lg border-4 border-transparent", {
+          "border-basedDark": isSelected,
+        })}
+      >
+        <Card className="relative h-full min-h-8  bg-cardShade p-4 text-left shadow-lg">
+          <div
+            className={cn(
+              "absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-basedDark p-1 text-cardShade",
+              {
+                hidden: !isSelected,
+              },
+            )}
+          >
+            <CheckIcon />
+          </div>
+          <CardHeader className="p-0">
+            <CardTitle className="pb-2 text-lg">{title}</CardTitle>
+          </CardHeader>
+        </Card>
+      </RadixRadioGroupItem>
+    </>
   );
 }
