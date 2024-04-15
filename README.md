@@ -1,4 +1,4 @@
-![Captura de Tela 2024-04-12 às 21 15 36](https://github.com/NossaTerra/nossa-terra-project/assets/20156917/d3242142-6c16-4796-ae23-56936313905b)![Captura de Tela 2024-04-12 às 20 58 12](https://github.com/NossaTerra/nossa-terra-project/assets/20156917/150b5278-7513-43cd-a44f-2dd402829ef3)# How To Run
+# How To Run
 
 ```console
 # Initialize Environment Variables
