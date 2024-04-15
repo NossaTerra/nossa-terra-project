@@ -33,8 +33,11 @@ enum Role {
 
 enum BusinessSector {
     Exporter
-    Distributor
-    Retailer
+    Roaster
+    Industry
+    Machinist
+    Merchant
+    Cooperative
     Other
 }
 

@@ -18,8 +18,11 @@ export const UserActiveStateLabel = {
 
 export const BusinessSectorLabel = {
   Exporter: "Exportador",
-  Distributor: "Distribuidor",
-  Retailer: "Varejista",
+  Roaster: "Torrador",
+  Industry: "Indústria",
+  Machinist: "Maquinista",
+  Merchant: "Comerciante",
+  Cooperative: "Cooperativa",
   Other: "Outro",
 } as const satisfies Record<BusinessSector, string>;
 
