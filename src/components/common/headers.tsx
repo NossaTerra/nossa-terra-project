@@ -18,6 +18,7 @@ import { useRouter } from "next/router";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { useAuth } from "~/hooks/useAuth";
+import { PermittedRoles } from "~/server/types/user.type";
 
 interface NavItem {
   href: string;
@@ -82,35 +83,45 @@ export function AppHeader({
   user,
   hideLogo = false,
 }: {
-  className?: ClassNameProps | string;
   user: User | null;
   hideLogo?: boolean;
-}) {
+} & ClassNameProps) {
+  const { logout } = useAuth();
+
+  const commonLayoutClassName =
+    "mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 py-4 shadow";
+
   if (!user) {
     return (
       <div
         className={cn(
-          "flex items-center justify-end px-10 pb-7 pt-10",
-          !hideLogo && "w-full",
+          commonLayoutClassName,
+          "flex-col gap-4 sm:flex-row",
           className,
         )}
       >
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-8">
+          <NossaTerraLogo className="h-20 w-fit" />
+          <h1 className="font-poppins-700 text-center text-lg text-headingPrimary sm:text-left lg:text-xl">
+            Seja bem vindo(a) à{" "}
+            <span className="font-poppins-700 block w-full text-2xl text-headingSecondary md:text-3xl lg:text-3xl">
+              Nossa Terra
+            </span>
+          </h1>
+        </div>
         <Button variant="primary" size="lg" asChild>
           <Link href="/login">
             <UserIcon /> Entrar
           </Link>
         </Button>
-        {!hideLogo && (
-          <Link href="/">
-            <NossaTerraLogo />
-          </Link>
-        )}
       </div>
     );
   }
 
+  const isBackoffice = PermittedRoles.Backoffice.some((r) => r === user.role);
+
   return (
-    <div className="mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 pb-7 pt-10 shadow">
+    <div className={cn(commonLayoutClassName, className)}>
       <NavBar>
         <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         {user.role === "buyer" && (
@@ -120,53 +131,51 @@ export function AppHeader({
             icon={<FolderOpenIcon />}
           />
         )}
-        <NavItem href="/profile" label="Perfil" icon={<UserIcon />} />
-        <NavItem href="/contact" label="Fale Conosco" icon={<PhoneIcon />} />
+        {!isBackoffice && (
+          <>
+            <NavItem href="/profile" label="Perfil" icon={<UserIcon />} />
+            <NavItem
+              href="/contact"
+              label="Fale Conosco"
+              icon={<PhoneIcon />}
+            />
+          </>
+        )}
+        {isBackoffice && (
+          <>
+            <NavItem
+              href="/backoffice/users"
+              label="Controle de Usuários"
+              icon={<UsersIcon />}
+            />
+            <NavItem
+              href="/backoffice/ads"
+              label="Anúncios"
+              icon={<DollarSignIcon />}
+            />
+            {user.role === "admin" && (
+              <NavItem
+                href="/admin/products"
+                label="Produtos"
+                icon={<TagsIcon />}
+              />
+            )}
+            <NavItem
+              onClick={logout}
+              href="/"
+              isSelectable={false}
+              label="Sair"
+              icon={<LogOut />}
+            />
+          </>
+        )}
       </NavBar>
 
       {!hideLogo && (
         <Link href="/">
-          <NossaTerraLogo />
+          <NossaTerraLogo className="h-20 w-fit" />
         </Link>
       )}
-    </div>
-  );
-}
-
-export function BackofficeHeader({ user }: { user: User }) {
-  const { logout } = useAuth();
-  return (
-    <div className="mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 pb-7 pt-10 shadow">
-      <NavBar>
-        <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
-        <NavItem
-          href="/backoffice/users"
-          label="Controle de Usuários"
-          icon={<UsersIcon />}
-        />
-        <NavItem
-          href="/backoffice/ads"
-          label="Anúncios"
-          icon={<DollarSignIcon />}
-        />
-        {user.role === "admin" && (
-          <NavItem
-            href="/admin/products"
-            label="Produtos"
-            icon={<TagsIcon />}
-          />
-        )}
-        <NavItem
-          onClick={logout}
-          href="/"
-          isSelectable={false}
-          label="Sair"
-          icon={<LogOut />}
-        />
-      </NavBar>
-      <Link href="/">
-        <NossaTerraLogo />
-      </Link>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { type InferGetServerSidePropsType } from "next";
-import { AppHeader, BackofficeHeader } from "~/components/common/headers";
+import { AppHeader } from "~/components/common/headers";
 
 import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerSideProps";
 import { type ClassNameProps, cn } from "~/utils/ui";
@@ -31,8 +31,6 @@ import { useDebouncedValue } from "~/hooks/useDebouncedValue";
 import Link from "next/link";
 import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
 import React from "react";
-import { PermittedRoles } from "~/server/types/user.type";
-import { z } from "zod";
 import toast from "react-hot-toast";
 
 const pageLimit = 10;
@@ -162,71 +160,16 @@ export default function SearchScreen({ user }: Props) {
     };
   }, [fetchNextPage, hasNextPage, isFetching]);
 
-  const isBackofficeUser = z
-    .enum(PermittedRoles.Backoffice)
-    .safeParse(user?.role).success;
-
   return (
     <div className="flex grow flex-col lg:max-h-dvh">
-      <div
-        className={cn("flex flex-col-reverse md:flex-row-reverse", {
-          "border-b-2 bg-cardHover bg-opacity-25 shadow md:py-8": !user,
-        })}
-      >
-        {isBackofficeUser && user ? (
-          <BackofficeHeader user={user} />
-        ) : (
-          <AppHeader
-            className="flex-col justify-center"
-            user={user}
-            hideLogo={!user}
-          />
-        )}
-
-        {!user && (
-          <div className="w-full px-10">
-            <div className="flex flex-col items-center gap-8 px-8 pt-5 sm:flex-row sm:gap-16 md:pt-0">
-              <Image
-                src="/images/logo-no-background.png"
-                width={104}
-                height={104}
-                priority
-                alt="Nossa terra logo"
-              />
-              <h1
-                className={cn(
-                  "font-poppins-700 text-headingPrimary",
-                  "text-justify md:text-left",
-                  "text-xl md:text-2xl lg:text-3xl",
-                )}
-              >
-                Seja bem vindo(a) à{" "}
-                <span
-                  className={cn(
-                    "font-poppins-700 w-full text-headingSecondary",
-                    "pl-3 text-3xl md:pl-0 md:text-5xl lg:text-6xl",
-                    "block",
-                  )}
-                >
-                  Nossa Terra
-                </span>
-              </h1>
-            </div>
-          </div>
-        )}
-      </div>
-      <div
-        className={cn(
-          "flex grow flex-row overflow-hidden bg-opacity-60",
-          user ? "mt-0" : "mt-1.5",
-        )}
-      >
+      <AppHeader user={user} hideLogo={!user} />
+      <div className="flex grow flex-row overflow-hidden">
         <>
           {!selectedProductId && (
             <Button
               variant="ghost"
               className={cn(
-                "fixed bottom-4 right-2 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2 ",
+                "fixed bottom-4 right-2 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2",
                 showTopButton ? "opacity-100" : "opacity-0",
               )}
               onClick={() => {
@@ -242,9 +185,9 @@ export default function SearchScreen({ user }: Props) {
             title="Pesquisa de Anúncios"
             showSlider={!!user && !!user?.latitude && !!user?.longitude}
             className={cn(
-              "flex w-full grow lg:overflow-y-auto lg:scrollbar-webkit xl:mr-8 xl:w-[58em]",
+              "flex w-full grow lg:mr-8 lg:w-[58em] lg:overflow-y-auto lg:scrollbar-webkit",
               {
-                "hidden xl:block": selectedProductId,
+                "hidden lg:block": selectedProductId,
               },
             )}
           />
@@ -260,7 +203,7 @@ export default function SearchScreen({ user }: Props) {
           className={cn(
             "grow px-3 pb-16 md:px-10 lg:overflow-y-auto lg:scrollbar-webkit",
             {
-              "hidden xl:block": !selectedProductId,
+              "hidden lg:block": !selectedProductId,
             },
           )}
         />
@@ -466,58 +409,57 @@ function SearchResultCard({
     otherProductsListingsFromUser?.length > 0;
 
   return (
-    <div className="flex max-w-[880px] rounded-lg border-[2.3px] border-black pb-3 md:justify-center md:px-0 xl:pb-0 ">
-      <div className="relative w-full px-4 pt-7">
-        <div className="font-poppins-500 absolute right-3 top-3 flex rounded-md text-xl ">
-          <PriceTag value={Number(searchResult?.price)} className="mt-2" />
+    <div className="flex max-w-[880px] flex-col gap-4 rounded-lg border-[2.3px] border-black p-4 md:justify-center">
+      <div className="flex w-full justify-between">
+        <div className="font-poppins-500 flex items-center gap-2">
+          <TimerIcon className="size-5" />
+          {timeString}
         </div>
-        <div className="font-poppins-500 absolute left-3 top-4 flex w-64 flex-row items-start rounded-md p-3 text-sm ">
-          <TimerIcon className="mr-1 " size={18} /> {timeString}{" "}
-        </div>
-        <div className="mt-12 flex w-full flex-col justify-between px-2 md:flex-row">
-          <ProductCard
-            small
-            footer={
-              <PriceTag value={Number(searchResult?.price)} className="mt-2" />
-            }
-            product={product}
-            className="xl:w-10em mb-8"
+        <PriceTag value={Number(searchResult?.price)} className="mt-2" />
+      </div>
+
+      <div className="flex w-full flex-row flex-wrap justify-between gap-8 pb-4">
+        <ProductCard
+          product={product}
+          footer={
+            <PriceTag value={Number(searchResult?.price)} className="mt-4" />
+          }
+          small
+          className="w-full max-w-[22em]"
+        />
+        {!!searchResult.user && (
+          <UserAnnouncementInfo
+            showBlured={showBlured}
+            user={searchResult.user}
+            className="max-w-[22em]"
           />
-          {!!searchResult.user && (
-            <UserAnnouncementInfo
-              showBlured={showBlured}
-              user={searchResult.user}
-            />
-          )}
-        </div>
-        {shouldShowOtherProductsListingsFromUser && (
-          <div className="space-y-4">
-            <Separator className="mb-4 mt-3 w-full bg-black md:mt-0"></Separator>
-            <span className="font-inter-600">
-              Outros anúncios desse comprador...
-            </span>
-            <div className="items-around flex flex-row flex-wrap ">
-              {otherProductsListingsFromUser?.map((listing, index) => (
-                <div
-                  key={index}
-                  className="mr-2 max-w-[140px] md:max-w-[170px] "
-                >
-                  <Card className="md:border-3 mb-3 mr-1 border-2 border-headingSecondary bg-slate-50 md:mr-3">
-                    <CardContent className="xl:text-ms font-inter-500 justify-top flex flex-col px-2.5 pb-2 pt-1 text-xs text-headingSecondary">
-                      <PriceTag
-                        small
-                        value={Number(listing.price)}
-                        className="mb-2 mt-2 opacity-80"
-                      />
-                      <p>{listing.product.name}</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
-          </div>
         )}
       </div>
+
+      {shouldShowOtherProductsListingsFromUser && (
+        <div className="space-y-2">
+          <span className="font-inter-600">
+            Outros anúncios desse comprador...
+          </span>
+          <div className="flex flex-row flex-wrap gap-4">
+            {otherProductsListingsFromUser?.map((listing, index) => (
+              <Card
+                key={index}
+                className="md:border-3 max-w-40 border-2 border-headingSecondary bg-slate-50 md:max-w-44"
+              >
+                <CardContent className="font-inter-500 justify-top flex flex-col px-2.5 pb-2 pt-1 text-xs text-headingSecondary lg:text-sm">
+                  <PriceTag
+                    small
+                    value={Number(listing.price)}
+                    className="mb-2 mt-2 opacity-80"
+                  />
+                  <p>{listing.product.name}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -525,10 +467,11 @@ function SearchResultCard({
 export function UserAnnouncementInfo({
   user,
   showBlured,
+  className,
 }: {
   user: User;
   showBlured: boolean;
-}) {
+} & ClassNameProps) {
   const commonPhones = useMemo(() => {
     const phones: string[] = [];
 
@@ -580,130 +523,122 @@ export function UserAnnouncementInfo({
   };
 
   return (
-    <div className={cn("md:max-w-2xl")}>
-      <div className="relative rounded-lg ">
-        {showBlured && (
-          <Link
-            href="/login"
-            className="font-poppins-600 absolute left-16 top-14 z-10 text-xl underline"
-          >
-            <span className="text-accent">Entre</span> para ver detalhes
-          </Link>
-        )}
-        <div
-          className={cn("mb-2 flex space-x-4", {
-            "select-none blur": showBlured,
-          })}
+    <div className={cn("relative w-full rounded-lg p-4 shadow-xl", className)}>
+      {showBlured && (
+        <Link
+          href="/login"
+          className="font-poppins-600 absolute left-16 top-14 z-10 text-xl underline"
         >
-          <div className="flex flex-col gap-2  capitalize md:pl-10">
-            <div className="ml-0.5 mt-0.5 flex items-start justify-start md:ml-0 ">
-              <div className="flex flex-col items-start">
-                <span className=" mb-1 w-40 break-all text-lg font-bold">
-                  {user?.name}
-                </span>
-              </div>
-            </div>
-            <div className="flex">
-              <MapPinIcon className="mr-2.5 h-5 w-5 text-current md:ml-0" />
-              <span className="w-36 text-sm text-gray-500">
-                {user?.city} - {user?.province}{" "}
-              </span>
-            </div>
-            {user?.instagram && (
-              <div className="mt-0.5 flex items-start justify-start">
-                <Image
-                  priority
-                  src="/images/icons/instagram-app-icon.svg"
-                  height={17}
-                  width={17}
-                  className="mr-2.5 pt-0.5 md:ml-0.5"
-                  alt="Instagram Icon"
-                />
-                <div className="flex flex-col items-start">
-                  <span className="mb-1 w-40 break-all text-sm">
-                    {user.instagram}
-                  </span>
-                </div>
-              </div>
-            )}
-            {whatsAppPhones.length > 0 && (
-              <div className="flex items-start justify-start">
-                <Image
-                  priority
-                  className="mr-2.5 cursor-pointer"
-                  src="/images/icons/whatsapp-icon.svg"
-                  height={22}
-                  onClick={() => {
-                    openWhatsApp(whatsAppPhones?.[0]);
-                  }}
-                  width={22}
-                  alt="Phone Icon"
-                />
-                <div className="flex flex-col">
-                  {whatsAppPhones.map((phone, index) => (
-                    <button
-                      onClick={() => {
-                        openWhatsApp(phone);
-                      }}
-                      key={index}
-                      className="cursor-pointer text-sm"
-                    >
-                      {phone}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {commonPhones.length > 0 && (
-              <div className="mt-[5px] flex items-start justify-start md:pointer-events-none">
-                <Image
-                  priority
-                  src="/images/icons/phone-icon.svg"
-                  height={20}
-                  width={20}
-                  className="mr-2.5 cursor-pointer"
-                  onClick={() => {
-                    openPhoneApp(commonPhones?.[0]);
-                  }}
-                  alt="Phone Icon"
-                />
-                <div className="flex flex-col md:pointer-events-none">
-                  {commonPhones.map((phone, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        openPhoneApp(phone);
-                      }}
-                      className="cursor-pointer text-sm"
-                    >
-                      {phone}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+          <span className="text-accent">Entre</span> para ver detalhes
+        </Link>
+      )}
+      <div
+        className={cn("flex w-full justify-between space-x-4", {
+          "select-none blur": showBlured,
+        })}
+      >
+        <div className="flex flex-col gap-2">
+          <span className="mb-1 w-40 break-all text-lg font-bold capitalize">
+            {user?.name}
+          </span>
+
+          <div className="flex gap-2">
+            <MapPinIcon className="size-5 text-current" />
+            <span className="text-sm capitalize text-gray-500">
+              {user?.city} - {user?.province}
+            </span>
           </div>
-          <Avatar className="mt-5 flex aspect-[1/1] h-24 w-24 items-center justify-center xl:h-28 xl:w-28">
-            {user?.avatarImage && (
-              <div className="flex ">
-                <AvatarImage
-                  className="rounded-full object-cover "
-                  src={showBlured ? undefined : user?.avatarImage}
-                />
+
+          {user?.instagram && (
+            <div className="flex items-start justify-start gap-2">
+              <Image
+                priority
+                src="/images/icons/instagram-app-icon.svg"
+                height={17}
+                width={17}
+                alt="Instagram"
+              />
+              <span className="mb-1 break-all text-sm">{user.instagram}</span>
+            </div>
+          )}
+          {whatsAppPhones.length > 0 && (
+            <div className="flex items-start justify-start gap-2">
+              <Image
+                alt=""
+                priority
+                className="not-sr-only cursor-pointer"
+                src="/images/icons/whatsapp-icon.svg"
+                height={22}
+                width={22}
+                onClick={() => {
+                  openWhatsApp(whatsAppPhones?.[0]);
+                }}
+              />
+              <div className="flex flex-col">
+                {whatsAppPhones.map((phone, index) => (
+                  <button
+                    onClick={() => {
+                      openWhatsApp(phone);
+                    }}
+                    key={index}
+                    className="cursor-pointer text-sm"
+                  >
+                    {phone}
+                  </button>
+                ))}
               </div>
-            )}
-            <AvatarFallback
-              style={{
-                backgroundColor: `${generateAvatarColor(user?.name ?? "")}`,
-              }}
-              className={`flex h-24 w-24 items-center justify-center rounded-full border border-slate-200 object-cover xl:h-28 xl:w-28 `}
-            >
-              <span className={`font-poppins-700 text-2xl text-white`}>
-                {user?.name?.substring(0, 2).toLocaleUpperCase()}
-              </span>
-            </AvatarFallback>
-          </Avatar>
+            </div>
+          )}
+          {commonPhones.length > 0 && (
+            <div className="mt-[5px] flex items-start justify-start md:pointer-events-none">
+              <Image
+                priority
+                alt=""
+                src="/images/icons/phone-icon.svg"
+                height={20}
+                width={20}
+                className="not-sr-only cursor-pointer"
+                onClick={() => {
+                  openPhoneApp(commonPhones?.[0]);
+                }}
+              />
+              <div className="flex flex-col md:pointer-events-none">
+                {commonPhones.map((phone, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      openPhoneApp(phone);
+                    }}
+                    className="cursor-pointer text-sm"
+                  >
+                    {phone}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+
+        <Avatar className="flex aspect-[1/1] h-28 w-24 items-center justify-center">
+          {user?.avatarImage && (
+            <div>
+              <AvatarImage
+                className="rounded-full object-cover "
+                src={showBlured ? undefined : user?.avatarImage}
+              />
+            </div>
+          )}
+          <AvatarFallback
+            style={{
+              backgroundColor: `${generateAvatarColor(user?.name ?? "")}`,
+            }}
+            className={`flex h-24 w-24 items-center justify-center rounded-full border border-slate-200 object-cover lg:w-28 `}
+          >
+            <span className={`font-poppins-700 text-2xl text-white`}>
+              {user?.name?.substring(0, 2).toLocaleUpperCase()}
+            </span>
+          </AvatarFallback>
+        </Avatar>
       </div>
     </div>
   );

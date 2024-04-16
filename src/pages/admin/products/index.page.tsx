@@ -1,7 +1,7 @@
 import { AlertTriangleIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
 import { type InferGetServerSidePropsType } from "next";
 import { type ChangeEventHandler, useCallback, useState, useMemo } from "react";
-import { BackofficeHeader } from "~/components/common/headers";
+import { AppHeader } from "~/components/common/headers";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import {
@@ -36,7 +36,7 @@ type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 export default function ProductsScreen({ user }: Props) {
   return (
     <>
-      <BackofficeHeader user={user} />
+      <AppHeader user={user} />
       <div className="p-10">
         <H1 className="text-4xl font-bold">Produtos</H1>
         <ProductsShowcase />

@@ -22,8 +22,7 @@ export function ProductCard({
   return (
     <div
       className={cn(
-        "bg-background relative flex min-h-20 overflow-hidden rounded-lg border-[2.5px] border-gray-800 p-4",
-        small ? "w-[19em]  xl:w-[22em]" : "w-[23em]",
+        "bg-background relative flex min-h-20 w-[23em] overflow-hidden rounded-lg border-[2.5px] border-gray-800 p-4",
         className,
       )}
       {...rest}
@@ -39,8 +38,9 @@ export function ProductCard({
         src={getProductImageSrc(product.type)}
         height={small ? 62 : 90}
         width={small ? 62 : 90}
-        alt="marca dágua do produto"
         className="absolute -bottom-4 -right-3 opacity-60"
+        alt=""
+        aria-hidden
       />
       <div
         className={cn("flex flex-col pl-6 pr-16", {

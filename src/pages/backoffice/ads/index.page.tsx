@@ -1,6 +1,6 @@
 import { AlertTriangleIcon, PlusIcon } from "lucide-react";
 import { type InferGetServerSidePropsType } from "next";
-import { BackofficeHeader } from "~/components/common/headers";
+import { AppHeader } from "~/components/common/headers";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -42,6 +42,7 @@ import { api } from "~/utils/api";
 import { Label } from "@radix-ui/react-label";
 import { Switch } from "~/components/ui/switch";
 import { z } from "zod";
+import { cn } from "~/utils/ui";
 
 export const getServerSideProps = redirectGetServerSideProps.Backoffice;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -168,7 +169,7 @@ export default function BackofficeAdsScreen({ user }: Props) {
 
   return (
     <>
-      <BackofficeHeader user={user} />
+      <AppHeader user={user} />
       <div className="flex w-full flex-row items-center justify-between px-10">
         <h1 className="text-4xl font-bold">Anúncios</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -378,9 +379,10 @@ export default function BackofficeAdsScreen({ user }: Props) {
                       {ad.link}
                     </td>
                     <td
-                      className={`px-6 py-4 ${
-                        ad.isActive ? "text-green-600" : "text-red-600"
-                      }`}
+                      className={cn(
+                        "px-6 py-4",
+                        ad.isActive ? "text-green-600" : "text-red-600",
+                      )}
                     >
                       <Label
                         className="mb-1 flex h-full items-start "
