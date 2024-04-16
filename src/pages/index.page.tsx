@@ -239,7 +239,7 @@ export default function SearchScreen({ user }: Props) {
           )}
 
           <ProductSearchColumn
-            title="Pesquisa de Anúnicios"
+            title="Pesquisa de Anúncios"
             showSlider={!!user && !!user?.latitude && !!user?.longitude}
             className={cn(
               "flex w-full grow lg:overflow-y-auto lg:pr-8 lg:scrollbar-webkit xl:w-[58em]",
