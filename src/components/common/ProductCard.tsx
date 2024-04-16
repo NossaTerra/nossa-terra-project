@@ -36,8 +36,8 @@ export function ProductCard({
       <Image
         priority
         src={getProductImageSrc(product.type)}
-        height={small ? 62 : 90}
-        width={small ? 62 : 90}
+        height={small ? 75 : 90}
+        width={small ? 75 : 90}
         className="absolute -bottom-4 -right-3 opacity-60"
         alt=""
         aria-hidden
