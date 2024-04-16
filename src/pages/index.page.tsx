@@ -242,7 +242,7 @@ export default function SearchScreen({ user }: Props) {
             title="Pesquisa de Anúncios"
             showSlider={!!user && !!user?.latitude && !!user?.longitude}
             className={cn(
-              "flex w-full grow lg:overflow-y-auto lg:pr-8 lg:scrollbar-webkit xl:w-[58em]",
+              "flex w-full grow lg:overflow-y-auto lg:scrollbar-webkit xl:mr-8 xl:w-[58em]",
               {
                 "hidden xl:block": selectedProductId,
               },
