@@ -1,15 +1,21 @@
-import { SearchIcon } from "lucide-react";
+import { CheckIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { type ChangeEventHandler, useCallback, useMemo, useState } from "react";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Input } from "~/components/ui/input";
-import { CheckboxProductType } from "~/components/ui/checkbox";
 import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType } from "@prisma/client";
 import { SearchSlider } from "../ui/slider";
 import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
 import toast from "react-hot-toast";
+import { RadioGroup } from "~/components/ui/radio-group";
+import { RadioGroupItem as RadixRadioGroupItem } from "@radix-ui/react-radio-group";
+import {
+  ProductTypeLabel,
+  getProductImageSrc,
+} from "~/server/types/product.type";
+import Image from "next/image";
 
 export function ProductSearchColumn({
   className,
@@ -34,16 +40,7 @@ export function ProductSearchColumn({
     [],
   );
 
-  const [productTypeFilter, setProductTypeFilter] = useState<
-    Record<ProductType, boolean>
-  >({
-    [ProductType.CoffeeArabica]: true,
-    [ProductType.CoffeeRobusta]: true,
-  });
-
-  const noProductTypeFilterSelected = useMemo(() => {
-    return Object.values(productTypeFilter).every((value) => !value);
-  }, [productTypeFilter]);
+  const [filterOption, setFilterOption] = useState<FilterOption>("all");
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
@@ -51,11 +48,11 @@ export function ProductSearchColumn({
       .filter((product) =>
         product.name.toLowerCase().includes(searchString.toLowerCase()),
       )
-      .filter(
-        (product) =>
-          noProductTypeFilterSelected || productTypeFilter[product.type],
-      );
-  }, [noProductTypeFilterSelected, productTypeFilter, products, searchString]);
+      .filter((product) => {
+        if (filterOption === "all") return true;
+        return product.type === filterOption;
+      });
+  }, [filterOption, products, searchString]);
 
   const shouldShowEmptyState = filteredProducts.length === 0 && !isLoading;
 
@@ -75,20 +72,11 @@ export function ProductSearchColumn({
                 className="mr-4 border-slate-400 pl-12 pr-[2vw] text-xl md:mr-3"
               />
             </div>
-            <div className="mt-6 flex gap-3 pl-12 md:gap-4">
-              {Object.values(ProductType).map((productType) => (
-                <CheckboxProductType
-                  key={productType}
-                  productType={productType}
-                  checked={productTypeFilter[productType]}
-                  onCheckedChange={(checked) =>
-                    setProductTypeFilter((prev) => ({
-                      ...prev,
-                      [productType]: checked,
-                    }))
-                  }
-                />
-              ))}
+            <div className="ml-12 mt-10 flex gap-3 md:gap-4">
+              <SearchFilters
+                selectedValue={filterOption}
+                onChange={setFilterOption}
+              />
             </div>
             {showSlider && (
               <div className="ml-12 mt-4 flex items-center justify-center rounded-md pl-2 pr-4 pt-6 md:pr-2">
@@ -129,5 +117,112 @@ export function ProductSearchColumn({
         )}
       </div>
     </div>
+  );
+}
+
+const filterOptions = [
+  ProductType.CoffeeRobusta,
+  ProductType.CoffeeArabica,
+  "all",
+] as const;
+
+type FilterOption = (typeof filterOptions)[number];
+
+function SearchFilters({
+  selectedValue,
+  onChange,
+}: {
+  selectedValue: FilterOption;
+  onChange: (newFilter: FilterOption) => void;
+}) {
+  return (
+    <RadioGroup
+      value={selectedValue}
+      onValueChange={onChange}
+      className="flex w-full flex-row flex-wrap gap-2"
+    >
+      <FilterCardRadioItem
+        filterOption="all"
+        isSelected={selectedValue === "all"}
+        label="Todos"
+      />
+      <FilterCardRadioItem
+        filterOption={ProductType.CoffeeArabica}
+        isSelected={selectedValue === ProductType.CoffeeArabica}
+        label={ProductTypeLabel[ProductType.CoffeeArabica]}
+      />
+      <FilterCardRadioItem
+        filterOption={ProductType.CoffeeRobusta}
+        isSelected={selectedValue === ProductType.CoffeeRobusta}
+        label={ProductTypeLabel[ProductType.CoffeeRobusta]}
+      />
+    </RadioGroup>
+  );
+}
+
+function FilterCardRadioItem({
+  isSelected,
+  filterOption,
+  label,
+}: {
+  isSelected: boolean;
+  filterOption: FilterOption;
+  label: string;
+}) {
+  return (
+    <RadixRadioGroupItem
+      value={filterOption}
+      className={cn(
+        "peer relative shrink-0 overflow-hidden rounded-lg border-4 border-neutral-200 bg-cardShade p-3 py-4 pr-11 shadow-xl ring-offset-white transition-all hover:scale-105 hover:bg-cardHover",
+        {
+          "border-basedDark": isSelected,
+        },
+      )}
+    >
+      <div
+        className={cn(
+          "absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-basedDark p-1 text-cardShade",
+          {
+            hidden: !isSelected,
+          },
+        )}
+      >
+        <CheckIcon />
+      </div>
+
+      <span className="font-poppins-500">{label}</span>
+
+      {filterOption !== "all" && (
+        <Image
+          priority
+          src={getProductImageSrc(filterOption)}
+          height={50}
+          width={50}
+          alt=""
+          className="absolute -bottom-2 -right-2 opacity-90"
+        />
+      )}
+
+      {filterOption === "all" && (
+        <>
+          <Image
+            priority
+            src={getProductImageSrc(ProductType.CoffeeRobusta)}
+            height={40}
+            width={40}
+            alt=""
+            className="absolute -bottom-4 right-4 rotate-[30deg] opacity-90"
+          />
+          <Image
+            priority
+            src={getProductImageSrc(ProductType.CoffeeArabica)}
+            height={40}
+            width={40}
+            alt=""
+            className="absolute -bottom-1 -right-2 opacity-90"
+          />
+        </>
+      )}
+    </RadixRadioGroupItem>
   );
 }
