@@ -1,10 +1,6 @@
-export const animateScrollToTop = () => {
-  const c = document.documentElement.scrollTop || document.body.scrollTop;
-  if (c > 0) {
-    window.requestAnimationFrame(animateScrollToTop);
-    window.scrollTo(0, c - c / 8);
-  }
-};
+export function animateScrollToTop() {
+  void scrollToTopAsync();
+}
 
 export function scrollToTopAsync(duration = 500): Promise<void> {
   return new Promise((resolve) => {
