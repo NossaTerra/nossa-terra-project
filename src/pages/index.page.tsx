@@ -5,7 +5,12 @@ import { redirectGetServerSideProps } from "~/server/api/auth/redirectGetServerS
 import { type ClassNameProps, cn } from "~/utils/ui";
 import { ProductSearchColumn } from "~/components/common/ProductSearchColumn";
 import { useRouter } from "next/router";
-import { ArrowLeftIcon, XIcon, ArrowUpIcon, TimerIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowUpIcon,
+  MapPinIcon,
+  TimerIcon,
+} from "lucide-react";
 import { type SearchResult, api } from "~/utils/api";
 import { Card, CardContent } from "~/components/ui/card";
 import { type Product } from "@prisma/client";
@@ -22,6 +27,10 @@ import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
 import React from "react";
 import toast from "react-hot-toast";
 import { UserInfoCard } from "~/components/common/UserInfoCard";
+import { SearchSlider } from "~/components/ui/slider";
+import { AnimatePresence, motion } from "framer-motion";
+import { Separator } from "~/components/ui/separator";
+import { useIsMobile } from "~/hooks/useResponsive";
 
 const pageLimit = 10;
 
@@ -121,7 +130,8 @@ export default function SearchScreen({ user }: Props) {
     window.scrollTo(0, 0);
   }, [selectedProductId]);
 
-  const [showTopButton, setShowTopButton] = useState(false);
+  const [isBellowScrollThreashold, setIsBellowScrollThreshold] =
+    useState(false);
 
   /*Small screens just use the default scroll mechanism this useEffect adds
     scroll event listener for those screens to either show the top button so
@@ -132,7 +142,8 @@ export default function SearchScreen({ user }: Props) {
     const handleScroll = () => {
       //logic to show the top button on small screens
       const scrollTop = window.scrollY;
-      setShowTopButton(scrollTop > 100);
+      setIsBellowScrollThreshold(scrollTop > 400);
+
       //logic to do Pagination on Small screens
       const height =
         document.documentElement.scrollHeight -
@@ -150,38 +161,59 @@ export default function SearchScreen({ user }: Props) {
     };
   }, [fetchNextPage, hasNextPage, isFetching]);
 
-  return (
-    <div className="flex grow flex-col lg:max-h-dvh">
-      <AppHeader user={user} hideLogo={!user} />
-      <div className="flex grow flex-row overflow-hidden">
-        <>
-          {!selectedProductId && (
-            <Button
-              variant="ghost"
-              className={cn(
-                "fixed bottom-4 right-2 z-10 rounded-full bg-slate-100 bg-opacity-100 p-2",
-                showTopButton ? "opacity-100" : "opacity-0",
-              )}
-              onClick={() => {
-                animateScrollToTop();
-              }}
-            >
-              <ArrowUpIcon className="lg:hidden" size={22} />
-              <span className="pr-2 lg:hidden">TOPO</span>
-            </Button>
-          )}
+  const isMobile = useIsMobile();
 
-          <ProductSearchColumn
-            title="Pesquisa de Anúncios"
-            showSlider={!!user && !!user?.latitude && !!user?.longitude}
-            className={cn(
-              "flex w-full grow lg:mr-8 lg:w-[58em] lg:overflow-y-auto lg:scrollbar-webkit",
-              {
-                "hidden lg:block": selectedProductId,
-              },
-            )}
-          />
-        </>
+  return (
+    <div className="relative flex grow flex-col lg:max-h-dvh">
+      <AppHeader
+        user={user}
+        hideLogo={!user}
+        className={cn({
+          "hidden lg:flex": selectedProductId,
+        })}
+      />
+      <MobileListingsHeader
+        showSlider={!!user && !!user.latitude && !!user.longitude}
+        className={cn("hidden", {
+          "flex lg:hidden": selectedProductId,
+        })}
+      />
+
+      <AnimatePresence>
+        {isBellowScrollThreashold && (
+          <motion.div
+            initial={{ opacity: 0, y: "-100%" }}
+            animate={{ opacity: 1, y: "0%" }}
+            exit={{ opacity: 0, y: "-100%" }}
+            transition={{ duration: 0.4 }}
+            className="fixed left-0 right-0 top-4 z-50 flex justify-center"
+          >
+            <Button
+              variant="outline"
+              className="flex gap-4 rounded-full border-4 border-black p-5 text-lg"
+              onClick={animateScrollToTop}
+            >
+              <ArrowUpIcon size={22} />
+              TOPO
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex grow flex-row overflow-x-hidden">
+        <ProductSearchColumn
+          showSlider={
+            !isMobile && !!user && !!user.latitude && !!user.longitude
+          }
+          title="Pesquisa de Anúncios"
+          className={cn(
+            "flex w-full grow lg:mr-8 lg:w-[58em] lg:overflow-y-auto lg:scrollbar-webkit",
+            {
+              "hidden lg:block": selectedProductId,
+            },
+          )}
+        />
+
         <SelectedProductListingsColumn
           searchResults={searchResults}
           isFetching={isFetching}
@@ -191,7 +223,7 @@ export default function SearchScreen({ user }: Props) {
           isLoading={isLoading}
           user={user}
           className={cn(
-            "grow px-3 pb-16 md:px-10 lg:overflow-y-auto lg:scrollbar-webkit",
+            "w-full grow p-4 pb-16 sm:p-8 lg:overflow-y-auto lg:scrollbar-webkit",
             {
               "hidden lg:block": !selectedProductId,
             },
@@ -213,14 +245,13 @@ function SelectedProductListingsColumn({
   hasNextPage,
 }: {
   searchResults?: SearchResult[];
-  className?: ClassNameProps | string;
   isLoading?: boolean;
   isFetching?: boolean;
   fetchNextPage?: () => Promise<unknown>;
   hasNextPage?: boolean;
   listingsQueryError: boolean;
-} & Props) {
-  const router = useRouter();
+} & Props &
+  ClassNameProps) {
   const { selectedProductId } = useSearchScreenParams();
   const { data: products } = api.product.getAll.useQuery(undefined, {
     onError: () => {
@@ -264,115 +295,101 @@ function SelectedProductListingsColumn({
   const hasAtLeastTenResults =
     searchResults && searchResults.length < 10 && searchResults.length > 0;
 
+  if (isLoading) {
+    return (
+      <div className={className}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <SearchCardShimmer key={index} />
+        ))}
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className={cn("flex h-full w-full grow", className)}>
+        <div className="fixed bottom-32 flex flex-row items-center gap-8 text-3xl">
+          <ArrowLeftIcon size={30} />
+          <h3 className="font-medium">Selecione um Produto</h3>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       onScroll={handleScroll}
-      className={cn("w-full", className)}
+      className={cn("relative flex flex-col items-end lg:pt-0", className)}
       // This resets scroll position on key change,
       // cus key changes forces React to rerender the component
       key={product?.id}
     >
-      {isLoading &&
-        Array.from({ length: 4 }).map((_, index) => (
-          <SearchCardShimmer key={index} />
-        ))}
-      {!product && !isLoading && (
-        <div className="flex h-full w-full">
-          <div className="flex flex-row items-center gap-8 text-3xl">
-            <ArrowLeftIcon size={30} />
-            <h3 className="font-medium">Selecione um Produto</h3>
-          </div>
+      <div className="w-full rounded-xl">
+        <div className="mb-6 mt-2 block max-w-[895px] rounded-lg bg-slate-100 p-6">
+          {!listingsQueryError && (
+            <span className="font-poppins-600 block text-xl lg:text-2xl">
+              {shouldShowResultMessage
+                ? "Resultados Para Saca (60kg) de:"
+                : "Ainda não há anúncios para distância pesquisada para:"}
+            </span>
+          )}
+          {listingsQueryError && (
+            <span className="font-poppins-600 block text-xl lg:text-2xl">
+              Tente novamente mais tarde, houve um erro ao buscar anúncios de:
+            </span>
+          )}
+          <span className="font-poppins-400 mt-4 block text-lg lg:text-xl">
+            {product.name}
+          </span>
+          {shouldShowLinkForFirstListing && (
+            <Button
+              variant="link"
+              asChild
+              className="font-poppins-700 mt-4 block p-0 text-xl text-accent"
+            >
+              <a href={`/listings/new?product=${product.id}`}>
+                Seja o primeiro a Anunciar
+              </a>
+            </Button>
+          )}
         </div>
-      )}
 
-      {product && !isLoading && (
-        <div className="flex flex-col items-end">
-          <Button
-            variant="ghost"
-            className="fixed bottom-4 z-20 rounded-full bg-slate-100 bg-opacity-100 p-2 lg:sticky lg:right-0 lg:top-2"
-            onClick={() =>
-              router.replace(
-                {
-                  pathname: router.pathname,
-                  query: { ...router.query, product: undefined },
-                },
-                undefined,
-                { shallow: true },
-              )
-            }
-          >
-            <XIcon className="hidden lg:block" />
-            <ArrowLeftIcon className="lg:hidden" size={22} />
-            <span className="pr-2 lg:hidden">LISTA DE PRODUTOS</span>
-          </Button>
-          <div className="relative w-full rounded-xl md:p-8">
-            <div className="mb-6  mr-2 mt-2 block max-w-[895px] rounded-lg bg-slate-100 p-4 lg:mr-8 ">
-              {!listingsQueryError && (
-                <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
-                  {shouldShowResultMessage
-                    ? "Resultados Para Saca (60kg) de:"
-                    : "Ainda não há anúncios para distância pesquisada para:"}
-                </span>
-              )}
-              {listingsQueryError && (
-                <span className="font-poppins-600 mb-2  ml-2 block text-xl lg:mb-0 lg:pb-4 lg:text-2xl">
-                  Tente novamente mais tarde, houve um erro ao buscar anúncios
-                  de:
-                </span>
-              )}
-              <span className="font-poppins-400 ml-2 mt-2 block pb-4 text-lg lg:text-xl">
-                {product.name}
-              </span>
-              {shouldShowLinkForFirstListing && (
-                <Button
-                  variant="link"
-                  asChild
-                  className="font-poppins-700 ml-2 block p-0 text-xl text-accent"
-                >
-                  <a href={`/listings/new?product=${product.id}`}>
-                    Seja o primeiro a Anunciar
-                  </a>
-                </Button>
-              )}
-            </div>
-            <div>
-              <div className="flex max-w-[890px] flex-col gap-0">
-                {searchResults?.map((searchResult, index) => (
-                  <React.Fragment key={index}>
-                    <div className="mb-10 md:mr-7">
-                      <SearchResultCard
-                        searchResult={searchResult}
-                        showBlured={!user}
-                        product={product}
-                      />
-                    </div>
-                    {(index + 1) % pageLimit === 0 &&
-                      index + 1 !== searchResults.length && (
-                        <AdsCarrouselListings />
-                      )}
-                  </React.Fragment>
-                ))}
-                {/* Show sponsored section at the end if there are fewer than ten results */}
-                {hasAtLeastTenResults && <AdsCarrouselListings />}
-              </div>
-              {shouldShowLoader && (
-                <div className="mt-4 flex  w-full max-w-[880px] items-center justify-center ">
-                  <span className="font-poppins-800 mr-2 text-accent  lg:mr-6">
-                    {" "}
-                    Carregando mais resultados ...{" "}
-                  </span>
-                  <BounceLoader
-                    color={"#3cb37e"}
-                    loading={true}
-                    size={50}
-                    aria-label="Carregando"
+        <div>
+          <div className="flex max-w-[890px] flex-col">
+            {searchResults?.map((searchResult, index) => (
+              <React.Fragment key={index}>
+                <div className="mb-10">
+                  <SearchResultCard
+                    searchResult={searchResult}
+                    showBlured={!user}
+                    product={product}
                   />
                 </div>
-              )}
-            </div>
+                {(index + 1) % pageLimit === 0 &&
+                  index + 1 !== searchResults.length && (
+                    <AdsCarrouselListings />
+                  )}
+              </React.Fragment>
+            ))}
+            {/* Show sponsored section at the end if there are fewer than ten results */}
+            {hasAtLeastTenResults && <AdsCarrouselListings />}
           </div>
+
+          {shouldShowLoader && (
+            <div className="mt-4 flex w-full max-w-[880px] items-center justify-center gap-2 lg:gap-4 ">
+              <span className="font-poppins-800 text-accent">
+                Carregando mais resultados ...
+              </span>
+              <BounceLoader
+                color={"#3cb37e"}
+                loading={true}
+                size={50}
+                aria-label="Carregando"
+              />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -421,13 +438,14 @@ function SearchResultCard({
           <UserInfoCard
             showBlured={showBlured}
             user={searchResult.user}
-            className="max-w-[22em]"
+            className="max-w-[22em] p-2"
           />
         )}
       </div>
 
       {shouldShowOtherProductsListingsFromUser && (
-        <div className="space-y-2">
+        <div className="space-y-2 pb-2">
+          <Separator orientation="horizontal" className="mb-4 bg-black" />
           <span className="font-inter-600">
             Outros anúncios desse comprador...
           </span>
@@ -448,6 +466,53 @@ function SearchResultCard({
               </Card>
             ))}
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileListingsHeader({
+  showSlider = true,
+  className,
+}: { showSlider?: boolean } & ClassNameProps) {
+  const router = useRouter();
+  const unselectProduct = useCallback(
+    () =>
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, product: undefined },
+        },
+        undefined,
+        { shallow: true },
+      ),
+    [router],
+  );
+
+  return (
+    <div className={cn("flex w-full flex-col gap-8", className)}>
+      <div
+        className={cn(
+          "flex w-full flex-col gap-8 bg-cardHover bg-opacity-25 px-4 py-8 shadow sm:px-8",
+        )}
+      >
+        <Button
+          className="w-fit gap-3 p-6 text-lg"
+          variant="outline"
+          onClick={unselectProduct}
+        >
+          <ArrowLeftIcon />
+          Voltar
+        </Button>
+      </div>
+      {showSlider && (
+        <div className="flex w-full flex-col px-4 sm:px-8">
+          <div className="flex flex-row gap-2">
+            <MapPinIcon className="size-6" />
+            Distância:
+          </div>
+          <SearchSlider className="m-0 p-0" step={1} />
         </div>
       )}
     </div>
