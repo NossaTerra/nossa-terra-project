@@ -21,9 +21,11 @@ export function ProductSearchColumn({
   className,
   title,
   showSlider = false,
+  stickyHeader = false,
 }: ClassNameProps & {
   title: string;
   showSlider?: boolean;
+  stickyHeader?: boolean;
 }) {
   const router = useRouter();
   // TODO: maybe react to the loading state or make this query in server side rendering
@@ -58,7 +60,11 @@ export function ProductSearchColumn({
 
   return (
     <div className={cn("flex flex-col items-center", className)}>
-      <div className="sticky top-0 z-10 w-full items-center">
+      <div
+        className={cn("w-full items-center", {
+          "sticky top-0 z-10": stickyHeader,
+        })}
+      >
         <div className="flex w-full justify-center  bg-backgroundPrimary">
           <div className="w-full max-w-[36em] pb-8  pt-2 md:pr-8">
             <h1 className="mb-6 ml-12 mt-4 text-2xl font-bold md:mb-12 md:text-4xl">
