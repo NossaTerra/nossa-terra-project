@@ -12,6 +12,7 @@ export const productSchema = z.object({
   name: z.string(),
   mainColor: z.string(),
   type: z.nativeEnum(ProductType),
+  category: z.nativeEnum(ProductCategory),
 });
 
 export function getProductImageSrc(productType: ProductType) {

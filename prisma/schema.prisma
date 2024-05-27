@@ -117,15 +117,21 @@ enum ProductType {
     CoffeeRobusta
 }
 
+enum ProductCategory {
+    Pronto
+    MercadoInterno
+    BicaCorrida
+}
+
 model Product {
     id String @id @unique @default(cuid())
 
-    name String
-    type ProductType
+    name     String
+    type     ProductType
+    category ProductCategory @default(Pronto)
 
     mainColor String
-
-    listings Listing[]
+    listings  Listing[]
 
     updatedAt DateTime @default(now()) @updatedAt
 }
