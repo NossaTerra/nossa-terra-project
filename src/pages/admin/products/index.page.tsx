@@ -24,8 +24,8 @@ import { ProductType, type Product } from "@prisma/client";
 import Image from "next/image";
 import { Separator } from "~/components/ui/separator";
 import {
-  ProductTypeLabel,
   getProductImageSrc,
+  productTypeToString,
 } from "~/server/types/product.type";
 import { ProductCard } from "~/components/common/ProductCard";
 import toast from "react-hot-toast";
@@ -260,7 +260,7 @@ function ProductRow({ product }: { product: Product }) {
                   )}
                   onClick={() => setNewProduct({ ...newProduct, type })}
                 >
-                  <span>{ProductTypeLabel[type]}</span>
+                  <span>{productTypeToString(type)}</span>
                   <Image
                     priority
                     src={getProductImageSrc(type)}

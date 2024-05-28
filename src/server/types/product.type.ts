@@ -1,11 +1,31 @@
 import { z } from "zod";
-import { ProductType } from "@prisma/client";
+import { ProductCategory, ProductType } from "@prisma/client";
 export { ProductType } from "@prisma/client";
 
-export const ProductTypeLabel = {
-  CoffeeRobusta: "Robusta",
-  CoffeeArabica: "Arábica",
-} as const satisfies Record<ProductType, string>;
+export type ProductSpecification = {
+  type: ProductType;
+  category: ProductCategory;
+};
+
+export function productTypeToString(productType: ProductType) {
+  switch (productType) {
+    case ProductType.CoffeeRobusta:
+      return "Robusta";
+    case ProductType.CoffeeArabica:
+      return "Arábica";
+  }
+}
+
+export function productCategoryToString(productCategory: ProductCategory) {
+  switch (productCategory) {
+    case ProductCategory.Pronto:
+      return "Pronto";
+    case ProductCategory.MercadoInterno:
+      return "Mercado Interno";
+    case ProductCategory.BicaCorrida:
+      return "Bica Corrida";
+  }
+}
 
 export const productSchema = z.object({
   id: z.string(),

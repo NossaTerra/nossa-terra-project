@@ -1,21 +1,24 @@
-import { CheckIcon, SearchIcon } from "lucide-react";
+import { BoxesIcon, CheckIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { type ChangeEventHandler, useCallback, useMemo, useState } from "react";
 import { ProductCard } from "~/components/common/ProductCard";
 import { Input } from "~/components/ui/input";
 import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
-import { ProductType } from "@prisma/client";
+import { ProductType, ProductCategory } from "@prisma/client";
 import { SearchSlider } from "../ui/slider";
 import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
 import toast from "react-hot-toast";
 import { RadioGroup } from "~/components/ui/radio-group";
 import { RadioGroupItem as RadixRadioGroupItem } from "@radix-ui/react-radio-group";
 import {
-  ProductTypeLabel,
+  productTypeToString,
+  productCategoryToString,
   getProductImageSrc,
+  type ProductSpecification,
 } from "~/server/types/product.type";
 import Image from "next/image";
+import { Button } from "../ui/button";
 
 export function ProductSearchColumn({
   className,
@@ -42,7 +45,9 @@ export function ProductSearchColumn({
     [],
   );
 
-  const [filterOption, setFilterOption] = useState<FilterOption>("all");
+  const [filterOption, setFilterOption] = useState<
+    ProductSpecification | undefined
+  >(undefined);
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
@@ -51,10 +56,15 @@ export function ProductSearchColumn({
         product.name.toLowerCase().includes(searchString.toLowerCase()),
       )
       .filter((product) => {
-        if (filterOption === "all") return true;
-        return product.type === filterOption;
+        if (!filterOption) return true;
+        return (
+          product.type === filterOption.type &&
+          product.category === filterOption.category
+        );
       });
   }, [filterOption, products, searchString]);
+
+  const resetFilters = useCallback(() => setFilterOption(undefined), []);
 
   const shouldShowEmptyState = filteredProducts.length === 0 && !isLoading;
 
@@ -76,12 +86,31 @@ export function ProductSearchColumn({
                 className="border-slate-400 pl-12 text-xl"
               />
             </div>
-            <div className="mt-6 flex gap-3 md:gap-4">
-              <SearchFilters
+
+            <div className="flex flex-col gap-5 pt-8">
+              <div className="font-inter-400 flex flex-row items-center gap-3 text-xl">
+                <BoxesIcon /> Tipos de Café
+                <Button
+                  onClick={resetFilters}
+                  disabled={!filterOption}
+                  className={cn(
+                    "ml-8",
+                    "border-2 border-slate-300 bg-transparent text-slate-800 hover:bg-slate-400",
+                    {
+                      invisible: filterOption === undefined,
+                    },
+                  )}
+                >
+                  <RotateCcwIcon className="size-5" />
+                  Limpar Filtro
+                </Button>
+              </div>
+              <ProductSpecificationChooser
                 selectedValue={filterOption}
                 onChange={setFilterOption}
               />
             </div>
+
             {showSlider && (
               <div className="flex items-center justify-center rounded-md pt-8">
                 <SearchSlider className="m-0 p-0" step={1} />
@@ -124,62 +153,71 @@ export function ProductSearchColumn({
   );
 }
 
-const filterOptions = [
-  ProductType.CoffeeRobusta,
-  ProductType.CoffeeArabica,
-  "all",
-] as const;
+function id(productSpecification: ProductSpecification) {
+  return `${productSpecification.type};${productSpecification.category}`;
+}
+function parseId(id: string): ProductSpecification {
+  const [typeStr, categoryStr] = id.split(";");
+  return {
+    type: typeStr as ProductType,
+    category: categoryStr as ProductCategory,
+  };
+}
 
-type FilterOption = (typeof filterOptions)[number];
-
-function SearchFilters({
+export function ProductSpecificationChooser({
   selectedValue,
   onChange,
 }: {
-  selectedValue: FilterOption;
-  onChange: (newFilter: FilterOption) => void;
+  selectedValue?: ProductSpecification;
+  onChange: (newValue: ProductSpecification) => void;
 }) {
+  const onRadioChange = useCallback(
+    (id: string) => {
+      onChange(parseId(id));
+    },
+    [onChange],
+  );
+
   return (
     <RadioGroup
-      value={selectedValue}
-      onValueChange={onChange}
-      className="flex w-full flex-row flex-wrap gap-2"
+      value={selectedValue ? id(selectedValue) : ""}
+      onValueChange={onRadioChange}
+      className="flex w-full flex-col gap-4"
     >
-      <FilterCardRadioItem
-        filterOption="all"
-        isSelected={selectedValue === "all"}
-        label="Todos"
-      />
-      <FilterCardRadioItem
-        filterOption={ProductType.CoffeeArabica}
-        isSelected={selectedValue === ProductType.CoffeeArabica}
-        label={ProductTypeLabel[ProductType.CoffeeArabica]}
-      />
-      <FilterCardRadioItem
-        filterOption={ProductType.CoffeeRobusta}
-        isSelected={selectedValue === ProductType.CoffeeRobusta}
-        label={ProductTypeLabel[ProductType.CoffeeRobusta]}
-      />
+      {Object.values(ProductType).map((pType) => (
+        <div key={pType} className="flex w-full flex-row flex-wrap gap-4">
+          {Object.values(ProductCategory).map((pCategory) => (
+            <ProductSpecificationRadioCard
+              key={id({ type: pType, category: pCategory })}
+              selectedValue={selectedValue}
+              productSpecification={{ type: pType, category: pCategory }}
+            />
+          ))}
+        </div>
+      ))}
     </RadioGroup>
   );
 }
 
-function FilterCardRadioItem({
-  isSelected,
-  filterOption,
-  label,
+function ProductSpecificationRadioCard({
+  selectedValue,
+  productSpecification,
 }: {
-  isSelected: boolean;
-  filterOption: FilterOption;
-  label: string;
+  selectedValue?: ProductSpecification;
+  productSpecification: ProductSpecification;
 }) {
+  const isSelected =
+    selectedValue?.type === productSpecification.type &&
+    selectedValue?.category === productSpecification.category;
+
   return (
     <RadixRadioGroupItem
-      value={filterOption}
+      value={id(productSpecification)}
       className={cn(
-        "peer relative shrink-0 overflow-hidden rounded-lg border-4 border-neutral-200 bg-cardShade p-3 py-4 pr-11 shadow-xl ring-offset-white transition-all hover:scale-105 hover:bg-cardHover",
+        "peer relative min-w-32 shrink-0 overflow-hidden rounded-lg border-4 border-neutral-200 bg-cardShade p-3 py-4 pr-6 shadow-xl ring-offset-white transition-all hover:scale-105 hover:bg-cardHover",
         {
-          "border-basedDark": isSelected,
+          "scale-110 border-basedDark shadow-black/50 hover:scale-110":
+            isSelected,
         },
       )}
     >
@@ -194,39 +232,23 @@ function FilterCardRadioItem({
         <CheckIcon />
       </div>
 
-      <span className="font-poppins-500">{label}</span>
+      <div className="flex flex-col items-start justify-start">
+        <span className="font-poppins-600 text-sm">
+          {productCategoryToString(productSpecification.category)}
+        </span>
+        <span className="font-poppins-300 text-xs italic">
+          {productTypeToString(productSpecification.type)}
+        </span>
+      </div>
 
-      {filterOption !== "all" && (
-        <Image
-          priority
-          src={getProductImageSrc(filterOption)}
-          height={50}
-          width={50}
-          alt=""
-          className="absolute -bottom-2 -right-2 opacity-90"
-        />
-      )}
-
-      {filterOption === "all" && (
-        <>
-          <Image
-            priority
-            src={getProductImageSrc(ProductType.CoffeeRobusta)}
-            height={40}
-            width={40}
-            alt=""
-            className="absolute -bottom-4 right-4 rotate-[30deg] opacity-90"
-          />
-          <Image
-            priority
-            src={getProductImageSrc(ProductType.CoffeeArabica)}
-            height={40}
-            width={40}
-            alt=""
-            className="absolute -bottom-1 -right-2 opacity-90"
-          />
-        </>
-      )}
+      <Image
+        priority
+        src={getProductImageSrc(productSpecification.type)}
+        height={42}
+        width={42}
+        alt=""
+        className="absolute -bottom-2 -right-2 opacity-90"
+      />
     </RadixRadioGroupItem>
   );
 }
