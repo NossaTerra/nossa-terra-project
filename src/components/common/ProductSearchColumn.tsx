@@ -1,4 +1,10 @@
-import { BoxesIcon, CheckIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
+import {
+  BoxesIcon,
+  CheckIcon,
+  MapPinIcon,
+  RotateCcwIcon,
+  SearchIcon,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import { type ChangeEventHandler, useCallback, useMemo, useState } from "react";
 import { ProductCard } from "~/components/common/ProductCard";
@@ -112,7 +118,10 @@ export function ProductSearchColumn({
             </div>
 
             {showSlider && (
-              <div className="flex items-center justify-center rounded-md pt-8">
+              <div className="flex flex-col gap-1 pt-8">
+                <div className="font-inter-400 flex flex-row items-center gap-3 text-xl">
+                  <MapPinIcon /> Distância
+                </div>
                 <SearchSlider className="m-0 p-0" step={1} />
               </div>
             )}
