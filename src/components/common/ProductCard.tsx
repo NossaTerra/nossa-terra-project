@@ -6,7 +6,7 @@ import { cn } from "~/utils/ui";
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   price?: string;
   small?: boolean;
-  product: Product;
+  product: Omit<Product, "updatedAt">;
   footer?: React.ReactNode;
   topRightElement?: React.ReactNode;
 }

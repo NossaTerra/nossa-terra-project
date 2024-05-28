@@ -1,6 +1,13 @@
-import { AlertTriangleIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  PlusIcon,
+  RotateCcwIcon,
+  SaveIcon,
+  XIcon,
+} from "lucide-react";
+import Link from "next/link";
 import { type InferGetServerSidePropsType } from "next";
-import { type ChangeEventHandler, useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { BackofficeHeader } from "~/components/common/headers";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
@@ -20,29 +27,254 @@ import { type ClassNameProps, cn } from "~/utils/ui";
 import { initialProducts } from "./initialProducts";
 import { useRouter } from "next/router";
 import { Input } from "~/components/ui/input";
-import { ProductType, type Product } from "@prisma/client";
-import Image from "next/image";
+import { ProductType, type Product, ProductCategory } from "@prisma/client";
 import { Separator } from "~/components/ui/separator";
-import {
-  getProductImageSrc,
-  productTypeToString,
-} from "~/server/types/product.type";
 import { ProductCard } from "~/components/common/ProductCard";
 import toast from "react-hot-toast";
+import {
+  ProductSearchColumn,
+  ProductSpecificationChooser,
+} from "~/components/common/ProductSearchColumn";
 
 export const getServerSideProps = redirectGetServerSideProps.Admin;
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 export default function ProductsScreen({ user }: Props) {
   return (
-    <>
+    <div className="h-dvh overflow-auto">
       <BackofficeHeader user={user} />
-      <div className="p-10">
-        <H1 className="text-4xl font-bold">Produtos</H1>
-        <ProductsShowcase />
-        <DangerZone className="mt-20" />
+      <H1 className="px-10 text-4xl font-bold">Produtos</H1>
+      <ProductsShowcase />
+      <DangerZone className="mt-20 px-10" />
+    </div>
+  );
+}
+
+function ProductsShowcase() {
+  const router = useRouter();
+  const selectedProductId = router.query.product;
+
+  const apiUtils = api.useUtils();
+  const createProduct = api.product.createProduct.useMutation({
+    onSuccess() {
+      void apiUtils.product.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Erro ao Criar Produto");
+    },
+  });
+  const onClickNewProduct = useCallback(async () => {
+    const newProduct = await createProduct.mutateAsync({
+      name: "Novo Café",
+      mainColor: "brown",
+      type: ProductType.CoffeeArabica,
+      category: ProductCategory.Pronto,
+    });
+    await router.push(
+      {
+        pathname: router.pathname,
+        query: { product: newProduct.id },
+      },
+      undefined,
+      { shallow: true },
+    );
+  }, [router, createProduct]);
+
+  return (
+    <>
+      <Button onClick={onClickNewProduct} className="mx-10">
+        <PlusIcon /> Novo Produto
+      </Button>
+      <div className="flex flex-row">
+        <ProductSearchColumn
+          title="Edição de Produtos"
+          className={cn("w-full lg:w-[56em]", {
+            "hidden lg:block": selectedProductId,
+          })}
+        />
+        <EditProductColumn
+          className={cn("px-10", {
+            "hidden lg:block": !selectedProductId,
+          })}
+        />
       </div>
     </>
+  );
+}
+
+function EditProductColumn({ className }: ClassNameProps) {
+  const router = useRouter();
+  const selectedProductId = router.query.product;
+  const { data: products } = api.product.getAll.useQuery(undefined, {
+    onError: () => {
+      toast.error("Erro ao Buscar produtos");
+    },
+  });
+  const product = products?.find((product) => product.id === selectedProductId);
+
+  if (!product) {
+    return <div className="w-full px-10" />;
+  }
+
+  return (
+    <div className={cn("sticky top-10 mt-8 h-dvh w-full", className)}>
+      <div className="relative max-w-[68em] rounded-xl bg-cardShade p-8 shadow-2xl">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-4 top-4"
+          asChild
+        >
+          <Link href="">
+            <XIcon />
+          </Link>
+        </Button>
+        <EditProductForm product={product} />
+      </div>
+    </div>
+  );
+}
+
+function EditProductForm({ product }: { product: Product }) {
+  const [newProduct, setNewProduct] =
+    useState<Omit<Product, "id" | "updatedAt">>(product);
+
+  useEffect(() => setNewProduct(product), [product]);
+
+  const apiUtils = api.useUtils();
+  const editProduct = api.product.editProduct.useMutation({
+    onSuccess() {
+      void apiUtils.product.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Erro ao Editar Produto");
+    },
+  });
+  const onClickSave = useCallback(async () => {
+    await editProduct.mutateAsync({
+      id: product.id,
+      ...newProduct,
+    });
+    toast.success("Produto Editado");
+  }, [editProduct, product.id, newProduct]);
+
+  return (
+    <div>
+      <div className="flex flex-row flex-wrap gap-8">
+        <div>
+          <H2 className="pb-4 pt-2">Produto Atual</H2>
+          <ProductCard product={product} />
+        </div>
+        <div>
+          <H2 className="pb-4 pt-2">Produto Novo</H2>
+          <ProductCard product={{ id: product.id, ...newProduct }} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-[auto,1fr] items-center gap-4 py-8">
+        <Label className="text-end font-bold">Nome</Label>
+        <Input
+          value={newProduct.name}
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, name: e.target.value })
+          }
+        />
+        <Label className="w-24 text-end font-bold">Cor Principal</Label>
+        <div className="flex flex-row">
+          <Input
+            className="w-30"
+            type="color"
+            value={newProduct.mainColor}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, mainColor: e.target.value })
+            }
+          />
+          <Input
+            value={newProduct.mainColor}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, mainColor: e.target.value })
+            }
+          />
+        </div>
+        <Label className="w-24 text-end font-bold">Tipo</Label>
+        <div className="flex flex-row flex-wrap gap-4">
+          <ProductSpecificationChooser
+            selectedValue={newProduct}
+            onChange={({ category, type }) =>
+              setNewProduct({ ...newProduct, category, type })
+            }
+          />
+        </div>
+      </div>
+
+      <Separator className="my-8" />
+
+      <div className="flex w-full flex-row flex-wrap">
+        <div className="flex-1 space-y-4">
+          <h2 className="flex flex-row items-center gap-4 py-0 text-lg">
+            <SaveIcon size={20} /> Salvar Produto
+          </h2>
+          <Button onClick={onClickSave}>Salvar</Button>
+        </div>
+        <div className="flex-1 space-y-4">
+          <h2 className="flex flex-row items-center gap-4 py-0 text-lg text-red-950">
+            <AlertTriangleIcon size={20} /> Deletar Produto
+          </h2>
+          <DeleteProductButton product={product} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeleteProductButton({ product }: { product: Product }) {
+  const apiUtils = api.useUtils();
+  const deleteProduct = api.product.deleteProduct.useMutation({
+    onSuccess() {
+      void apiUtils.product.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Erro ao deletar produto");
+    },
+  });
+  const onClickDelete = useCallback(
+    () =>
+      deleteProduct.mutate({
+        id: product.id,
+      }),
+    [deleteProduct, product.id],
+  );
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="destructive" className="w-fit">
+          Deletar
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle className="flex flex-row items-center gap-4 text-red-900">
+          <AlertTriangleIcon className="mb-3" />
+          <div className="font-bold">Deletar produto</div>
+        </DialogTitle>
+        <p className="text-md pb-4">
+          Essa ação irá resetar{" "}
+          <span className="font-bold text-red-900">TODOS</span> os anúncios
+          desse produto! Você tem certeza?
+          <ProductCard product={product} className="my-8" />
+        </p>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="secondary">Cancelar</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button onClick={onClickDelete} variant="destructive">
+              Confirmar
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -98,219 +330,6 @@ function DangerZone({ className }: ClassNameProps) {
               </Button>
             </DialogClose>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-function ProductsShowcase() {
-  const { data: products, isLoading } = api.product.getAll.useQuery(undefined, {
-    onError: () => {
-      toast.error("Erro ao Buscar Produtos");
-    },
-  });
-
-  const apiUtils = api.useUtils();
-  const createProduct = api.product.createProduct.useMutation({
-    onSuccess() {
-      void apiUtils.product.getAll.invalidate();
-    },
-    onError: () => {
-      toast.error("Erro ao Criar Produto");
-    },
-  });
-
-  const onClickNewProduct = useCallback(
-    () =>
-      createProduct.mutate({
-        name: "Novo Café",
-        mainColor: "brown",
-        type: ProductType.CoffeeArabica,
-      }),
-    [createProduct],
-  );
-
-  const [searchString, setSearchString] = useState("");
-  const onInputChange: ChangeEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      setSearchString(event.target.value);
-    },
-    [],
-  );
-
-  const filteredProducts = useMemo(
-    () =>
-      (products ?? []).filter((product) =>
-        product.name.toLowerCase().includes(searchString.toLowerCase()),
-      ),
-    [products, searchString],
-  );
-
-  return (
-    <div>
-      <div className="flex max-w-3xl flex-row items-center gap-2 pb-8">
-        <SearchIcon /> <Input value={searchString} onChange={onInputChange} />
-      </div>
-      <Button onClick={onClickNewProduct} className="mb-8">
-        Novo Produto
-      </Button>
-
-      {isLoading && <p>Carregando...</p>}
-
-      {filteredProducts?.length ? (
-        filteredProducts.map((product) => (
-          <ProductRow key={product.id} product={product} />
-        ))
-      ) : (
-        <div>Nenhum produto encontrado</div>
-      )}
-    </div>
-  );
-}
-
-function ProductRow({ product }: { product: Product }) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id: _, ...productContent } = product;
-  const [newProduct, setNewProduct] = useState(productContent);
-
-  const apiUtils = api.useUtils();
-  const editProduct = api.product.editProduct.useMutation({
-    onSuccess() {
-      void apiUtils.product.getAll.invalidate();
-    },
-    onError: () => {
-      toast.error("Erro ao Editar Produto");
-    },
-  });
-  const onClickSave = useCallback(
-    () =>
-      editProduct.mutate({
-        id: product.id,
-        ...newProduct,
-      }),
-    [editProduct, product.id, newProduct],
-  );
-
-  const deleteProduct = api.product.deleteProduct.useMutation({
-    onSuccess() {
-      void apiUtils.product.getAll.invalidate();
-    },
-    onError: () => {
-      toast.error("Erro ao deletar produto");
-    },
-  });
-
-  const onClickDelete = useCallback(
-    () =>
-      deleteProduct.mutate({
-        id: product.id,
-      }),
-    [deleteProduct, product.id],
-  );
-
-  return (
-    <div className="py-4">
-      <Dialog>
-        <DialogTrigger asChild>
-          <ProductCard
-            product={product}
-            className="transition-transform duration-300 hover:scale-110 hover:bg-slate-100"
-            role="button"
-          />
-        </DialogTrigger>
-        <DialogContent>
-          <h1 className="text-lg font-bold">Preview</h1>
-          <ProductCard product={{ id: product.id, ...newProduct }} />
-          <h1 className="mt-4 text-lg font-bold">Editar Produto</h1>
-          <div className="grid grid-cols-[auto,1fr] items-center gap-4">
-            <Label className="text-end font-bold">Nome</Label>
-            <Input
-              value={newProduct.name}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, name: e.target.value })
-              }
-            />
-            <Label className="w-24 text-end font-bold">Cor Principal</Label>
-            <div className="flex flex-row">
-              <Input
-                className="w-30"
-                type="color"
-                value={newProduct.mainColor}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, mainColor: e.target.value })
-                }
-              />
-              <Input
-                value={newProduct.mainColor}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, mainColor: e.target.value })
-                }
-              />
-            </div>
-            <Label className="w-24 text-end font-bold">Tipo</Label>
-            <div className="flex flex-row flex-wrap gap-4">
-              {Object.values(ProductType).map((type) => (
-                <div
-                  role="button"
-                  key={type}
-                  className={cn(
-                    "relative flex cursor-pointer gap-4 overflow-hidden rounded-lg border-4 border-slate-200 p-4 pr-14 shadow-xl transition-colors duration-300 hover:bg-slate-200",
-                    { "border-slate-800": type === newProduct.type },
-                  )}
-                  onClick={() => setNewProduct({ ...newProduct, type })}
-                >
-                  <span>{productTypeToString(type)}</span>
-                  <Image
-                    priority
-                    src={getProductImageSrc(type)}
-                    height={60}
-                    width={60}
-                    alt="marca dágua do produto"
-                    className="absolute -bottom-2 -right-2 opacity-90"
-                  />
-                </div>
-              ))}
-            </div>
-            <div />
-            <DialogClose asChild>
-              <Button onClick={onClickSave}>Salvar</Button>
-            </DialogClose>
-          </div>
-          <Separator className="my-2" />
-          <div>
-            <h2 className="flex flex-row items-center gap-4 py-0 text-lg text-red-950">
-              <AlertTriangleIcon size={20} /> Deletar Produto
-            </h2>
-          </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="destructive" className="w-fit">
-                Deletar
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogTitle className="flex flex-row items-center gap-4 text-red-900">
-                <AlertTriangleIcon className="mb-3" />
-                <div className="font-bold">Deletar produto</div>
-              </DialogTitle>
-              <p className="text-md pb-4">
-                Essa ação irá resetar{" "}
-                <span className="font-bold text-red-900">TODOS</span> os
-                anúncios desse produto! Você tem certeza?
-              </p>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="secondary">Cancelar</Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button onClick={onClickDelete} variant="destructive">
-                    Confirmar
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </DialogContent>
       </Dialog>
     </div>
