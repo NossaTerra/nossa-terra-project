@@ -34,6 +34,7 @@ import React from "react";
 import { PermittedRoles } from "~/server/types/user.type";
 import { z } from "zod";
 import toast from "react-hot-toast";
+import { SearchSlider } from "~/components/ui/slider";
 
 const pageLimit = 10;
 
@@ -240,7 +241,6 @@ export default function SearchScreen({ user }: Props) {
 
           <ProductSearchColumn
             title="Pesquisa de Anúncios"
-            showSlider={!!user && !!user?.latitude && !!user?.longitude}
             className={cn(
               "flex w-full grow lg:overflow-y-auto lg:scrollbar-webkit xl:mr-8 xl:w-[58em]",
               {
@@ -252,6 +252,7 @@ export default function SearchScreen({ user }: Props) {
         <SelectedProductListingsColumn
           searchResults={searchResults}
           isFetching={isFetching}
+          showSlider={!!user && !!user?.latitude && !!user?.longitude}
           listingsQueryError={!!listingsQueryError}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
@@ -278,6 +279,7 @@ function SelectedProductListingsColumn({
   fetchNextPage,
   isFetching,
   hasNextPage,
+  showSlider,
 }: {
   searchResults?: SearchResult[];
   className?: ClassNameProps | string;
@@ -286,6 +288,7 @@ function SelectedProductListingsColumn({
   fetchNextPage?: () => Promise<unknown>;
   hasNextPage?: boolean;
   listingsQueryError: boolean;
+  showSlider: boolean;
 } & Props) {
   const router = useRouter();
   const { selectedProductId } = useSearchScreenParams();
@@ -404,6 +407,14 @@ function SelectedProductListingsColumn({
             </div>
             <div>
               <div className="flex max-w-[890px] flex-col gap-0">
+                {showSlider && (
+                  <div className="flex flex-col gap-1 pb-6 md:pr-6">
+                    <div className="font-inter-400 flex flex-row items-center gap-3 text-xl">
+                      <MapPinIcon /> Distância
+                    </div>
+                    <SearchSlider className="m-0 p-0" step={1} />
+                  </div>
+                )}
                 {searchResults?.map((searchResult, index) => (
                   <React.Fragment key={index}>
                     <div className="mb-10 md:mr-7">

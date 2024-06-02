@@ -12,7 +12,6 @@ import { Input } from "~/components/ui/input";
 import { api } from "~/utils/api";
 import { cn, type ClassNameProps } from "~/utils/ui";
 import { ProductType, ProductCategory } from "@prisma/client";
-import { SearchSlider } from "../ui/slider";
 import ProductSearchShimmer from "~/components/common/ProductSearchShimmer";
 import toast from "react-hot-toast";
 import { RadioGroup } from "~/components/ui/radio-group";
@@ -29,11 +28,9 @@ import { Button } from "../ui/button";
 export function ProductSearchColumn({
   className,
   title,
-  showSlider = false,
   stickyHeader = false,
 }: ClassNameProps & {
   title: string;
-  showSlider?: boolean;
   stickyHeader?: boolean;
 }) {
   const router = useRouter();
@@ -116,15 +113,6 @@ export function ProductSearchColumn({
                 onChange={setFilterOption}
               />
             </div>
-
-            {showSlider && (
-              <div className="flex flex-col gap-1 pt-8">
-                <div className="font-inter-400 flex flex-row items-center gap-3 text-xl">
-                  <MapPinIcon /> Distância
-                </div>
-                <SearchSlider className="m-0 p-0" step={1} />
-              </div>
-            )}
           </div>
         </div>
         <div className="h-4 w-full bg-gradient-to-b from-backgroundPrimary to-transparent" />
