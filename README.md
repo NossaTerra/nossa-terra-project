@@ -81,5 +81,5 @@ To do this, it is necessary to create branches in PlanetScale and perform deploy
 12. To test if everything is working, set up the `DATABASE_URL` of the main branch and play with the `pnpm db:studio`
 
 ### Note: Never delete or merge the dev branch on planet scale as it serves as dev database
-<img width="1351" alt="Captura de Tela 2024-04-16 às 09 38 50" src="https://github.com/NossaTerra/nossa-terra-project/assets/20156917/0e04b728-4af9-46bb-ae40-b03307a70582">
 
+<img width="1351" alt="Captura de Tela 2024-04-16 às 09 38 50" src="https://github.com/NossaTerra/nossa-terra-project/assets/20156917/0e04b728-4af9-46bb-ae40-b03307a70582">

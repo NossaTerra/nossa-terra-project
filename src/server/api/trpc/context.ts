@@ -29,5 +29,8 @@ export const createTRPCContext = async ({
   };
 };
 
-export type TRPCContext =
-  ReturnType<typeof createTRPCContext> extends Promise<infer T> ? T : never;
+export type TRPCContext = ReturnType<typeof createTRPCContext> extends Promise<
+  infer T
+>
+  ? T
+  : never;
