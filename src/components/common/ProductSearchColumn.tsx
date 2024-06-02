@@ -211,7 +211,7 @@ function ProductSpecificationRadioCard({
     <RadixRadioGroupItem
       value={id(productSpecification)}
       className={cn(
-        "peer relative min-w-32 shrink-0 overflow-hidden rounded-lg border-4 border-neutral-200 bg-cardShade p-3 py-4 pr-6 shadow-xl ring-offset-white transition-all hover:scale-105 hover:bg-cardHover",
+        "peer relative min-w-36 shrink-0 overflow-hidden rounded-lg border-4 border-neutral-200 bg-cardShade p-3 py-4 pr-6 shadow-xl ring-offset-white transition-all hover:scale-105 hover:bg-cardHover",
         {
           "scale-110 border-basedDark shadow-black/50 hover:scale-110":
             isSelected,
@@ -231,18 +231,18 @@ function ProductSpecificationRadioCard({
 
       <div className="flex flex-col items-start justify-start">
         <span className="font-poppins-600 text-sm">
-          {productCategoryToString(productSpecification.category)}
+          {productTypeToString(productSpecification.type)}
         </span>
         <span className="font-poppins-300 text-xs italic">
-          {productTypeToString(productSpecification.type)}
+          {productCategoryToString(productSpecification.category)}
         </span>
       </div>
 
       <Image
         priority
         src={getProductImageSrc(productSpecification.type)}
-        height={42}
-        width={42}
+        height={40}
+        width={40}
         alt=""
         className="absolute -bottom-2 -right-2 opacity-90"
       />
