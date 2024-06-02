@@ -59,8 +59,9 @@ export default function ProfileScreen({ user: ssrUser }: Props) {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const direction = isEditingProfile ? Direction.Right : Direction.Left;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const keyUserChange = useMemo(() => crypto.randomUUID(), [user]);
+  // This key is used to force the form to re-render when the user changes
+  // TL;DR: a successful edit should re-render the form with the new user data
+  const keyUserChange = useMemo(() => JSON.stringify(user), [user]);
 
   const formProps = useMemo(() => {
     return {
