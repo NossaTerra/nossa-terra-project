@@ -110,7 +110,7 @@ export function AppHeader({
   }
 
   return (
-    <div className="mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 pb-7 pt-10 shadow">
+    <div className="mb-3 flex w-full items-center justify-between bg-cardHover bg-opacity-25 px-10 pb-2 pt-3 shadow">
       <NavBar>
         <NavItem href="/" label="Pesquisa de Anúncios" icon={<SearchIcon />} />
         {user.role === "buyer" && (
