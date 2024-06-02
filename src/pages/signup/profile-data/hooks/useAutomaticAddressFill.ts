@@ -170,12 +170,13 @@ export function useAutomaticAddressFill<FormData extends AddressFormData>({
     return () => unsubscribe();
   }, [enableFields, form, queryAndUpdateFields]);
 
-  const { data: user } = api.auth.getUser.useQuery();
+  const isOnMountRef = useRef(true);
   useEffect(() => {
-    if (user && !form.formState.dirtyFields.zipCode) {
+    if (isOnMountRef.current) {
+      isOnMountRef.current = false;
       disableFilledFields(form.getValues());
     }
-  }, [disableFilledFields, form, user]);
+  }, [disableFilledFields, form]);
 
   return {
     isLoading,
