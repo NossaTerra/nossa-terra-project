@@ -1,10 +1,4 @@
-import {
-  BoxesIcon,
-  CheckIcon,
-  MapPinIcon,
-  RotateCcwIcon,
-  SearchIcon,
-} from "lucide-react";
+import { BoxesIcon, CheckIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { type ChangeEventHandler, useCallback, useMemo, useState } from "react";
 import { ProductCard } from "~/components/common/ProductCard";
