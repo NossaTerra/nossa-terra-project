@@ -28,7 +28,6 @@ import { PriceTag } from "~/components/common/PriceTag";
 import BounceLoader from "react-spinners/BounceLoader";
 import SearchCardShimmer from "./search/SearchCardShimmer";
 import { useDebouncedValue } from "~/hooks/useDebouncedValue";
-import Link from "next/link";
 import { AdsCarrouselListings } from "~/components/common/AdsCarrousel";
 import React from "react";
 import { PermittedRoles } from "~/server/types/user.type";
@@ -420,7 +419,6 @@ function SelectedProductListingsColumn({
                     <div className="mb-10 md:mr-7">
                       <SearchResultCard
                         searchResult={searchResult}
-                        showBlured={!user}
                         product={product}
                       />
                     </div>
@@ -458,11 +456,9 @@ function SelectedProductListingsColumn({
 function SearchResultCard({
   searchResult,
   product,
-  showBlured,
 }: {
   searchResult: SearchResult;
   product: Product;
-  showBlured: boolean;
 }) {
   const listingTime = new Date(searchResult?.updatedAt ?? "");
   const timeString = getDisplayTimeWithAgo(listingTime);
@@ -495,10 +491,7 @@ function SearchResultCard({
             className="xl:w-10em mb-8"
           />
           {!!searchResult.user && (
-            <UserAnnouncementInfo
-              showBlured={showBlured}
-              user={searchResult.user}
-            />
+            <UserAnnouncementInfo user={searchResult.user} />
           )}
         </div>
         {shouldShowOtherProductsListingsFromUser && (
@@ -533,13 +526,7 @@ function SearchResultCard({
   );
 }
 
-export function UserAnnouncementInfo({
-  user,
-  showBlured,
-}: {
-  user: User;
-  showBlured: boolean;
-}) {
+export function UserAnnouncementInfo({ user }: { user: User }) {
   const commonPhones = useMemo(() => {
     const phones: string[] = [];
 
@@ -593,19 +580,7 @@ export function UserAnnouncementInfo({
   return (
     <div className={cn("md:max-w-2xl")}>
       <div className="relative rounded-lg ">
-        {showBlured && (
-          <Link
-            href="/login"
-            className="font-poppins-600 absolute left-16 top-14 z-10 text-xl underline"
-          >
-            <span className="text-accent">Entre</span> para ver detalhes
-          </Link>
-        )}
-        <div
-          className={cn("mb-2 flex space-x-4", {
-            "select-none blur": showBlured,
-          })}
-        >
+        <div className="mb-2 flex space-x-4">
           <div className="flex flex-col gap-2  capitalize md:pl-10">
             <div className="ml-0.5 mt-0.5 flex items-start justify-start md:ml-0 ">
               <div className="flex flex-col items-start">
@@ -699,7 +674,7 @@ export function UserAnnouncementInfo({
               <div className="flex ">
                 <AvatarImage
                   className="rounded-full object-cover "
-                  src={showBlured ? undefined : user?.avatarImage}
+                  src={user?.avatarImage}
                 />
               </div>
             )}
