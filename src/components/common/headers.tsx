@@ -90,16 +90,20 @@ export function AppHeader({
     return (
       <div
         className={cn(
-          "flex items-center justify-end px-10 pb-7 pt-10",
+          "flex items-center justify-end px-10 pb-7",
           !hideLogo && "w-full",
           className,
         )}
       >
-        <Button variant="primary" size="lg" asChild>
-          <Link href="/login">
-            <UserIcon /> Entrar
-          </Link>
-        </Button>
+        <div className="flex flex-col max-w-72 w-full gap-4 mt-12 md:mt-4 font-poppins-400 min-w-52">
+          Para anunciar no nossa terra...
+          <Button variant="primary" size="lg" asChild>
+            <Link href="/login">
+              <UserIcon /> Entre na Plataforma
+            </Link>
+          </Button>
+        </div>
+
         {!hideLogo && (
           <Link href="/">
             <NossaTerraLogo />
