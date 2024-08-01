@@ -406,14 +406,8 @@ function SelectedProductListingsColumn({
             </div>
             <div>
               <div className="flex max-w-[890px] flex-col gap-0">
-                {showSlider && (
-                  <div className="flex flex-col gap-1 pb-6 md:pr-6">
-                    <div className="font-inter-400 flex flex-row items-center gap-3 text-xl">
-                      <MapPinIcon /> Distância
-                    </div>
-                    <SearchSlider className="m-0 p-0" step={1} />
-                  </div>
-                )}
+                {showSlider && <SearchSlider step={1} />}
+
                 {searchResults?.map((searchResult, index) => (
                   <React.Fragment key={index}>
                     <div className="mb-10 md:mr-7">
