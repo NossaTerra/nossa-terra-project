@@ -194,8 +194,8 @@ export default function SearchScreen({ user }: Props) {
         )}
 
         {!user && (
-          <div className="w-full px-10">
-            <div className="flex flex-col items-center gap-8 px-8 pt-5 sm:flex-row sm:gap-16 md:pt-0">
+          <div className="w-full px-10 md:pr-0">
+            <div className="flex flex-col items-center gap-8 pt-5 md:flex-row md:gap-16 md:pt-0">
               <Image
                 src="/images/logo-no-background.png"
                 width={104}
@@ -207,14 +207,14 @@ export default function SearchScreen({ user }: Props) {
                 className={cn(
                   "font-poppins-700 text-headingPrimary",
                   "text-justify md:text-left",
-                  "text-xl md:text-2xl lg:text-3xl",
+                  "text-xl lg:text-2xl",
                 )}
               >
                 Seja bem vindo(a) à{" "}
                 <span
                   className={cn(
                     "font-poppins-700 w-full text-headingSecondary",
-                    "pl-3 text-3xl md:pl-0 md:text-5xl lg:text-6xl",
+                    "pl-3 text-3xl md:pl-0 lg:text-5xl",
                     "block",
                   )}
                 >
