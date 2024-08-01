@@ -10,9 +10,11 @@ import {
   ArrowLeftIcon,
   XIcon,
   ArrowUpIcon,
-  MapPinIcon,
   TimerIcon,
+  MapPinIcon,
+  FilterIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { type SearchResult, api } from "~/utils/api";
 import { Card, CardContent } from "~/components/ui/card";
 import { type User, type Product } from "@prisma/client";
@@ -34,6 +36,14 @@ import { PermittedRoles } from "~/server/types/user.type";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { SearchSlider } from "~/components/ui/slider";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 
 const pageLimit = 10;
 
@@ -251,7 +261,6 @@ export default function SearchScreen({ user }: Props) {
         <SelectedProductListingsColumn
           searchResults={searchResults}
           isFetching={isFetching}
-          showSlider={!!user && !!user?.latitude && !!user?.longitude}
           listingsQueryError={!!listingsQueryError}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
@@ -278,7 +287,6 @@ function SelectedProductListingsColumn({
   fetchNextPage,
   isFetching,
   hasNextPage,
-  showSlider,
 }: {
   searchResults?: SearchResult[];
   className?: ClassNameProps | string;
@@ -287,7 +295,6 @@ function SelectedProductListingsColumn({
   fetchNextPage?: () => Promise<unknown>;
   hasNextPage?: boolean;
   listingsQueryError: boolean;
-  showSlider: boolean;
 } & Props) {
   const router = useRouter();
   const { selectedProductId } = useSearchScreenParams();
@@ -406,7 +413,12 @@ function SelectedProductListingsColumn({
             </div>
             <div>
               <div className="flex max-w-[890px] flex-col gap-0">
-                {showSlider && <SearchSlider step={1} />}
+                {!!user && !!user?.latitude && !!user?.longitude && (
+                  <SearchSlider step={1} className="pb-12 md:pr-6" />
+                )}
+                {!user && !!searchResults?.length && (
+                  <FilterByDistanceButton className="mb-6 self-start md:pr-6" />
+                )}
 
                 {searchResults?.map((searchResult, index) => (
                   <React.Fragment key={index}>
@@ -686,5 +698,42 @@ export function UserAnnouncementInfo({ user }: { user: User }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function FilterByDistanceButton({ className }: ClassNameProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  return (
+    <Dialog>
+      <DialogTrigger className={className}>
+        <Button variant="ghost">
+          <FilterIcon />
+          Filtrar por Distância
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Filtrar por Distância</DialogTitle>
+        Para filtrar por distância é necessário se cadastrar, deseja continuar?
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="secondary" size="lg">
+              Cancelar
+            </Button>
+          </DialogClose>
+          <Button
+            autoFocus
+            variant="primary"
+            size="lg"
+            onClick={() => setIsLoading(true)}
+            isLoading={isLoading}
+            disabled={isLoading}
+            asChild
+          >
+            <Link href="/login">Continuar</Link>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
