@@ -7,6 +7,7 @@ import { type ClassNameProps, cn } from "src/utils/ui";
 import { useCallback, useState } from "react";
 import { biggestTwoPointsKmDistanceInBrazil } from "~/utils/constants";
 import { useRouter } from "next/router";
+import { MapPinIcon } from "lucide-react";
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -87,15 +88,17 @@ function SearchSlider({
   );
 
   return (
-    <div className="flex w-full flex-col pb-2 pt-4 ">
+    <div className={cn("flex flex-col gap-1 pb-6", className)}>
+      <div className="font-inter-400 flex flex-row items-center gap-3 text-xl">
+        <MapPinIcon /> Distância
+      </div>
       <SliderPrimitive.Root
         value={[thumbPosition]}
         onValueChange={handleValueChange}
         max={maxSliderValue}
         min={minSliderValue}
         className={cn(
-          "relative flex  w-full touch-none select-none items-center rounded-md bg-slate-200 pb-2 pt-4",
-          className,
+          "relative flex w-full touch-none select-none items-center rounded-md pb-2 pt-4",
         )}
         {...rest}
       >
