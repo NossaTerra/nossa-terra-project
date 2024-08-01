@@ -22,6 +22,8 @@ import { api } from "~/utils/api";
 import { Separator } from "~/components/ui/separator";
 import { GoogleOAuthButton } from "~/components/common/OAuthButton";
 import { useToastMustSignIn } from "./useToastMustSignIn";
+import { ArrowLeftIcon } from "lucide-react";
+import Link from "next/link";
 
 export const getServerSideProps = redirectGetServerSideProps.NoAuthOnly;
 
@@ -43,20 +45,18 @@ export default function LoginScreen() {
   useToastWhenRedirected();
 
   return (
-    <div className="flex min-h-dvh flex-grow flex-col justify-center">
-      <header className="flex  items-start justify-center pt-12 md:justify-end">
-        <div className="absolute right-4 top-10 hidden px-12 md:block">
-          <NossaTerraLogo />
-        </div>
+    <div className="flex min-h-dvh flex-grow flex-col">
+      <header className="flex items-center justify-between pt-12 px-10 pb-6 md:pb-20">
+        <Button variant="outline" asChild>
+          <Link href="/">
+            <ArrowLeftIcon className="size-6" />
+            Voltar
+          </Link>
+        </Button>
+        <NossaTerraLogo />
       </header>
 
       <LoginGreetingContent className="flex " />
-
-      <footer className="flex flex-col justify-center">
-        <div className="mt-8 flex justify-center p-12 md:hidden">
-          <NossaTerraLogo />
-        </div>
-      </footer>
     </div>
   );
 }
@@ -138,7 +138,7 @@ function LoginGreetingContent({ className }: ClassNameProps) {
             "text-2xl md:text-3xl lg:text-4xl",
           )}
         >
-          Seja bem vindo(a) à{" "}
+          Entre e seja parte da{" "}
           <span
             className={cn(
               "font-poppins-800 text-headingSecondary",
