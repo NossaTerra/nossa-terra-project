@@ -72,7 +72,7 @@ export default function SearchScreen({ user }: Props) {
   // the route components
   //
   // if you useEffect and console log a query param you'll notice that
-  const debouncedDistanceFilter = useDebouncedValue({
+  const debouncedDistanceFilter =  useDebouncedValue({
     value:
       distanceQueryParam !== undefined
         ? parseFloat(distanceQueryParam)

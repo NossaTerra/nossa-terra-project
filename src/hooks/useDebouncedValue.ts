@@ -24,10 +24,10 @@ export function useDebouncedValue<T>({
   const queuedDebounceRef = useRef<QueuedDebounce<T> | null>(null);
 
   useEffect(() => {
-    if (
-      value !== debouncedValue &&
-      value !== queuedDebounceRef.current?.value
-    ) {
+    const isValueChanged =
+      value !== debouncedValue || queuedDebounceRef.current?.value !== value;
+
+    if (isValueChanged) {
       if (queuedDebounceRef.current) {
         clearTimeout(queuedDebounceRef.current.timer);
       }
